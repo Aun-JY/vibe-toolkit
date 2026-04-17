@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>바이브툴킷 — 바이브 코딩 초보자를 위한 도구 모음</title>
+  <meta name="description" content="바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 실전 도구 모음. 파비콘, 플로팅 버튼, 메타태그 등 코드를 직접 복붙해서 바로 쓸 수 있어요.">
+  <meta name="keywords" content="바이브코딩, 바이브 코딩, 파비콘, favicon, 초보 개발자, HTML 기초, 웹개발 입문">
+  <meta property="og:title" content="바이브툴킷 — 바이브 코딩 도구 모음">
+  <meta property="og:description" content="바이브 코딩으로 웹사이트를 만드는 초보자를 위한 실전 도구 모음">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://aun-jy.github.io/vibe-toolkit/">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+  /* ══════════════════════════════════════
+     CSS 변수 & 리셋
+  ══════════════════════════════════════ */
+  :root {
+    --header-h:    60px;
+    --sidebar-w:   240px;
+    --footer-bar-h: 44px;
+    --accent:      #4f46e5;
+    --accent-s:    #eef2ff;
+    --accent-b:    #c7d2fe;
+    --green:       #16a34a;
+    --green-s:     #f0fdf4;
+    --amber:       #d97706;
+    --purple:      #7c3aed;
+    --gray-50:     #f9fafb;
+    --gray-100:    #f3f4f6;
+    --gray-200:    #e5e7eb;
+    --gray-300:    #d1d5db;
+    --gray-400:    #9ca3af;
+    --gray-500:    #6b7280;
+    --gray-600:    #4b5563;
+    --gray-700:    #374151;
+    --gray-900:    #111827;
+    --sidebar-bg:  #fafafa;
+    --r:           10px;
+    --r-sm:        7px;
+    --sh-sm:       0 1px 3px rgba(0,0,0,.07);
+    --sh:          0 4px 12px rgba(0,0,0,.08);
+    --sh-lg:       0 8px 28px rgba(0,0,0,.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-700);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+
+  /* ══════════════════════════════════════
+     헤더 (고정 60px)
+  ══════════════════════════════════════ */
+  .header {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--header-h);
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex; align-items: center;
+    padding: 0 20px;
+    gap: 16px;
+    z-index: 300;
+    box-shadow: var(--sh-sm);
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 9px;
+    flex-shrink: 0; text-decoration: none;
+  }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .logo-text { line-height: 1.2; }
+  .logo-name { font-size: .95rem; font-weight: 700; color: var(--gray-900); display: block; }
+  .logo-sub  { font-size: .65rem; color: var(--gray-400); display: block; font-family: 'JetBrains Mono', monospace; }
+
+  .header-divider { width: 1px; height: 24px; background: var(--gray-200); flex-shrink: 0; }
+
+  /* 검색 바 */
+  .search-wrap {
+    flex: 1; max-width: 400px;
+    position: relative;
+    display: flex; align-items: center;
+  }
+  .search-icon {
+    position: absolute; left: 12px;
+    color: var(--gray-400); font-size: 14px;
+    pointer-events: none;
+  }
+  .search-input {
+    width: 100%; height: 36px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 20px;
+    padding: 0 14px 0 36px;
+    font-size: .88rem; color: var(--gray-700);
+    outline: none; font-family: inherit;
+    transition: border-color .15s, box-shadow .15s, opacity .15s;
+  }
+  .search-input::placeholder { color: var(--gray-400); }
+  .search-input:focus {
+    border-color: var(--accent-b);
+    box-shadow: 0 0 0 3px var(--accent-s);
+    background: #fff;
+  }
+  .search-input:disabled {
+    opacity: .45; cursor: not-allowed;
+  }
+
+  .header-right {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .header-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: .72rem; font-weight: 600;
+    background: var(--accent-s); color: var(--accent);
+    border: 1px solid var(--accent-b);
+    border-radius: 20px; padding: 3px 10px;
+  }
+
+  /* 모바일 사이드바 토글 */
+  .sidebar-toggle {
+    display: none;
+    width: 36px; height: 36px;
+    background: none; border: 1px solid var(--gray-200);
+    border-radius: var(--r-sm);
+    align-items: center; justify-content: center;
+    color: var(--gray-600); font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.4); z-index: 150;
+  }
+
+  /* ══════════════════════════════════════
+     사이드바 (고정 240px)
+  ══════════════════════════════════════ */
+  .sidebar {
+    position: fixed;
+    top: var(--header-h); bottom: var(--footer-bar-h); left: 0;
+    width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--gray-200);
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 200;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-300) transparent;
+  }
+
+  .sidebar-section { padding: 8px 0; }
+  .sidebar-section + .sidebar-section { border-top: 1px solid var(--gray-200); }
+
+  .sb-group-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px 8px;
+    font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--gray-400);
+    cursor: pointer; user-select: none;
+    transition: color .15s;
+  }
+  .sb-group-header:hover { color: var(--gray-600); }
+  .sb-chevron {
+    display: inline-block; transition: transform .2s;
+    font-size: .65rem; color: var(--gray-300);
+  }
+  .sb-group.open .sb-chevron { transform: rotate(90deg); }
+  .sb-group-body { display: none; }
+  .sb-group.open .sb-group-body { display: block; }
+
+  .sb-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 14px 7px 20px;
+    font-size: .85rem; color: var(--gray-600);
+    cursor: pointer;
+    transition: background .12s, color .12s;
+    position: relative;
+  }
+  .sb-item:hover { background: var(--gray-100); color: var(--gray-900); }
+  .sb-item.active {
+    background: var(--accent-s); color: var(--accent); font-weight: 600;
+  }
+  .sb-item.active::before {
+    content: '';
+    position: absolute; left: 0; top: 4px; bottom: 4px;
+    width: 3px; background: var(--accent);
+    border-radius: 0 2px 2px 0;
+  }
+  .sb-item-icon { font-size: .9rem; flex-shrink: 0; width: 18px; text-align: center; }
+  .sb-badge {
+    margin-left: auto; font-size: .62rem; font-weight: 700;
+    padding: 1px 6px; border-radius: 3px; flex-shrink: 0;
+  }
+  .sb-badge-done { background: var(--green-s); color: var(--green); }
+  .sb-badge-soon { background: var(--gray-100); color: var(--gray-400); }
+
+  /* 사이드바 하단 프로모 */
+  .sb-promo {
+    margin: 12px 10px;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent-s), #faf5ff);
+    border: 1px solid var(--accent-b);
+    border-radius: var(--r);
+    font-size: .78rem; color: var(--gray-700); line-height: 1.6;
+  }
+  .sb-promo strong { color: var(--accent); display: block; margin-bottom: 4px; font-size: .82rem; }
+
+  /* ══════════════════════════════════════
+     메인 iframe
+  ══════════════════════════════════════ */
+  #tool-frame {
+    position: fixed;
+    top: var(--header-h);
+    left: var(--sidebar-w);
+    right: 0;
+    bottom: var(--footer-bar-h);
+    width: calc(100% - var(--sidebar-w));
+    height: calc(100vh - var(--header-h) - var(--footer-bar-h));
+    border: none;
+    background: var(--gray-50);
+  }
+
+  /* ══════════════════════════════════════
+     하단 고정 바 (항상 노출)
+  ══════════════════════════════════════ */
+  .footer-bar {
+    position: fixed;
+    bottom: 0; left: var(--sidebar-w); right: 0;
+    height: var(--footer-bar-h);
+    background: var(--gray-900);
+    border-top: 1px solid #1f2937;
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 100;
+    gap: 16px;
+  }
+  .footer-bar-copy {
+    font-size: .72rem; color: #6b7280;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .footer-bar-links {
+    display: flex; align-items: center; gap: 0;
+    flex-shrink: 0;
+  }
+  .footer-bar-links a {
+    font-size: .72rem; color: #9ca3af;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: color .15s;
+    white-space: nowrap;
+  }
+  .footer-bar-links a:hover { color: #e5e7eb; }
+  .footer-bar-links span {
+    color: #374151; font-size: .65rem;
+  }
+
+  /* ══════════════════════════════════════
+     쿠키 동의 배너
+  ══════════════════════════════════════ */
+  .cookie-banner {
+    display: none;                        /* JS가 보여줌 */
+    position: fixed;
+    bottom: var(--footer-bar-h);
+    left: var(--sidebar-w); right: 0;
+    background: #1e293b;
+    border-top: 2px solid #4f46e5;
+    padding: 14px 20px;
+    z-index: 500;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    box-shadow: 0 -4px 20px rgba(0,0,0,.25);
+  }
+  .cookie-banner.show { display: flex; }
+
+  .cookie-text {
+    flex: 1; font-size: .82rem; color: #cbd5e1;
+    line-height: 1.6; min-width: 200px;
+  }
+  .cookie-text a { color: #818cf8; text-decoration: underline; cursor: pointer; }
+  .cookie-text a:hover { color: #a5b4fc; }
+
+  .cookie-btns { display: flex; gap: 8px; flex-shrink: 0; }
+
+  .cookie-accept {
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 6px;
+    padding: 8px 18px; font-size: .82rem; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    transition: opacity .15s;
+  }
+  .cookie-accept:hover { opacity: .88; }
+
+  .cookie-decline {
+    background: transparent; color: #94a3b8;
+    border: 1px solid #475569; border-radius: 6px;
+    padding: 8px 14px; font-size: .82rem; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+    transition: border-color .15s;
+  }
+  .cookie-decline:hover { border-color: #94a3b8; color: #e2e8f0; }
+
+  /* ══════════════════════════════════════
+     반응형
+  ══════════════════════════════════════ */
+  @media (max-width: 900px) {
+    .sidebar {
+      transform: translateX(-240px); width: 240px;
+      transition: transform .25s;
+      bottom: 0;                       /* 모바일에서는 footer-bar 위까지 덮음 */
+    }
+    .sidebar.open { transform: translateX(0); box-shadow: var(--sh-lg); }
+    .sidebar-toggle { display: flex; }
+    .sidebar-overlay.open { display: block; }
+
+    #tool-frame { left: 0; width: 100%; }
+    .footer-bar { left: 0; }
+    .footer-bar-copy { display: none; }     /* 작은 화면에선 copyright 숨김 */
+    .cookie-banner { left: 0; }             /* 모바일에선 전폭 */
+  }
+
+  @media (max-width: 480px) {
+    .logo-sub { display: none; }
+    .header-badge { display: none; }
+  }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     헤더
+══════════════════════════════════════ -->
+<header class="header">
+  <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="메뉴 열기">☰</button>
+
+  <a class="logo" onclick="loadTool('home.html')" style="cursor:pointer;">
+    <div class="logo-mark">VT</div>
+    <div class="logo-text">
+      <span class="logo-name">바이브툴킷</span>
+      <span class="logo-sub">vibe-toolkit</span>
+    </div>
+  </a>
+
+  <div class="header-divider"></div>
+
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" type="search" id="search-input"
+           placeholder="도구 검색... (예: 파비콘, 플로팅)"
+           autocomplete="off"
+           oninput="handleSearch(this.value)">
+  </div>
+
+  <div class="header-right">
+    <span class="header-badge">🚀 v0.1 베타</span>
+  </div>
+</header>
+
+
+<!-- 사이드바 오버레이 (모바일) -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+
+<!-- ══════════════════════════════════════
+     사이드바
+══════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+
+  <!-- 바이브코딩 정보 -->
+  <div class="sidebar-section">
+    <div class="sb-group open" id="sg-vibe">
+      <div class="sb-group-header" onclick="toggleGroup('sg-vibe')">
+        바이브코딩 정보 <span class="sb-chevron">▶</span>
+      </div>
+      <div class="sb-group-body">
+        <div class="sb-item" data-tool="home.html" onclick="loadTool('home.html#intro')">
+          <span class="sb-item-icon">💡</span>바이브코딩이란?
+        </div>
+        <div class="sb-item" data-tool="home.html" onclick="loadTool('home.html#tools')">
+          <span class="sb-item-icon">🗂️</span>전체 도구 보기
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HTML 기초 -->
+  <div class="sidebar-section">
+    <div class="sb-group open" id="sg-html">
+      <div class="sb-group-header" onclick="toggleGroup('sg-html')">
+        HTML 기초 <span class="sb-chevron">▶</span>
+      </div>
+      <div class="sb-group-body">
+        <div class="sb-item" data-tool="favicon-sample.html" onclick="loadTool('favicon-sample.html')">
+          <span class="sb-item-icon">🌐</span>
+          파비콘 (Favicon)
+          <span class="sb-badge sb-badge-done">완성</span>
+        </div>
+        <div class="sb-item" data-tool="floating-button.html" onclick="loadTool('floating-button.html')">
+          <span class="sb-item-icon">💬</span>
+          플로팅 버튼
+          <span class="sb-badge sb-badge-done">완성</span>
+        </div>
+        <div class="sb-item" style="opacity:.6; cursor:not-allowed;">
+          <span class="sb-item-icon">📸</span>
+          오픈그래프 (OG)
+          <span class="sb-badge sb-badge-soon">준비중</span>
+        </div>
+        <div class="sb-item" style="opacity:.6; cursor:not-allowed;">
+          <span class="sb-item-icon">🏷️</span>
+          메타 태그 (SEO)
+          <span class="sb-badge sb-badge-soon">준비중</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CSS 기초 -->
+  <div class="sidebar-section">
+    <div class="sb-group" id="sg-css">
+      <div class="sb-group-header" onclick="toggleGroup('sg-css')">
+        CSS 기초 <span class="sb-chevron">▶</span>
+      </div>
+      <div class="sb-group-body">
+        <div class="sb-item" style="opacity:.6; cursor:not-allowed;">
+          <span class="sb-item-icon">🎨</span>CSS 변수 사용법
+          <span class="sb-badge sb-badge-soon">준비중</span>
+        </div>
+        <div class="sb-item" style="opacity:.6; cursor:not-allowed;">
+          <span class="sb-item-icon">📐</span>Flexbox 레이아웃
+          <span class="sb-badge sb-badge-soon">준비중</span>
+        </div>
+        <div class="sb-item" style="opacity:.6; cursor:not-allowed;">
+          <span class="sb-item-icon">🌗</span>다크모드 대응
+          <span class="sb-badge sb-badge-soon">준비중</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEO / 수익화 -->
+  <div class="sidebar-section">
+    <div class="sb-group" id="sg-seo">
+      <div class="sb-group-header" onclick="toggleGroup('sg-seo')">
+        SEO / 수익화 <span class="sb-chevron">▶</span>
+      </div>
+      <div class="sb-group-body">
+        <div class="sb-item" style="opacity:.6; cursor:not-allowed;">
+          <span class="sb-item-icon">🗺️</span>사이트맵 만들기
+          <span class="sb-badge sb-badge-soon">준비중</span>
+        </div>
+        <div class="sb-item" style="opacity:.6; cursor:not-allowed;">
+          <span class="sb-item-icon">📊</span>Google Analytics
+          <span class="sb-badge sb-badge-soon">준비중</span>
+        </div>
+        <div class="sb-item" style="opacity:.6; cursor:not-allowed;">
+          <span class="sb-item-icon">💰</span>애드센스 가이드
+          <span class="sb-badge sb-badge-soon">준비중</span>
+        </div>
+        <div class="sb-item" style="opacity:.6; cursor:not-allowed;">
+          <span class="sb-item-icon">🍪</span>쿠키 동의 배너
+          <span class="sb-badge sb-badge-soon">준비중</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript 기초 -->
+  <div class="sidebar-section">
+    <div class="sb-group" id="sg-js">
+      <div class="sb-group-header" onclick="toggleGroup('sg-js')">
+        JavaScript 기초 <span class="sb-chevron">▶</span>
+      </div>
+      <div class="sb-group-body">
+        <div class="sb-item" style="opacity:.6; cursor:not-allowed;">
+          <span class="sb-item-icon">🖱️</span>클릭 이벤트 기초
+          <span class="sb-badge sb-badge-soon">준비중</span>
+        </div>
+        <div class="sb-item" style="opacity:.6; cursor:not-allowed;">
+          <span class="sb-item-icon">💾</span>로컬 스토리지
+          <span class="sb-badge sb-badge-soon">준비중</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 사이트 정보 -->
+  <div class="sidebar-section">
+    <div class="sb-group" id="sg-info">
+      <div class="sb-group-header" onclick="toggleGroup('sg-info')">
+        사이트 정보 <span class="sb-chevron">▶</span>
+      </div>
+      <div class="sb-group-body">
+        <div class="sb-item" data-tool="about.html" onclick="loadTool('about.html')">
+          <span class="sb-item-icon">ℹ️</span>바이브툴킷 소개
+        </div>
+        <div class="sb-item" data-tool="sitemap.html" onclick="loadTool('sitemap.html')">
+          <span class="sb-item-icon">🗺️</span>사이트맵
+        </div>
+        <div class="sb-item" data-tool="contact.html" onclick="loadTool('contact.html')">
+          <span class="sb-item-icon">✉️</span>문의하기
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 하단 프로모 -->
+  <div class="sb-promo">
+    <strong>🤖 AI로 만드는 웹사이트</strong>
+    Claude, ChatGPT로 이 도구들을 활용하는 방법을 배워봐요.
+    각 페이지에 <strong>AI 프롬프트 TIP</strong>이 있어요.
+  </div>
+
+</aside>
+
+
+<!-- ══════════════════════════════════════
+     쿠키 동의 배너
+══════════════════════════════════════ -->
+<div class="cookie-banner" id="cookie-banner" role="dialog" aria-label="쿠키 사용 동의">
+  <p class="cookie-text">
+    🍪 바이브툴킷은 서비스 개선과 맞춤 광고 제공을 위해 쿠키를 사용해요.
+    Google Analytics 및 Google AdSense 쿠키가 포함됩니다.
+    자세한 내용은 <a onclick="loadTool('privacy.html')">개인정보처리방침</a>을 확인하세요.
+  </p>
+  <div class="cookie-btns">
+    <button class="cookie-decline" onclick="handleCookieDecline()">필수만 허용</button>
+    <button class="cookie-accept" onclick="handleCookieAccept()">✓ 모두 동의</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     메인 iframe (콘텐츠 영역)
+══════════════════════════════════════ -->
+<iframe
+  id="tool-frame"
+  src="home.html"
+  title="바이브툴킷 콘텐츠"
+  allowfullscreen>
+</iframe>
+
+
+<!-- ══════════════════════════════════════
+     하단 고정 바 (항상 노출)
+══════════════════════════════════════ -->
+<div class="footer-bar">
+  <span class="footer-bar-copy">© 2025 바이브툴킷 · 바이브 코딩을 배우는 모든 분들을 위해 ❤️</span>
+  <div class="footer-bar-links">
+    <a onclick="loadTool('about.html')">소개</a>
+    <span>·</span>
+    <a onclick="loadTool('privacy.html')">개인정보처리방침</a>
+    <span>·</span>
+    <a onclick="loadTool('terms.html')">이용약관</a>
+    <span>·</span>
+    <a onclick="loadTool('contact.html')">문의하기</a>
+  </div>
+</div>
+
+
+<script>
+/* ══════════════════════════════════════
+   핵심 함수: 도구/페이지 로드
+══════════════════════════════════════ */
+function loadTool(url) {
+  const frame = document.getElementById('tool-frame');
+  const searchInput = document.getElementById('search-input');
+
+  /* iframe에 URL 로드 */
+  frame.src = url;
+
+  /* 사이드바 활성 표시 갱신 */
+  updateSidebarActive(url);
+
+  /* 홈이 아닐 때 검색 비활성화 */
+  const isHome = url === 'home.html' || url.startsWith('home.html');
+  searchInput.disabled = !isHome;
+  searchInput.placeholder = isHome
+    ? '도구 검색... (예: 파비콘, 플로팅)'
+    : '홈 화면에서 검색 가능해요';
+  if (!isHome) searchInput.value = '';
+
+  /* 모바일이면 사이드바 닫기 */
+  if (window.innerWidth < 900) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('open');
+  }
+}
+
+/* 사이드바 활성 항목 표시 */
+function updateSidebarActive(url) {
+  const filename = url.split('#')[0].split('/').pop() || 'home.html';
+  document.querySelectorAll('.sb-item[data-tool]').forEach(item => {
+    const tool = item.getAttribute('data-tool');
+    item.classList.toggle('active', tool === filename || url.includes(tool));
+  });
+}
+
+/* iframe 자연 탐색 감지 (내부 링크 클릭 시) */
+document.getElementById('tool-frame').addEventListener('load', function() {
+  try {
+    const path = this.contentWindow.location.pathname;
+    const filename = path.split('/').pop() || 'home.html';
+    updateSidebarActive(filename);
+
+    /* 검색창 상태 동기화 */
+    const searchInput = document.getElementById('search-input');
+    const isHome = filename === 'home.html' || filename === '';
+    searchInput.disabled = !isHome;
+    searchInput.placeholder = isHome
+      ? '도구 검색... (예: 파비콘, 플로팅)'
+      : '홈 화면에서 검색 가능해요';
+  } catch(e) { /* cross-origin 접근 오류 무시 */ }
+});
+
+/* ══════════════════════════════════════
+   검색 → iframe(home.html)에 postMessage
+══════════════════════════════════════ */
+function handleSearch(query) {
+  const frame = document.getElementById('tool-frame');
+  try {
+    frame.contentWindow.postMessage({ type: 'search', q: query }, '*');
+  } catch(e) {}
+}
+
+/* ══════════════════════════════════════
+   사이드바 그룹 토글
+══════════════════════════════════════ */
+function toggleGroup(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+/* ══════════════════════════════════════
+   모바일 사이드바
+══════════════════════════════════════ */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+
+/* ══════════════════════════════════════
+   초기 활성 표시
+══════════════════════════════════════ */
+updateSidebarActive('home.html');
+
+/* ══════════════════════════════════════
+   쿠키 동의 배너
+══════════════════════════════════════ */
+(function initCookieBanner() {
+  /* 이미 응답한 경우 배너 숨김 */
+  if (localStorage.getItem('cookie-consent')) return;
+  /* 약간의 딜레이 후 표시 (페이지 로딩 완료 후) */
+  setTimeout(function() {
+    const banner = document.getElementById('cookie-banner');
+    if (banner) banner.classList.add('show');
+  }, 800);
+})();
+
+function handleCookieAccept() {
+  localStorage.setItem('cookie-consent', 'all');
+  hideCookieBanner();
+  /* 동의 후 Google Analytics / AdSense 스크립트 로드 가능 */
+  /* 예: loadAnalytics(); */
+}
+
+function handleCookieDecline() {
+  localStorage.setItem('cookie-consent', 'essential');
+  hideCookieBanner();
+}
+
+function hideCookieBanner() {
+  const banner = document.getElementById('cookie-banner');
+  if (banner) {
+    banner.style.transition = 'opacity .3s';
+    banner.style.opacity = '0';
+    setTimeout(function() { banner.classList.remove('show'); banner.style.opacity = ''; }, 320);
+  }
+}
+</script>
+
+</body>
+</html>

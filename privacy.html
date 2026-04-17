@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>개인정보처리방침 — 바이브툴킷</title>
+  <meta name="description" content="바이브툴킷의 개인정보처리방침입니다. 수집하는 정보, 이용 목적, 보관 기간 등을 안내합니다.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://aun-jy.github.io/vibe-toolkit/privacy.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+  :root {
+    --header-h:   60px;
+    --accent:     #4f46e5;
+    --accent-s:   #eef2ff;
+    --accent-b:   #c7d2fe;
+    --gray-50:    #f9fafb;
+    --gray-100:   #f3f4f6;
+    --gray-200:   #e5e7eb;
+    --gray-300:   #d1d5db;
+    --gray-400:   #9ca3af;
+    --gray-500:   #6b7280;
+    --gray-600:   #4b5563;
+    --gray-700:   #374151;
+    --gray-900:   #111827;
+    --r:          10px;
+    --sh-sm:      0 1px 3px rgba(0,0,0,.07);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-700);
+    line-height: 1.8;
+    font-size: 15px;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* 헤더 */
+  .header {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--header-h);
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex; align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+    z-index: 300;
+    box-shadow: var(--sh-sm);
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 9px;
+    flex-shrink: 0; text-decoration: none;
+  }
+  .logo-mark {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem; font-weight: 700; color: #fff;
+  }
+  .logo-name { font-size: .95rem; font-weight: 700; color: var(--gray-900); }
+
+  .header-nav {
+    margin-left: auto;
+    display: flex; align-items: center; gap: 20px;
+    font-size: .85rem;
+  }
+  .header-nav a { color: var(--gray-600); text-decoration: none; }
+  .header-nav a:hover { color: var(--accent); text-decoration: none; }
+
+  /* 메인 레이아웃 */
+  .page-wrap {
+    margin-top: var(--header-h);
+    min-height: calc(100vh - var(--header-h));
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-hero {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 48px 24px 40px;
+    text-align: center;
+  }
+  .page-hero-icon {
+    font-size: 2.8rem;
+    margin-bottom: 12px;
+  }
+  .page-hero h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 10px;
+  }
+  .page-hero p {
+    font-size: .9rem;
+    color: var(--gray-500);
+    margin-bottom: 0;
+  }
+  .page-hero .update-date {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: .78rem;
+    background: var(--accent-s);
+    color: var(--accent);
+    border: 1px solid var(--accent-b);
+    border-radius: 20px;
+    padding: 3px 12px;
+  }
+
+  /* 본문 */
+  .page-content {
+    flex: 1;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* 목차 */
+  .toc-box {
+    background: var(--accent-s);
+    border: 1px solid var(--accent-b);
+    border-radius: var(--r);
+    padding: 20px 24px;
+    margin-bottom: 48px;
+  }
+  .toc-box h3 {
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+  .toc-box ol {
+    padding-left: 20px;
+    font-size: .9rem;
+    color: var(--gray-700);
+  }
+  .toc-box li { margin-bottom: 6px; }
+  .toc-box a { color: var(--gray-700); }
+  .toc-box a:hover { color: var(--accent); text-decoration: none; }
+
+  /* 섹션 */
+  .privacy-section {
+    margin-bottom: 48px;
+    scroll-margin-top: 80px;
+  }
+  .privacy-section h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--gray-200);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .privacy-section h2 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    font-size: .82rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .privacy-section p {
+    color: var(--gray-600);
+    margin-bottom: 14px;
+  }
+
+  /* 표 */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: .88rem;
+    background: #fff;
+    border-radius: var(--r);
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .info-table th {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    font-weight: 600;
+    padding: 11px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .info-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-600);
+    vertical-align: top;
+  }
+  .info-table tr:last-child td { border-bottom: none; }
+
+  /* 목록 */
+  .privacy-section ul {
+    padding-left: 22px;
+    color: var(--gray-600);
+    margin-bottom: 14px;
+  }
+  .privacy-section ul li {
+    margin-bottom: 8px;
+    line-height: 1.7;
+  }
+
+  /* 하이라이트 박스 */
+  .highlight-box {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 var(--r) var(--r) 0;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: .9rem;
+    color: var(--gray-600);
+  }
+  .highlight-box strong { color: var(--gray-900); }
+
+  /* 연락처 박스 */
+  .contact-box {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--r);
+    padding: 20px 24px;
+    margin-top: 16px;
+  }
+  .contact-box p { margin-bottom: 8px; color: var(--gray-600); }
+  .contact-box strong { color: var(--gray-900); }
+
+  /* 푸터 */
+  .site-footer {
+    background: var(--gray-900);
+    color: #9ca3af;
+  }
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 24px 32px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+  }
+  .footer-brand .footer-logo-wrap {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 14px;
+  }
+  .footer-logo-mark {
+    width: 30px; height: 30px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem; font-weight: 700; color: #fff;
+  }
+  .footer-logo-name { font-size: .9rem; font-weight: 700; color: #f9fafb; }
+  .footer-desc { font-size: .82rem; line-height: 1.7; margin-bottom: 12px; }
+  .footer-copy { font-size: .75rem; color: var(--gray-500); }
+  .footer-col h4 { font-size: .8rem; font-weight: 700; color: #f9fafb; margin-bottom: 14px; text-transform: uppercase; letter-spacing: .06em; }
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 9px; }
+  .footer-links a { font-size: .83rem; color: #9ca3af; text-decoration: none; transition: color .15s; }
+  .footer-links a:hover { color: #f9fafb; text-decoration: none; }
+  .footer-bottom {
+    border-top: 1px solid #374151;
+    padding: 20px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+    font-size: .78rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .footer-bottom-links { display: flex; gap: 20px; }
+  .footer-bottom-links a { color: #9ca3af; text-decoration: none; }
+  .footer-bottom-links a:hover { color: #f9fafb; text-decoration: none; }
+
+  @media (max-width: 768px) {
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+    .footer-brand { grid-column: 1 / -1; }
+    .header-nav { display: none; }
+  }
+  @media (max-width: 480px) {
+    .footer-inner { grid-template-columns: 1fr; }
+  }
+  </style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<header class="header">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">VT</div>
+    <span class="logo-name">바이브툴킷</span>
+  </a>
+  <nav class="header-nav">
+    <a href="index.html">홈</a>
+    <a href="favicon-sample.html">파비콘 도구</a>
+    <a href="about.html">소개</a>
+    <a href="contact.html">문의</a>
+  </nav>
+</header>
+
+<div class="page-wrap">
+
+  <!-- 페이지 히어로 -->
+  <div class="page-hero">
+    <div class="page-hero-icon">🔐</div>
+    <h1>개인정보처리방침</h1>
+    <p>바이브툴킷이 수집·이용하는 개인정보에 대해 투명하게 안내합니다.</p>
+    <span class="update-date">최종 업데이트: 2025년 1월 1일</span>
+  </div>
+
+  <!-- 본문 -->
+  <main class="page-content">
+
+    <!-- 목차 -->
+    <nav class="toc-box">
+      <h3>📋 목차</h3>
+      <ol>
+        <li><a href="#s1">개인정보의 수집 및 이용 목적</a></li>
+        <li><a href="#s2">수집하는 개인정보 항목</a></li>
+        <li><a href="#s3">개인정보의 보유 및 이용 기간</a></li>
+        <li><a href="#s4">제3자 서비스 및 쿠키 사용</a></li>
+        <li><a href="#s5">개인정보의 제3자 제공</a></li>
+        <li><a href="#s6">이용자의 권리</a></li>
+        <li><a href="#s7">개인정보 보호책임자</a></li>
+        <li><a href="#s8">방침 변경 고지</a></li>
+      </ol>
+    </nav>
+
+    <!-- 1. 수집 목적 -->
+    <section class="privacy-section" id="s1">
+      <h2><span class="num">1</span> 개인정보의 수집 및 이용 목적</h2>
+      <p>바이브툴킷(이하 "사이트")은 바이브 코딩을 배우는 초보 개발자를 위한 무료 도구 모음 서비스입니다. 사이트 운영을 위해 다음 목적으로 개인정보를 수집·이용할 수 있습니다.</p>
+      <ul>
+        <li>서비스 이용 통계 분석 및 사용자 경험 개선</li>
+        <li>광고 게재 및 광고 효과 측정 (Google AdSense)</li>
+        <li>문의 사항 접수 및 답변 제공</li>
+        <li>서비스 오류 탐지 및 기술적 문제 해결</li>
+      </ul>
+      <div class="highlight-box">
+        <strong>중요:</strong> 바이브툴킷은 회원가입 기능이 없으며, 이용자가 직접 개인정보를 입력하지 않는 한 어떠한 개인식별 정보도 수집하지 않습니다.
+      </div>
+    </section>
+
+    <!-- 2. 수집 항목 -->
+    <section class="privacy-section" id="s2">
+      <h2><span class="num">2</span> 수집하는 개인정보 항목</h2>
+      <p>사이트 방문 시 자동으로 수집될 수 있는 정보와 이용자가 직접 제공하는 정보로 구분됩니다.</p>
+
+      <table class="info-table">
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>수집 항목</th>
+            <th>수집 방식</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>자동 수집</strong></td>
+            <td>IP 주소, 브라우저 종류, 방문 페이지, 체류 시간, 유입 경로</td>
+            <td>Google Analytics, 서버 로그</td>
+          </tr>
+          <tr>
+            <td><strong>광고 관련</strong></td>
+            <td>쿠키 식별자, 광고 클릭/노출 데이터</td>
+            <td>Google AdSense 자동 수집</td>
+          </tr>
+          <tr>
+            <td><strong>문의 시</strong></td>
+            <td>이메일 주소, 문의 내용</td>
+            <td>이용자 직접 입력</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>위 항목 외의 민감한 개인정보(주민등록번호, 신용카드 정보, 금융 정보 등)는 수집하지 않습니다.</p>
+    </section>
+
+    <!-- 3. 보유 기간 -->
+    <section class="privacy-section" id="s3">
+      <h2><span class="num">3</span> 개인정보의 보유 및 이용 기간</h2>
+      <p>수집된 개인정보는 수집 목적이 달성되는 즉시 파기하거나, 아래 기간 동안 보유합니다.</p>
+
+      <table class="info-table">
+        <thead>
+          <tr>
+            <th>항목</th>
+            <th>보유 기간</th>
+            <th>근거</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>서비스 이용 통계 (Analytics)</td>
+            <td>26개월 (Google 정책 기준)</td>
+            <td>서비스 개선 목적</td>
+          </tr>
+          <tr>
+            <td>광고 쿠키</td>
+            <td>최대 2년 (Google AdSense 기준)</td>
+            <td>광고 맞춤화 및 효과 측정</td>
+          </tr>
+          <tr>
+            <td>문의 이메일</td>
+            <td>문의 해결 후 1년</td>
+            <td>서비스 품질 관리</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 4. 제3자 서비스 -->
+    <section class="privacy-section" id="s4">
+      <h2><span class="num">4</span> 제3자 서비스 및 쿠키 사용</h2>
+      <p>바이브툴킷은 서비스 운영을 위해 다음의 제3자 서비스를 활용하며, 각 서비스는 자체 개인정보처리방침을 따릅니다.</p>
+
+      <table class="info-table">
+        <thead>
+          <tr>
+            <th>서비스</th>
+            <th>제공사</th>
+            <th>목적</th>
+            <th>방침 링크</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Google Analytics (GA4)</td>
+            <td>Google LLC</td>
+            <td>방문자 통계 분석</td>
+            <td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">보기</a></td>
+          </tr>
+          <tr>
+            <td>Google AdSense</td>
+            <td>Google LLC</td>
+            <td>광고 게재 및 수익화</td>
+            <td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">보기</a></td>
+          </tr>
+          <tr>
+            <td>Google Fonts</td>
+            <td>Google LLC</td>
+            <td>웹폰트 로드</td>
+            <td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">보기</a></td>
+          </tr>
+          <tr>
+            <td>GitHub Pages</td>
+            <td>GitHub Inc.</td>
+            <td>웹사이트 호스팅</td>
+            <td><a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">보기</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="font-size:1rem; font-weight:600; color:var(--gray-800); margin:24px 0 12px;">쿠키(Cookie) 사용 안내</h3>
+      <p>쿠키는 웹사이트가 이용자의 브라우저에 저장하는 소량의 데이터입니다. 사이트는 다음 목적으로 쿠키를 사용합니다.</p>
+      <ul>
+        <li><strong>분석 쿠키:</strong> 방문자 통계 수집을 위해 Google Analytics가 사용</li>
+        <li><strong>광고 쿠키:</strong> 관심 기반 광고 게재를 위해 Google AdSense가 사용</li>
+        <li><strong>기능 쿠키:</strong> 사용자 설정(다크모드 등) 저장을 위해 사이트가 직접 사용</li>
+      </ul>
+      <p>브라우저 설정에서 쿠키를 비활성화할 수 있으나, 일부 서비스 기능이 제한될 수 있습니다.</p>
+
+      <div class="highlight-box">
+        <strong>Google 광고 쿠키 거부 방법:</strong> <a href="https://adssettings.google.com" target="_blank" rel="noopener">Google 광고 설정</a>에서 관심 기반 광고를 비활성화하거나, <a href="https://optout.aboutads.info" target="_blank" rel="noopener">aboutads.info</a>에서 업계 수준의 옵트아웃이 가능합니다.
+      </div>
+    </section>
+
+    <!-- 5. 제3자 제공 -->
+    <section class="privacy-section" id="s5">
+      <h2><span class="num">5</span> 개인정보의 제3자 제공</h2>
+      <p>바이브툴킷은 원칙적으로 이용자의 개인정보를 외부에 제공하지 않습니다. 다만, 다음의 경우에는 예외로 합니다.</p>
+      <ul>
+        <li>이용자가 사전에 동의한 경우</li>
+        <li>법령의 규정에 의거하거나, 수사 목적으로 법령에 정해진 절차와 방법에 따라 수사기관의 요구가 있는 경우</li>
+        <li>위 제4조에 명시된 제3자 서비스에 의해 자동으로 수집되는 기술적 데이터 (각 서비스 방침에 따름)</li>
+      </ul>
+    </section>
+
+    <!-- 6. 이용자 권리 -->
+    <section class="privacy-section" id="s6">
+      <h2><span class="num">6</span> 이용자의 권리</h2>
+      <p>이용자는 다음의 권리를 행사할 수 있습니다.</p>
+      <ul>
+        <li><strong>열람 요구:</strong> 본인에 관한 개인정보의 열람을 요구할 수 있습니다.</li>
+        <li><strong>정정·삭제 요구:</strong> 오류나 누락이 있는 개인정보의 정정 또는 삭제를 요구할 수 있습니다.</li>
+        <li><strong>처리 정지 요구:</strong> 개인정보 처리의 정지를 요구할 수 있습니다.</li>
+        <li><strong>쿠키 거부:</strong> 브라우저 설정을 통해 쿠키 저장을 거부할 수 있습니다.</li>
+        <li><strong>Google Analytics 제외:</strong> <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Google Analytics 옵트아웃 브라우저 부가기능</a> 설치로 수집을 거부할 수 있습니다.</li>
+      </ul>
+      <p>권리 행사는 아래 개인정보 보호책임자에게 이메일로 요청해 주세요.</p>
+    </section>
+
+    <!-- 7. 책임자 -->
+    <section class="privacy-section" id="s7">
+      <h2><span class="num">7</span> 개인정보 보호책임자</h2>
+      <p>개인정보 관련 문의, 불만, 피해 구제 등의 사항은 아래 담당자에게 문의해 주세요.</p>
+      <div class="contact-box">
+        <p><strong>서비스명:</strong> 바이브툴킷 (Vibe Toolkit)</p>
+        <p><strong>이메일:</strong> <a href="mailto:jooyun87@gmail.com">jooyun87@gmail.com</a></p>
+        <p><strong>문의 페이지:</strong> <a href="contact.html">contact.html</a></p>
+        <p style="margin-top:12px; font-size:.85rem; color:var(--gray-500)">
+          개인정보 침해에 대한 신고·상담은 한국인터넷진흥원(KISA) 개인정보침해신고센터
+          (<a href="https://privacy.kisa.or.kr" target="_blank" rel="noopener">privacy.kisa.or.kr</a>)
+          또는 개인정보보호위원회(<a href="https://www.pipc.go.kr" target="_blank" rel="noopener">pipc.go.kr</a>)에 도움을 요청하실 수 있습니다.
+        </p>
+      </div>
+    </section>
+
+    <!-- 8. 방침 변경 -->
+    <section class="privacy-section" id="s8">
+      <h2><span class="num">8</span> 방침 변경 고지</h2>
+      <p>이 개인정보처리방침은 법령·서비스 변경 등에 따라 내용이 추가·삭제·수정될 수 있습니다. 변경 시에는 사이트 공지 또는 이 페이지 상단의 업데이트 날짜를 통해 안내합니다.</p>
+      <p>현행 방침의 시행일은 <strong>2025년 1월 1일</strong>이며, 이전 방침은 요청 시 제공될 수 있습니다.</p>
+    </section>
+
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo-wrap">
+          <div class="footer-logo-mark">VT</div>
+          <span class="footer-logo-name">바이브툴킷</span>
+        </div>
+        <p class="footer-desc">바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 실전 도구 모음이에요.</p>
+        <p class="footer-copy">© 2025 바이브툴킷. All rights reserved.</p>
+      </div>
+      <div class="footer-col">
+        <h4>도구 모음</h4>
+        <ul class="footer-links">
+          <li><a href="favicon-sample.html">🌐 파비콘 (Favicon)</a></li>
+          <li><a href="#">💬 플로팅 버튼 (준비중)</a></li>
+          <li><a href="#">📸 오픈그래프 (준비중)</a></li>
+          <li><a href="#">🏷️ 메타 태그 (준비중)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>사이트 정보</h4>
+        <ul class="footer-links">
+          <li><a href="about.html">바이브툴킷 소개</a></li>
+          <li><a href="privacy.html">개인정보처리방침</a></li>
+          <li><a href="terms.html">이용약관</a></li>
+          <li><a href="sitemap.html">사이트맵</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>문의 / 지원</h4>
+        <ul class="footer-links">
+          <li><a href="contact.html">✉️ 문의하기</a></li>
+          <li><a href="contact.html">🐛 오류 신고</a></li>
+          <li><a href="contact.html">💡 도구 제안</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 바이브툴킷 · 바이브 코딩을 배우는 모든 분들을 위해 만들었어요 ❤️</span>
+      <div class="footer-bottom-links">
+        <a href="privacy.html">개인정보처리방침</a>
+        <a href="terms.html">이용약관</a>
+        <a href="contact.html">문의하기</a>
+      </div>
+    </div>
+  </footer>
+
+</div><!-- /page-wrap -->
+
+<script>
+/* iframe 내부 실행 시: 자체 header 숨김, 상단 여백 제거 */
+(function() {
+  if (self === top) return;
+  const h = document.querySelector('.header');
+  if (h) h.style.display = 'none';
+  const w = document.querySelector('.page-wrap');
+  if (w) w.style.marginTop = '0';
+  /* footer도 숨김 (shell의 footer-bar가 담당) */
+  const f = document.querySelector('.site-footer');
+  if (f) f.style.display = 'none';
+  /* footer 링크들을 shell로 연결 */
+  document.querySelectorAll('a[href$=".html"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      if (window.parent.loadTool) {
+        e.preventDefault();
+        window.parent.loadTool(this.getAttribute('href'));
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

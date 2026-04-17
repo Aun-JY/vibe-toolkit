@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>플로팅 버튼 완전 정복 | 바이브툴킷</title>
+  <meta name="description" content="플로팅 버튼이란 무엇인지, 왜 필요한지, CSS·JS로 직접 만드는 방법까지. 바이브 코딩 초보자를 위한 플로팅 버튼 완전 가이드.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://aun-jy.github.io/vibe-toolkit/floating-button.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+  /* ════════════════════════════════════════
+     기본 설정
+  ════════════════════════════════════════ */
+  :root {
+    --accent:        #4f46e5;
+    --accent-soft:   #eef2ff;
+    --accent-border: #c7d2fe;
+    --green:         #16a34a;
+    --green-soft:    #f0fdf4;
+    --amber:         #d97706;
+    --amber-soft:    #fffbeb;
+    --red-soft:      #fff1f2;
+    --gray-50:       #f9fafb;
+    --gray-100:      #f3f4f6;
+    --gray-200:      #e5e7eb;
+    --gray-300:      #d1d5db;
+    --gray-400:      #9ca3af;
+    --gray-500:      #6b7280;
+    --gray-600:      #4b5563;
+    --gray-700:      #374151;
+    --gray-900:      #111827;
+    --code-bg:       #1e1e2e;
+    --code-surface:  #282a36;
+    --radius:        12px;
+    --radius-sm:     8px;
+    --shadow-sm:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    --shadow:        0 4px 12px rgba(0,0,0,.08);
+    --shadow-lg:     0 8px 28px rgba(0,0,0,.10);
+    --nav-h:         56px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 24px); }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fff;
+    color: var(--gray-700);
+    line-height: 1.75;
+    font-size: 16px;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  strong { color: var(--gray-900); font-weight: 600; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .83em;
+    background: var(--gray-100);
+    color: var(--accent);
+    padding: .1em .4em;
+    border-radius: 4px;
+    border: 1px solid var(--gray-200);
+  }
+
+  img { display: block; }
+
+  /* ════════════════════════════════════════
+     고정 상단 네비게이션
+  ════════════════════════════════════════ */
+  .site-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 500;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gray-200);
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--gray-900);
+    margin-right: 32px;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+  .nav-logo:hover { text-decoration: none; }
+
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem; font-weight: 700; color: #fff;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+
+  .nav-links a {
+    display: block;
+    padding: 6px 14px;
+    font-size: .85rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    transition: color .15s, background .15s;
+    text-decoration: none;
+  }
+  .nav-links a:hover { color: var(--gray-900); background: var(--gray-100); }
+  .nav-links a.active { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+
+  /* ════════════════════════════════════════
+     레이아웃
+  ════════════════════════════════════════ */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+  .section { padding: 72px 0; }
+  .section:nth-child(even) { background: var(--gray-50); }
+
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 3px 12px;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -.025em;
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+
+  .section-lead {
+    font-size: 1.05rem;
+    color: var(--gray-500);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 600px;
+  }
+
+  /* ════════════════════════════════════════
+     히어로
+  ════════════════════════════════════════ */
+  .hero {
+    padding: calc(var(--nav-h) + 56px) 0 64px;
+    background: linear-gradient(160deg, var(--accent-soft) 0%, #fff 60%);
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.9rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -.03em;
+    line-height: 1.2;
+    margin-bottom: 18px;
+  }
+  .hero h1 em { color: var(--accent); font-style: normal; }
+
+  .hero-desc {
+    font-size: 1.08rem;
+    color: var(--gray-500);
+    line-height: 1.75;
+    max-width: 540px;
+    margin-bottom: 32px;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: .82rem;
+    color: var(--gray-500);
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 5px; }
+
+  /* ════════════════════════════════════════
+     카드 그리드
+  ════════════════════════════════════════ */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .info-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow .2s, transform .2s;
+  }
+  .info-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .info-card-icon { font-size: 1.6rem; margin-bottom: 10px; }
+  .info-card h4 { font-size: .95rem; font-weight: 700; color: var(--gray-900); margin-bottom: 7px; }
+  .info-card p { font-size: .86rem; color: var(--gray-600); line-height: 1.7; }
+
+  .ic-accent { background: var(--accent-soft); border-color: var(--accent-border); }
+  .ic-green  { background: var(--green-soft);  border-color: #bbf7d0; }
+  .ic-amber  { background: var(--amber-soft);  border-color: #fde68a; }
+  .ic-red    { background: var(--red-soft);    border-color: #fecdd3; }
+  .ic-gray   { background: var(--gray-50);     border-color: var(--gray-200); }
+
+  /* ════════════════════════════════════════
+     콜아웃
+  ════════════════════════════════════════ */
+  .callout {
+    display: flex;
+    gap: 14px;
+    padding: 18px 20px;
+    border-radius: var(--radius);
+    margin: 24px 0;
+    font-size: .93rem;
+    line-height: 1.75;
+    color: var(--gray-700);
+  }
+  .callout-icon { font-size: 1.2rem; flex-shrink: 0; padding-top: 1px; }
+  .callout-body p { margin: 0; }
+  .callout-body p + p { margin-top: 6px; }
+
+  .co-blue  { background: var(--accent-soft);  border: 1px solid var(--accent-border); }
+  .co-green { background: var(--green-soft);   border: 1px solid #bbf7d0; }
+  .co-amber { background: var(--amber-soft);   border: 1px solid #fde68a; }
+
+  /* ════════════════════════════════════════
+     비교 테이블
+  ════════════════════════════════════════ */
+  .cmp-table {
+    width: 100%; border-collapse: collapse;
+    font-size: .88rem; margin-top: 24px;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .cmp-table th {
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 11px 16px;
+    text-align: left;
+    font-size: .78rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    color: var(--gray-600);
+  }
+  .cmp-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: top;
+    color: var(--gray-700);
+  }
+  .cmp-table tr:last-child td { border-bottom: none; }
+
+  .badge {
+    display: inline-block;
+    font-size: .7rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .bg { background: var(--green-soft);  color: var(--green); }
+  .bb { background: var(--gray-100);    color: var(--gray-600); }
+  .ba { background: var(--amber-soft);  color: var(--amber); }
+
+  /* ════════════════════════════════════════
+     바이브코더 TIP 박스
+  ════════════════════════════════════════ */
+  .vibe-tip {
+    background: linear-gradient(135deg, #faf5ff 0%, #eff6ff 100%);
+    border: 1px solid #e9d5ff;
+    border-left: 4px solid #8b5cf6;
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin: 32px 0;
+  }
+  .vibe-tip-label {
+    font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: #7c3aed;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+  }
+  .vibe-tip p { font-size: .92rem; color: var(--gray-700); margin-bottom: 10px; line-height: 1.75; }
+  .vibe-tip p:last-child { margin-bottom: 0; }
+  .vibe-tip code { background: #ede9fe; border-color: #ddd6fe; color: #7c3aed; }
+
+  .prompt-box {
+    background: #1e1e2e;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-top: 14px;
+  }
+  .prompt-box pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem; line-height: 1.65; color: #cdd6f4;
+    white-space: pre-wrap; word-break: break-word;
+  }
+
+  /* ════════════════════════════════════════
+     갤러리 (플로팅 버튼 유형)
+  ════════════════════════════════════════ */
+  .gallery-category { margin-bottom: 48px; }
+  .gallery-category:last-child { margin-bottom: 0; }
+
+  .cat-label {
+    font-size: .75rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--gray-500);
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .cat-label::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: var(--gray-200);
+  }
+
+  /* 플로팅 버튼 미리보기 그리드 */
+  .btn-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .btn-preview-card {
+    background: #fff;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color .2s, box-shadow .2s, transform .22s cubic-bezier(.34,1.56,.64,1);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-preview-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow);
+    transform: translateY(-3px);
+  }
+  .btn-preview-card.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+
+  /* 데모 영역: 실제 플로팅 버튼이 떠 있는 느낌 */
+  .btn-demo-area {
+    height: 120px;
+    background: repeating-conic-gradient(#f3f4f6 0% 25%, #e5e7eb 0% 50%) 0 0 / 16px 16px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .btn-demo-label {
+    position: absolute; top: 8px; left: 10px;
+    font-size: .65rem; color: var(--gray-400);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: .06em;
+  }
+
+  /* 데모 안에 실제 버튼 스타일들 */
+  .demo-fab {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    cursor: default;
+    box-shadow: 0 4px 16px rgba(0,0,0,.18);
+    transition: transform .2s;
+    border: none;
+  }
+  .demo-fab:hover { transform: scale(1.1); }
+
+  .demo-fab-rect {
+    width: auto; height: 48px;
+    border-radius: 24px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 20px;
+    font-size: .85rem; font-weight: 700;
+    cursor: default;
+    box-shadow: 0 4px 16px rgba(0,0,0,.18);
+    border: none;
+    white-space: nowrap;
+  }
+
+  .demo-fab-multi {
+    display: flex; gap: 10px;
+    align-items: flex-end;
+  }
+  .demo-fab-mini {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,.16);
+    border: none;
+  }
+  .demo-fab-main {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,.18);
+    border: none;
+  }
+
+  .demo-scroll-btn {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,.18);
+    border: none;
+  }
+
+  /* 카드 하단 정보 */
+  .btn-card-info {
+    padding: 14px 16px;
+    border-top: 1px solid var(--gray-100);
+  }
+  .btn-card-name {
+    font-size: .9rem; font-weight: 700; color: var(--gray-900);
+    margin-bottom: 4px;
+  }
+  .btn-card-desc {
+    font-size: .78rem; color: var(--gray-500); line-height: 1.55;
+  }
+  .btn-card-tags {
+    display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px;
+  }
+  .btn-tag {
+    font-size: .65rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px;
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .btn-tag-green {
+    background: var(--green-soft); color: var(--green);
+  }
+  .btn-tag-amber {
+    background: var(--amber-soft); color: var(--amber);
+  }
+
+  /* ════════════════════════════════════════
+     코드 해설 카드
+  ════════════════════════════════════════ */
+  .explain-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .exp-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .exp-header {
+    padding: 12px 16px;
+    background: var(--code-bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem; color: #a6e3a1;
+    line-height: 1.5; word-break: break-all;
+  }
+
+  .exp-body { padding: 16px; }
+  .exp-title { font-size: .92rem; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
+  .exp-desc { font-size: .85rem; color: var(--gray-600); line-height: 1.75; }
+
+  .exp-example {
+    margin-top: 12px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .74rem; line-height: 1.65; color: var(--gray-700);
+  }
+  .ek { color: #7c3aed; }
+  .ev { color: var(--green); }
+  .ec { color: var(--gray-400); font-style: italic; }
+
+  /* 코드 블록 공통 */
+  .code-block {
+    background: var(--code-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 24px;
+    border: 1px solid #2d2d3f;
+    box-shadow: var(--shadow);
+  }
+  .cb-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: #13131f;
+    border-bottom: 1px solid #2d2d3f;
+  }
+  .cb-dots { display: flex; gap: 6px; }
+  .cb-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .cb-dot-r { background: #ff5f57; }
+  .cb-dot-y { background: #febc2e; }
+  .cb-dot-g { background: #28c840; }
+  .cb-file { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: #6272a4; }
+  .cb-copy {
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 5px; color: #94a3b8; padding: 3px 12px;
+    cursor: pointer; transition: background .15s, color .15s;
+  }
+  .cb-copy:hover { background: rgba(255,255,255,.15); color: #fff; }
+  .cb-copy.ok { color: #a6e3a1; border-color: #a6e3a1; }
+
+  .cb-body { padding: 20px; overflow-x: auto; }
+  .cb-body pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem; line-height: 1.75; color: #cdd6f4;
+    white-space: pre;
+  }
+  .tk { color: #89b4fa; }
+  .ta { color: #a6e3a1; }
+  .tv { color: #f9e2af; }
+  .tc { color: #6272a4; font-style: italic; }
+
+  /* ════════════════════════════════════════
+     ④ 인터랙티브 에디터 (커스터마이저)
+  ════════════════════════════════════════ */
+  .editor-shell {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    background: var(--code-bg);
+    border: 1px solid #2d2d3f;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    min-height: 420px;
+  }
+
+  /* 왼쪽: 라이브 미리보기 */
+  .prev-pane {
+    background: #13131f;
+    border-right: 1px solid #2d2d3f;
+    padding: 24px 16px;
+    display: flex; flex-direction: column; align-items: center; gap: 20px;
+  }
+
+  .prev-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .62rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: #3d3d5c;
+  }
+
+  /* 라이브 미리보기 캔버스 */
+  .prev-canvas {
+    width: 140px; height: 140px;
+    border-radius: 12px;
+    background: repeating-conic-gradient(#1e1e2e 0% 25%, #13131f 0% 50%) 0 0 / 14px 14px;
+    border: 1px solid #2d2d3f;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #live-btn {
+    position: absolute;
+    bottom: 16px; right: 16px;
+    transition: transform .2s;
+  }
+  #live-btn:hover { transform: scale(1.1); }
+
+  /* 옵션 패널 */
+  .options-panel {
+    padding: 12px 14px;
+    background: #13131f;
+    border-top: 1px solid #2d2d3f;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .opt-row {
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .opt-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .6rem; letter-spacing: .1em; text-transform: uppercase;
+    color: #3d3d5c;
+  }
+  .opt-select {
+    background: #1e1e2e; border: 1px solid #2d2d3f;
+    color: #cdd6f4; border-radius: 5px;
+    padding: 5px 8px;
+    font-size: .75rem; font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    width: 100%;
+  }
+  .opt-color-row {
+    display: flex; gap: 5px; flex-wrap: wrap;
+  }
+  .opt-color {
+    width: 22px; height: 22px; border-radius: 5px;
+    border: 2px solid transparent;
+    cursor: pointer; transition: border-color .15s, transform .15s;
+    flex-shrink: 0;
+  }
+  .opt-color:hover { transform: scale(1.15); }
+  .opt-color.sel { border-color: #fff; }
+
+  /* 오른쪽: 코드 에디터 */
+  .edit-pane { display: flex; flex-direction: column; }
+
+  .edit-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: #13131f;
+    border-bottom: 1px solid #2d2d3f;
+    flex-shrink: 0;
+  }
+  .edit-left { display: flex; align-items: center; gap: 12px; }
+  .edit-file { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: #6272a4; }
+  .edit-btns { display: flex; gap: 8px; }
+
+  .ebtn {
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem;
+    border-radius: 5px; padding: 4px 12px; cursor: pointer;
+    border: 1px solid; transition: background .15s, color .15s;
+  }
+  .ebtn-copy { background: rgba(255,255,255,.06); color: #94a3b8; border-color: rgba(255,255,255,.12); }
+  .ebtn-copy:hover { background: rgba(255,255,255,.14); color: #fff; }
+  .ebtn-copy.ok { color: #a6e3a1; border-color: #a6e3a1; }
+  .ebtn-reset { background: rgba(239,68,68,.08); color: #f87171; border-color: rgba(239,68,68,.2); }
+  .ebtn-reset:hover { background: rgba(239,68,68,.16); }
+
+  .code-textarea {
+    flex: 1;
+    width: 100%;
+    min-height: 300px;
+    background: var(--code-surface);
+    color: #cdd6f4;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem; line-height: 1.7;
+    border: none; outline: none;
+    resize: vertical;
+    padding: 16px 18px;
+    tab-size: 2;
+    scrollbar-width: thin;
+    scrollbar-color: #2d2d4a #1e1e2e;
+  }
+  .code-textarea:focus { background: #21222c; }
+
+  /* ════════════════════════════════════════
+     FAQ 아코디언
+  ════════════════════════════════════════ */
+  .faq-list { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
+
+  .faq-item {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .faq-item summary {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    cursor: pointer; list-style: none;
+    font-weight: 600; font-size: .95rem; color: var(--gray-900);
+    transition: background .15s;
+    user-select: none;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after {
+    content: '+';
+    font-size: 1.2rem; color: var(--gray-400);
+    transition: transform .2s;
+    flex-shrink: 0; margin-left: 12px;
+  }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
+  .faq-item summary:hover { background: var(--gray-50); }
+
+  .faq-body {
+    padding: 16px 20px 18px;
+    font-size: .92rem; color: var(--gray-600);
+    line-height: 1.8; border-top: 1px solid var(--gray-100);
+  }
+  .faq-body p + p { margin-top: 10px; }
+
+  /* ════════════════════════════════════════
+     다음 단계 카드
+  ════════════════════════════════════════ */
+  .next-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-top: 28px;
+  }
+
+  .next-card {
+    display: block;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 20px 18px;
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    transition: box-shadow .2s, border-color .2s, transform .2s;
+    cursor: pointer;
+  }
+  .next-card:hover {
+    box-shadow: var(--shadow);
+    border-color: var(--accent-border);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .next-card-icon { font-size: 1.6rem; margin-bottom: 10px; }
+  .next-card-title { font-size: .92rem; font-weight: 700; color: var(--gray-900); margin-bottom: 5px; }
+  .next-card-desc { font-size: .82rem; color: var(--gray-500); line-height: 1.6; }
+  .next-card-tag {
+    display: inline-block; margin-top: 10px;
+    font-size: .68rem; font-weight: 600;
+    background: var(--accent-soft); color: var(--accent);
+    border-radius: 4px; padding: 2px 7px;
+  }
+
+  /* ════════════════════════════════════════
+     푸터
+  ════════════════════════════════════════ */
+  .site-footer {
+    background: var(--gray-900);
+    color: #9ca3af;
+    padding: 48px 24px 36px;
+    text-align: center;
+  }
+  .footer-logo {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 16px;
+  }
+  .footer-desc { font-size: .85rem; line-height: 1.7; margin-bottom: 20px; }
+  .footer-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 28px; }
+  .footer-links a { font-size: .82rem; color: #9ca3af; }
+  .footer-links a:hover { color: #fff; }
+  .footer-copy { font-size: .78rem; color: #6b7280; }
+
+  /* ════════════════════════════════════════
+     반응형
+  ════════════════════════════════════════ */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 1.7rem; }
+    .section-title { font-size: 1.4rem; }
+    .editor-shell { grid-template-columns: 1fr; }
+    .prev-pane {
+      border-right: none; border-bottom: 1px solid #2d2d3f;
+      flex-direction: row; flex-wrap: wrap; padding: 16px; gap: 16px;
+    }
+    .card-grid, .explain-grid, .next-grid { grid-template-columns: 1fr; }
+    .btn-gallery-grid { grid-template-columns: 1fr; }
+    .container { padding: 0 16px; }
+    .nav-logo span { display: none; }
+  }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     고정 네비게이션
+══════════════════════════════════════════ -->
+<nav class="site-nav">
+  <a href="#hero" class="nav-logo">
+    <div class="logo-mark">VT</div>
+    <span>바이브툴킷</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#concept">① 개념</a></li>
+    <li><a href="#gallery">② 유형 갤러리</a></li>
+    <li><a href="#code">③ 코드 해설</a></li>
+    <li><a href="#editor">④ 만들어보기</a></li>
+    <li><a href="#faq">⑤ FAQ</a></li>
+    <li><a href="#next">⑥ 다음 단계</a></li>
+  </ul>
+</nav>
+
+
+<!-- ══════════════════════════════════════════
+     히어로
+══════════════════════════════════════════ -->
+<section id="hero" class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">🎯 CSS · JavaScript · UI 패턴</div>
+    <h1>플로팅 버튼 <em>(Floating Button)</em><br>완전 정복 가이드</h1>
+    <p class="hero-desc">
+      화면 구석에 둥둥 떠 있는 그 버튼.<br>
+      뭔지, 언제 쓰는지, CSS·JS로 직접 만드는 법까지 — 복붙 한 번에 내 사이트에 바로 적용해요.
+    </p>
+    <div class="hero-meta">
+      <span>⏱️ 약 12분</span>
+      <span>📅 2025년 1월</span>
+      <span>🏷️ CSS · JS · UI 패턴</span>
+      <span>👶 입문 난이도</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ① 개념
+══════════════════════════════════════════ -->
+<section id="concept" class="section">
+  <div class="container">
+
+    <div class="section-badge">① 개념</div>
+    <h2 class="section-title">플로팅 버튼이란 무엇인가요?</h2>
+    <p class="section-lead">스크롤해도 항상 화면 위에 떠 있는 버튼 — Floating Action Button(FAB)의 모든 것</p>
+
+    <p>
+      웹사이트를 스크롤할 때 화면 오른쪽 아래에 둥실 떠 있는 버튼 본 적 있죠?
+      그게 <strong>플로팅 버튼</strong>(Floating Action Button, FAB)이에요.
+      CSS <code>position: fixed</code>를 이용해 뷰포트에 고정시키기 때문에,
+      사용자가 아무리 스크롤해도 항상 같은 자리에 보여요.
+    </p>
+
+    <p style="margin-top:16px">
+      대표적인 예가 <strong>맨 위로 가기 버튼</strong>이에요. 긴 글을 읽다가 한 번에 맨 위로 올라가고 싶을 때,
+      오른쪽 하단에 떠 있는 ↑ 버튼을 누르면 바로 이동하죠.
+      카카오톡 상담, 공유하기, AI 채팅 버튼도 모두 이 플로팅 버튼 패턴이에요.
+    </p>
+
+    <div class="card-grid" style="margin-top:32px">
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">📌</div>
+        <h4>항상 보인다</h4>
+        <p>스크롤 위치와 관계없이 항상 화면에 고정돼요. 사용자가 핵심 기능을 놓치지 않도록 도와줘요.</p>
+      </div>
+      <div class="info-card ic-green">
+        <div class="info-card-icon">👆</div>
+        <h4>모바일 친화적</h4>
+        <p>엄지손가락이 닿는 화면 하단 코너에 배치하면, 모바일에서 한 손으로 편하게 누를 수 있어요.</p>
+      </div>
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">⚡</div>
+        <h4>전환율 향상</h4>
+        <p>상담 버튼, CTA 버튼을 플로팅으로 올리면 페이지 어디서든 클릭 가능해 전환율이 올라가요.</p>
+      </div>
+      <div class="info-card ic-gray">
+        <div class="info-card-icon">🎨</div>
+        <h4>쉬운 구현</h4>
+        <p>HTML 한 줄 + CSS 10줄이면 완성이에요. 디자인 라이브러리 없이도 충분히 예쁘게 만들 수 있어요.</p>
+      </div>
+    </div>
+
+    <div class="callout co-blue" style="margin-top:32px">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <p><strong>position: fixed 란?</strong> 화면(뷰포트)을 기준으로 위치가 고정되는 CSS 속성이에요. 스크롤해도 요소가 움직이지 않고 항상 같은 자리에 있어요. <code>bottom: 24px; right: 24px;</code>처럼 지정하면 항상 우측 하단에 떠 있어요.</p>
+      </div>
+    </div>
+
+    <!-- 언제 사용해야 할까? -->
+    <h3 style="font-size:1.15rem; font-weight:700; color:var(--gray-900); margin:40px 0 16px">언제 사용하면 좋을까요?</h3>
+
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>상황</th>
+          <th>추천 플로팅 버튼</th>
+          <th>효과</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>긴 블로그 글 · 문서 페이지</td>
+          <td>↑ 맨 위로 버튼</td>
+          <td><span class="badge bg">UX 향상</span></td>
+        </tr>
+        <tr>
+          <td>서비스 · 쇼핑몰 사이트</td>
+          <td>💬 카카오톡 상담 / 문의하기</td>
+          <td><span class="badge bg">전환율 ↑</span></td>
+        </tr>
+        <tr>
+          <td>포트폴리오 · 소개 페이지</td>
+          <td>📩 연락하기 / GitHub 링크</td>
+          <td><span class="badge ba">노출 강화</span></td>
+        </tr>
+        <tr>
+          <td>콘텐츠 사이트</td>
+          <td>🔗 공유하기 / 소셜 링크</td>
+          <td><span class="badge ba">바이럴 ↑</span></td>
+        </tr>
+        <tr>
+          <td>SaaS · 웹앱</td>
+          <td>✨ AI 도우미 / 고객지원 채팅</td>
+          <td><span class="badge bg">지원 효율화</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout co-amber" style="margin-top:28px">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <p><strong>주의:</strong> 플로팅 버튼이 너무 많으면 오히려 불편해요. 한 페이지에 1~2개까지만 사용하고, 콘텐츠를 가리지 않는 위치에 배치하세요.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ② 유형 갤러리
+══════════════════════════════════════════ -->
+<section id="gallery" class="section">
+  <div class="container">
+
+    <div class="section-badge">② 유형 갤러리</div>
+    <h2 class="section-title">플로팅 버튼 유형 모아보기</h2>
+    <p class="section-lead">클릭하면 해당 유형의 코드가 아래 에디터에 자동으로 채워져요</p>
+
+    <!-- 기본형 -->
+    <div class="gallery-category">
+      <div class="cat-label">기본형</div>
+      <div class="btn-gallery-grid">
+
+        <!-- 맨 위로 가기 -->
+        <div class="btn-preview-card active" onclick="loadCode('scroll-top')" id="card-scroll-top">
+          <div class="btn-demo-area">
+            <span class="btn-demo-label">PREVIEW</span>
+            <button class="demo-fab" style="background:#4f46e5; color:#fff;">↑</button>
+          </div>
+          <div class="btn-card-info">
+            <div class="btn-card-name">맨 위로 가기</div>
+            <div class="btn-card-desc">스크롤 200px 이상 내리면 나타나고, 클릭하면 최상단으로 부드럽게 스크롤돼요.</div>
+            <div class="btn-card-tags">
+              <span class="btn-tag">CSS only 가능</span>
+              <span class="btn-tag-green btn-tag">가장 흔함</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 카카오톡 상담 -->
+        <div class="btn-preview-card" onclick="loadCode('kakao')" id="card-kakao">
+          <div class="btn-demo-area">
+            <span class="btn-demo-label">PREVIEW</span>
+            <button class="demo-fab" style="background:#FEE500; color:#3C1E1E;">💬</button>
+          </div>
+          <div class="btn-card-info">
+            <div class="btn-card-name">카카오톡 상담</div>
+            <div class="btn-card-desc">카카오 브랜드 컬러 노란색. 클릭 시 카카오톡 채널 링크로 이동해요.</div>
+            <div class="btn-card-tags">
+              <span class="btn-tag">외부 링크 이동</span>
+              <span class="btn-tag-amber btn-tag">카카오 노란색</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 문의하기 -->
+        <div class="btn-preview-card" onclick="loadCode('contact')" id="card-contact">
+          <div class="btn-demo-area">
+            <span class="btn-demo-label">PREVIEW</span>
+            <button class="demo-fab-rect" style="background:#4f46e5; color:#fff;">✉️ 문의하기</button>
+          </div>
+          <div class="btn-card-info">
+            <div class="btn-card-name">문의하기 (텍스트형)</div>
+            <div class="btn-card-desc">아이콘 + 텍스트 라벨이 함께 보이는 pill 형태의 플로팅 버튼이에요.</div>
+            <div class="btn-card-tags">
+              <span class="btn-tag">Pill 형태</span>
+              <span class="btn-tag-green btn-tag">CTA에 효과적</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 고급형 -->
+    <div class="gallery-category">
+      <div class="cat-label">고급형</div>
+      <div class="btn-gallery-grid">
+
+        <!-- 멀티 FAB -->
+        <div class="btn-preview-card" onclick="loadCode('multi')" id="card-multi">
+          <div class="btn-demo-area">
+            <span class="btn-demo-label">PREVIEW</span>
+            <div class="demo-fab-multi">
+              <button class="demo-fab-mini" style="background:#ef4444; color:#fff;">📞</button>
+              <button class="demo-fab-mini" style="background:#16a34a; color:#fff;">💬</button>
+              <button class="demo-fab-main" style="background:#4f46e5; color:#fff;">＋</button>
+            </div>
+          </div>
+          <div class="btn-card-info">
+            <div class="btn-card-name">멀티 FAB (스피드 다이얼)</div>
+            <div class="btn-card-desc">+ 버튼을 누르면 여러 하위 버튼이 펼쳐지는 패턴이에요. Google Material Design에서 유래했어요.</div>
+            <div class="btn-card-tags">
+              <span class="btn-tag">JS 필요</span>
+              <span class="btn-tag-amber btn-tag">애니메이션 포함</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 맨 위로 (둥근 사각형) -->
+        <div class="btn-preview-card" onclick="loadCode('scroll-rect')" id="card-scroll-rect">
+          <div class="btn-demo-area">
+            <span class="btn-demo-label">PREVIEW</span>
+            <button class="demo-scroll-btn" style="background:#111827; color:#fff;">↑</button>
+          </div>
+          <div class="btn-card-info">
+            <div class="btn-card-name">맨 위로 (사각형 스타일)</div>
+            <div class="btn-card-desc">원형 대신 모서리가 둥근 사각형 버튼. 진행바(progress ring) 없이 깔끔한 다크 스타일이에요.</div>
+            <div class="btn-card-tags">
+              <span class="btn-tag">다크 테마</span>
+              <span class="btn-tag-green btn-tag">미니멀</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 소셜 공유 -->
+        <div class="btn-preview-card" onclick="loadCode('share')" id="card-share">
+          <div class="btn-demo-area">
+            <span class="btn-demo-label">PREVIEW</span>
+            <div class="demo-fab-multi">
+              <button class="demo-fab-mini" style="background:#1877f2; color:#fff; font-size:.75rem; font-family:monospace; font-weight:700;">f</button>
+              <button class="demo-fab-mini" style="background:#000; color:#fff; font-size:.75rem; font-family:monospace; font-weight:700;">𝕏</button>
+              <button class="demo-fab-main" style="background:#6b7280; color:#fff;">🔗</button>
+            </div>
+          </div>
+          <div class="btn-card-info">
+            <div class="btn-card-name">소셜 공유 버튼</div>
+            <div class="btn-card-desc">공유 아이콘 클릭 시 Facebook·X(트위터) 공유 버튼이 펼쳐져요. 블로그에 최적이에요.</div>
+            <div class="btn-card-tags">
+              <span class="btn-tag">공유 API 연동</span>
+              <span class="btn-tag-green btn-tag">블로그 추천</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ③ 코드 해설
+══════════════════════════════════════════ -->
+<section id="code" class="section">
+  <div class="container">
+
+    <div class="section-badge">③ 코드 해설</div>
+    <h2 class="section-title">핵심 CSS 속성 파헤치기</h2>
+    <p class="section-lead">플로팅 버튼을 만드는 데 꼭 필요한 CSS 속성 4가지</p>
+
+    <div class="explain-grid">
+      <div class="exp-card">
+        <div class="exp-header">position: fixed</div>
+        <div class="exp-body">
+          <div class="exp-title">뷰포트에 고정</div>
+          <div class="exp-desc">화면(뷰포트)을 기준으로 위치를 잡아요. 스크롤해도 항상 같은 자리에 보여요. 플로팅 버튼의 핵심이에요.</div>
+          <div class="exp-example">
+<span class="ek">position</span>: <span class="ev">fixed</span>;
+<span class="ek">bottom</span>: <span class="ev">24px</span>; <span class="ec">/* 아래서 24px */</span>
+<span class="ek">right</span>: <span class="ev">24px</span>;  <span class="ec">/* 오른쪽에서 24px */</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-card">
+        <div class="exp-header">z-index: 9999</div>
+        <div class="exp-body">
+          <div class="exp-title">다른 요소 위에 표시</div>
+          <div class="exp-desc">z-index는 요소의 쌓임 순서예요. 높을수록 위에 쌓여요. 다른 콘텐츠에 가려지지 않으려면 충분히 높은 값이 필요해요.</div>
+          <div class="exp-example">
+<span class="ek">z-index</span>: <span class="ev">9999</span>;
+<span class="ec">/* 모달은 보통 1000~9000
+   플로팅버튼은 9999로 최우선 */</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-card">
+        <div class="exp-header">opacity + visibility</div>
+        <div class="exp-body">
+          <div class="exp-title">숨기기 · 나타내기 애니메이션</div>
+          <div class="exp-desc">스크롤 위치에 따라 버튼을 나타내고 숨길 때 사용해요. <code>display:none</code> 대신 이 둘을 조합하면 부드러운 페이드 효과가 가능해요.</div>
+          <div class="exp-example">
+<span class="ec">/* 숨김 상태 */</span>
+<span class="ek">opacity</span>: <span class="ev">0</span>;
+<span class="ek">visibility</span>: <span class="ev">hidden</span>;
+<span class="ec">/* 표시 상태 (JS로 추가) */</span>
+<span class="ek">opacity</span>: <span class="ev">1</span>;
+<span class="ek">visibility</span>: <span class="ev">visible</span>;
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-card">
+        <div class="exp-header">transition</div>
+        <div class="exp-body">
+          <div class="exp-title">부드러운 애니메이션</div>
+          <div class="exp-desc">opacity 변화, hover 시 크기 변화 등을 부드럽게 만들어줘요. 없으면 뚝뚝 끊겨서 보여요.</div>
+          <div class="exp-example">
+<span class="ek">transition</span>:
+  <span class="ev">opacity .3s ease</span>,
+  <span class="ev">transform .2s ease</span>;
+
+<span class="ec">/* hover 시 살짝 커짐 */</span>
+<span class="ek">&:hover</span> {
+  <span class="ek">transform</span>: <span class="ev">scale(1.1)</span>;
+}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 기본 완성 코드 -->
+    <h3 style="font-size:1.1rem; font-weight:700; color:var(--gray-900); margin:44px 0 0">맨 위로 가기 — 완성 코드 (HTML + CSS + JS)</h3>
+
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots">
+          <div class="cb-dot cb-dot-r"></div>
+          <div class="cb-dot cb-dot-y"></div>
+          <div class="cb-dot cb-dot-g"></div>
+        </div>
+        <span class="cb-file">index.html</span>
+        <button class="cb-copy" onclick="copyBlock(this, 'code-basic')">copy</button>
+      </div>
+      <div class="cb-body">
+        <pre id="code-basic"><span class="tc">&lt;!-- HTML: &lt;/body&gt; 바로 위에 추가 --&gt;</span>
+<span class="tk">&lt;button</span> <span class="ta">id</span>=<span class="tv">"scrollTopBtn"</span> <span class="ta">aria-label</span>=<span class="tv">"맨 위로"</span><span class="tk">&gt;</span>↑<span class="tk">&lt;/button&gt;</span>
+
+<span class="tc">&lt;!-- CSS: &lt;style&gt; 안에 추가 --&gt;</span>
+<span class="tk">&lt;style&gt;</span>
+<span class="ta">#scrollTopBtn</span> {
+  <span class="ek">position</span>: <span class="ev">fixed</span>;
+  <span class="ek">bottom</span>: <span class="ev">24px</span>;
+  <span class="ek">right</span>: <span class="ev">24px</span>;
+  <span class="ek">width</span>: <span class="ev">48px</span>;
+  <span class="ek">height</span>: <span class="ev">48px</span>;
+  <span class="ek">border-radius</span>: <span class="ev">50%</span>;
+  <span class="ek">background</span>: <span class="ev">#4f46e5</span>;
+  <span class="ek">color</span>: <span class="ev">#fff</span>;
+  <span class="ek">border</span>: <span class="ev">none</span>;
+  <span class="ek">font-size</span>: <span class="ev">1.2rem</span>;
+  <span class="ek">cursor</span>: <span class="ev">pointer</span>;
+  <span class="ek">box-shadow</span>: <span class="ev">0 4px 16px rgba(79,70,229,.4)</span>;
+  <span class="ek">opacity</span>: <span class="ev">0</span>;
+  <span class="ek">visibility</span>: <span class="ev">hidden</span>;
+  <span class="ek">transition</span>: <span class="ev">opacity .3s, visibility .3s, transform .2s</span>;
+  <span class="ek">z-index</span>: <span class="ev">9999</span>;
+}
+<span class="ta">#scrollTopBtn.show</span> {
+  <span class="ek">opacity</span>: <span class="ev">1</span>;
+  <span class="ek">visibility</span>: <span class="ev">visible</span>;
+}
+<span class="ta">#scrollTopBtn:hover</span> {
+  <span class="ek">transform</span>: <span class="ev">scale(1.1) translateY(-2px)</span>;
+}
+<span class="tk">&lt;/style&gt;</span>
+
+<span class="tc">&lt;!-- JS: &lt;/body&gt; 바로 위에 추가 --&gt;</span>
+<span class="tk">&lt;script&gt;</span>
+<span class="ta">const</span> btn = document.getElementById(<span class="tv">'scrollTopBtn'</span>);
+window.addEventListener(<span class="tv">'scroll'</span>, () =&gt; {
+  btn.classList.toggle(<span class="tv">'show'</span>, window.scrollY &gt; <span class="ev">200</span>);
+});
+btn.addEventListener(<span class="tv">'click'</span>, () =&gt; {
+  window.scrollTo({ top: <span class="ev">0</span>, behavior: <span class="tv">'smooth'</span> });
+});
+<span class="tk">&lt;/script&gt;</span></pre>
+      </div>
+    </div>
+
+    <div class="vibe-tip">
+      <div class="vibe-tip-label">✦ 바이브코더 TIP</div>
+      <p>AI에게 이렇게 물어보세요 👇</p>
+      <div class="prompt-box">
+        <pre>"내 HTML 페이지에 스크롤하면 나타나는 '맨 위로 가기' 플로팅 버튼을 추가해줘.
+- 인디고 색상 원형 버튼
+- 스크롤 200px 이상이면 나타나고, 위로면 사라짐
+- 클릭하면 부드럽게 맨 위로 스크롤
+- 모바일에서는 오른쪽 하단, 기존 footer와 겹치지 않도록"</pre>
+      </div>
+      <p style="margin-top:14px">위치, 색상, 스크롤 기준값(200px)을 구체적으로 말해주면 훨씬 정확한 코드가 나와요!</p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ④ 인터랙티브 에디터
+══════════════════════════════════════════ -->
+<section id="editor" class="section">
+  <div class="container">
+
+    <div class="section-badge">④ 만들어보기</div>
+    <h2 class="section-title">직접 만들어보기</h2>
+    <p class="section-lead">갤러리에서 유형을 선택하거나, 아래 옵션으로 버튼을 커스터마이즈해보세요</p>
+
+    <div class="editor-shell">
+
+      <!-- 왼쪽: 미리보기 + 옵션 -->
+      <div class="prev-pane">
+        <div class="prev-label">LIVE PREVIEW</div>
+
+        <!-- 캔버스 -->
+        <div class="prev-canvas">
+          <button id="live-btn"
+            style="width:48px;height:48px;border-radius:50%;background:#4f46e5;color:#fff;border:none;font-size:1.2rem;cursor:pointer;box-shadow:0 4px 16px rgba(79,70,229,.4);">↑</button>
+        </div>
+
+        <!-- 색상 선택 -->
+        <div class="options-panel" style="width:100%">
+          <div class="opt-row">
+            <div class="opt-label">색상</div>
+            <div class="opt-color-row">
+              <div class="opt-color sel" style="background:#4f46e5" data-color="#4f46e5" onclick="setColor(this)"></div>
+              <div class="opt-color" style="background:#7c3aed" data-color="#7c3aed" onclick="setColor(this)"></div>
+              <div class="opt-color" style="background:#16a34a" data-color="#16a34a" onclick="setColor(this)"></div>
+              <div class="opt-color" style="background:#dc2626" data-color="#dc2626" onclick="setColor(this)"></div>
+              <div class="opt-color" style="background:#d97706" data-color="#d97706" onclick="setColor(this)"></div>
+              <div class="opt-color" style="background:#0ea5e9" data-color="#0ea5e9" onclick="setColor(this)"></div>
+              <div class="opt-color" style="background:#111827" data-color="#111827" onclick="setColor(this)"></div>
+              <div class="opt-color" style="background:#FEE500; border:1px solid #ccc" data-color="#FEE500" onclick="setColor(this)"></div>
+            </div>
+          </div>
+          <div class="opt-row">
+            <div class="opt-label">모양</div>
+            <select class="opt-select" onchange="setShape(this.value)">
+              <option value="circle">원형 (50%)</option>
+              <option value="rounded">둥근 사각형 (12px)</option>
+              <option value="pill">알약형 (24px + 텍스트)</option>
+            </select>
+          </div>
+          <div class="opt-row">
+            <div class="opt-label">아이콘</div>
+            <select class="opt-select" onchange="setIcon(this.value)">
+              <option value="↑">↑ 맨 위로</option>
+              <option value="💬">💬 채팅</option>
+              <option value="✉️">✉️ 이메일</option>
+              <option value="📞">📞 전화</option>
+              <option value="＋">＋ 추가</option>
+              <option value="→">→ 다음</option>
+            </select>
+          </div>
+          <div class="opt-row">
+            <div class="opt-label">위치</div>
+            <select class="opt-select" onchange="setPos(this.value)">
+              <option value="br">오른쪽 하단</option>
+              <option value="bl">왼쪽 하단</option>
+              <option value="tr">오른쪽 상단</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 오른쪽: 코드 -->
+      <div class="edit-pane">
+        <div class="edit-topbar">
+          <div class="edit-left">
+            <div class="cb-dots">
+              <div class="cb-dot cb-dot-r"></div>
+              <div class="cb-dot cb-dot-y"></div>
+              <div class="cb-dot cb-dot-g"></div>
+            </div>
+            <span class="edit-file">floating-button.html</span>
+          </div>
+          <div class="edit-btns">
+            <button class="ebtn ebtn-copy" onclick="copyEditor(this)">copy</button>
+            <button class="ebtn ebtn-reset" onclick="resetEditor()">reset</button>
+          </div>
+        </div>
+        <textarea class="code-textarea" id="editor-code" spellcheck="false"></textarea>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ⑤ FAQ
+══════════════════════════════════════════ -->
+<section id="faq" class="section">
+  <div class="container">
+
+    <div class="section-badge">⑤ FAQ</div>
+    <h2 class="section-title">자주 묻는 질문</h2>
+    <p class="section-lead">플로팅 버튼 구현 시 가장 많이 헷갈리는 것들</p>
+
+    <div class="faq-list">
+
+      <details class="faq-item">
+        <summary>스크롤하면 나타나게 하려면 반드시 JS가 필요한가요?</summary>
+        <div class="faq-body">
+          <p>스크롤 위치에 따라 동적으로 버튼을 보이고 숨기려면 JavaScript가 필요해요. <code>window.scrollY</code>로 현재 스크롤 위치를 감지하고 클래스를 추가·제거하는 방식이에요.</p>
+          <p>단, 항상 표시되는 플로팅 버튼(스크롤 감지 없이)은 <code>position: fixed</code> CSS만으로도 만들 수 있어요. 간단한 문의 버튼, SNS 링크 버튼 같은 경우에 적합해요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>모바일에서 하단 네비게이션 바와 겹쳐요. 어떻게 하나요?</summary>
+        <div class="faq-body">
+          <p>iOS Safari의 경우 하단 UI(주소바, 홈 인디케이터)를 고려해 <code>bottom</code> 값을 <code>env(safe-area-inset-bottom)</code>과 함께 사용하세요.</p>
+          <p>
+            <code>bottom: calc(24px + env(safe-area-inset-bottom));</code>
+          </p>
+          <p>Android Chrome의 경우 <code>bottom: 80px</code> 정도로 여유를 주면 대부분의 브라우저 UI와 겹치지 않아요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>플로팅 버튼이 다른 요소 뒤에 숨어버려요.</summary>
+        <div class="faq-body">
+          <p><code>z-index</code>가 낮거나, 부모 요소에 <code>position: relative</code>와 낮은 <code>z-index</code>가 설정되어 있으면 플로팅 버튼이 가려질 수 있어요.</p>
+          <p>플로팅 버튼을 <code>&lt;body&gt;</code>의 직접 자식으로 배치하고, <code>z-index: 9999</code>를 부여하면 거의 모든 경우 최상단에 표시돼요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>접근성(Accessibility)을 어떻게 챙기나요?</summary>
+        <div class="faq-body">
+          <p>아이콘만 있는 버튼은 스크린 리더가 "버튼"이라고만 읽어요. 반드시 <code>aria-label</code>을 추가해주세요.</p>
+          <p><code>&lt;button aria-label="맨 위로 이동"&gt;↑&lt;/button&gt;</code></p>
+          <p>또한 <code>:focus-visible</code> 스타일을 지정해 키보드 사용자도 버튼을 찾을 수 있게 해주세요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>애드센스 광고와 겹치지 않게 하려면?</summary>
+        <div class="faq-body">
+          <p>Google 애드센스 정책상 광고 위에 다른 요소가 겹쳐 클릭을 유발하면 정책 위반이 될 수 있어요.</p>
+          <p>플로팅 버튼 위치(보통 우측 하단)에 광고를 배치하지 않거나, 버튼 위치를 왼쪽 하단으로 변경하는 방법으로 피할 수 있어요. 또는 광고 슬롯과 버튼의 겹침 여부를 화면 크기별로 테스트해보세요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>카카오톡 채널 링크는 어디서 구하나요?</summary>
+        <div class="faq-body">
+          <p><a href="https://business.kakao.com/info/kakaotalkChannel/" target="_blank" rel="noopener">카카오 비즈니스</a>에서 카카오톡 채널을 개설하면 채널 링크를 받을 수 있어요.</p>
+          <p>링크 형식: <code>https://pf.kakao.com/_채널ID/chat</code></p>
+          <p>이 링크를 플로팅 버튼의 <code>href</code>에 넣으면 클릭 시 카카오톡 채널 채팅으로 연결돼요.</p>
+        </div>
+      </details>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ⑥ 다음 단계
+══════════════════════════════════════════ -->
+<section id="next" class="section">
+  <div class="container">
+
+    <div class="section-badge">⑥ 다음 단계</div>
+    <h2 class="section-title">다음에 배워볼 것들</h2>
+    <p class="section-lead">플로팅 버튼을 마스터했다면 이 도구들도 도전해보세요</p>
+
+    <div class="next-grid">
+      <div class="next-card" onclick="navTo('favicon-sample.html')">
+        <div class="next-card-icon">🌐</div>
+        <div class="next-card-title">파비콘 만들기</div>
+        <div class="next-card-desc">브라우저 탭 아이콘을 SVG로 직접 만드는 방법</div>
+        <span class="next-card-tag">HTML · SVG</span>
+      </div>
+      <div class="next-card" onclick="navTo('home.html')">
+        <div class="next-card-icon">🏷️</div>
+        <div class="next-card-title">메타태그 가이드</div>
+        <div class="next-card-desc">SEO와 소셜 공유를 위한 메타태그 설정법</div>
+        <span class="next-card-tag">준비중</span>
+      </div>
+      <div class="next-card" onclick="navTo('home.html')">
+        <div class="next-card-icon">📊</div>
+        <div class="next-card-title">오픈그래프 이미지</div>
+        <div class="next-card-desc">카카오톡·SNS 공유 시 미리보기 이미지 설정</div>
+        <span class="next-card-tag">준비중</span>
+      </div>
+      <div class="next-card" onclick="navTo('home.html')">
+        <div class="next-card-icon">🍪</div>
+        <div class="next-card-title">쿠키 동의 배너</div>
+        <div class="next-card-desc">GDPR·애드센스를 위한 쿠키 동의 UI 구현</div>
+        <span class="next-card-tag">준비중</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     푸터
+══════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-logo">
+    <div class="logo-mark">VT</div>
+    바이브툴킷
+  </div>
+  <p class="footer-desc">
+    바이브 코딩하는 개발자를 위한 실용 도구 모음<br>
+    AI와 함께 만드는 웹 — 기초부터 배포까지
+  </p>
+  <div class="footer-links">
+    <a href="about.html">소개</a>
+    <a href="privacy.html">개인정보처리방침</a>
+    <a href="terms.html">이용약관</a>
+    <a href="contact.html">문의</a>
+    <a href="sitemap.html">사이트맵</a>
+  </div>
+  <div class="footer-copy">© 2025 바이브툴킷. 콘텐츠는 자유롭게 참고하세요.</div>
+</footer>
+
+
+<script>
+/* ────────────────────────────────────────
+   코드 템플릿 맵
+──────────────────────────────────────── */
+const CODES = {
+  'scroll-top': `<!-- ↑ 맨 위로 가기 플로팅 버튼 -->
+<!-- <body> 닫기 태그 바로 위에 붙여넣으세요 -->
+
+<button id="scrollTopBtn" aria-label="맨 위로 이동">↑</button>
+
+<style>
+#scrollTopBtn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(79, 70, 229, .4);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s, visibility .3s, transform .2s;
+  z-index: 9999;
+}
+#scrollTopBtn.show {
+  opacity: 1;
+  visibility: visible;
+}
+#scrollTopBtn:hover {
+  transform: scale(1.1) translateY(-2px);
+}
+</style>
+
+<script>
+const btn = document.getElementById('scrollTopBtn');
+window.addEventListener('scroll', () => {
+  btn.classList.toggle('show', window.scrollY > 200);
+});
+btn.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+<\/script>`,
+
+  'kakao': `<!-- 💬 카카오톡 상담 플로팅 버튼 -->
+<!-- 채널 링크를 본인 것으로 바꿔주세요 -->
+
+<a id="kakaoBtn"
+   href="https://pf.kakao.com/_채널ID/chat"
+   target="_blank"
+   rel="noopener"
+   aria-label="카카오톡 상담">💬</a>
+
+<style>
+#kakaoBtn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #FEE500;
+  color: #3C1E1E;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .2);
+  transition: transform .2s, box-shadow .2s;
+  z-index: 9999;
+}
+#kakaoBtn:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  text-decoration: none;
+}
+</style>`,
+
+  'contact': `<!-- ✉️ 문의하기 Pill 형 플로팅 버튼 -->
+
+<a id="contactBtn" href="mailto:your@email.com" aria-label="문의하기">
+  ✉️ 문의하기
+</a>
+
+<style>
+#contactBtn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  height: 48px;
+  padding: 0 20px;
+  border-radius: 24px;
+  background: #4f46e5;
+  color: #fff;
+  font-size: .88rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(79, 70, 229, .4);
+  transition: transform .2s, box-shadow .2s;
+  z-index: 9999;
+  white-space: nowrap;
+}
+#contactBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(79, 70, 229, .45);
+  text-decoration: none;
+}
+</style>`,
+
+  'multi': `<!-- ＋ 멀티 FAB (스피드 다이얼) -->
+<!-- ＋ 버튼 클릭 시 하위 버튼 펼침 -->
+
+<div id="fabGroup">
+  <div class="fab-items">
+    <a href="tel:010-0000-0000" class="fab-item" aria-label="전화">📞</a>
+    <a href="https://pf.kakao.com/_채널ID/chat" target="_blank" class="fab-item" aria-label="카카오톡">💬</a>
+  </div>
+  <button id="fabMain" aria-label="메뉴 열기" aria-expanded="false">＋</button>
+</div>
+
+<style>
+#fabGroup {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  z-index: 9999;
+}
+.fab-items {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity .25s, visibility .25s, transform .25s;
+}
+#fabGroup.open .fab-items {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.fab-item {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 3px 12px rgba(0,0,0,.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: transform .2s;
+}
+.fab-item:hover { transform: scale(1.1); }
+#fabMain {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(79,70,229,.4);
+  transition: transform .25s;
+}
+#fabGroup.open #fabMain { transform: rotate(45deg); }
+</style>
+
+<script>
+const fabGroup = document.getElementById('fabGroup');
+const fabMain  = document.getElementById('fabMain');
+fabMain.addEventListener('click', () => {
+  const isOpen = fabGroup.classList.toggle('open');
+  fabMain.setAttribute('aria-expanded', isOpen);
+});
+document.addEventListener('click', (e) => {
+  if (!fabGroup.contains(e.target)) {
+    fabGroup.classList.remove('open');
+    fabMain.setAttribute('aria-expanded', false);
+  }
+});
+<\/script>`,
+
+  'scroll-rect': `<!-- ↑ 맨 위로 (다크 사각형 스타일) -->
+
+<button id="scrollTopBtn" aria-label="맨 위로 이동">↑</button>
+
+<style>
+#scrollTopBtn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #111827;
+  color: #fff;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .3);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s, visibility .3s, transform .2s;
+  z-index: 9999;
+}
+#scrollTopBtn.show {
+  opacity: 1;
+  visibility: visible;
+}
+#scrollTopBtn:hover {
+  transform: translateY(-3px);
+  background: #1f2937;
+}
+</style>
+
+<script>
+const btn = document.getElementById('scrollTopBtn');
+window.addEventListener('scroll', () => {
+  btn.classList.toggle('show', window.scrollY > 200);
+});
+btn.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+<\/script>`,
+
+  'share': `<!-- 🔗 소셜 공유 플로팅 버튼 -->
+
+<div id="shareGroup">
+  <div class="share-items">
+    <a id="shareFb"  class="share-item" style="background:#1877f2" aria-label="Facebook 공유">f</a>
+    <a id="shareX"   class="share-item" style="background:#000" aria-label="X(트위터) 공유">𝕏</a>
+  </div>
+  <button id="shareMain" aria-label="공유하기" aria-expanded="false">🔗</button>
+</div>
+
+<style>
+#shareGroup {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  z-index: 9999;
+}
+.share-items {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity .25s, visibility .25s, transform .25s;
+}
+#shareGroup.open .share-items {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.share-item {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 3px 10px rgba(0,0,0,.2);
+  transition: transform .2s;
+}
+.share-item:hover { transform: scale(1.1); text-decoration: none; }
+#shareMain {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #6b7280;
+  color: #fff;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,.2);
+  transition: transform .25s;
+}
+#shareGroup.open #shareMain { transform: rotate(45deg); }
+</style>
+
+<script>
+const sg   = document.getElementById('shareGroup');
+const smain= document.getElementById('shareMain');
+const url  = encodeURIComponent(location.href);
+const title= encodeURIComponent(document.title);
+
+document.getElementById('shareFb').href =
+  'https://www.facebook.com/sharer/sharer.php?u=' + url;
+document.getElementById('shareX').href =
+  'https://twitter.com/intent/tweet?url=' + url + '&text=' + title;
+
+smain.addEventListener('click', () => {
+  if (navigator.share) {
+    navigator.share({ title: document.title, url: location.href });
+  } else {
+    const isOpen = sg.classList.toggle('open');
+    smain.setAttribute('aria-expanded', isOpen);
+  }
+});
+document.addEventListener('click', (e) => {
+  if (!sg.contains(e.target)) {
+    sg.classList.remove('open');
+    smain.setAttribute('aria-expanded', false);
+  }
+});
+<\/script>`
+};
+
+/* ────────────────────────────────────────
+   에디터 초기화
+──────────────────────────────────────── */
+const textarea = document.getElementById('editor-code');
+let currentCode = 'scroll-top';
+
+function loadCode(key) {
+  currentCode = key;
+  textarea.value = CODES[key] || '';
+  // 갤러리 카드 활성화
+  document.querySelectorAll('.btn-preview-card').forEach(c => c.classList.remove('active'));
+  const card = document.getElementById('card-' + key);
+  if (card) card.classList.add('active');
+  // 라이브 버튼도 업데이트
+  syncLivePreview();
+}
+
+// 초기 로드
+loadCode('scroll-top');
+
+/* ────────────────────────────────────────
+   라이브 미리보기 동기화
+──────────────────────────────────────── */
+let liveColor = '#4f46e5';
+let liveShape = 'circle';
+let liveIcon  = '↑';
+let livePos   = 'br';
+
+function syncLivePreview() {
+  const btn = document.getElementById('live-btn');
+  if (!btn) return;
+
+  const br = liveShape === 'circle' ? '50%' : liveShape === 'rounded' ? '12px' : '24px';
+  const isKakao = liveColor === '#FEE500';
+  const textColor = isKakao ? '#3C1E1E' : '#fff';
+
+  if (liveShape === 'pill') {
+    btn.style.cssText = `
+      width: auto; height: 40px; padding: 0 14px;
+      border-radius: 24px;
+      background: ${liveColor}; color: ${textColor};
+      border: none; font-size: .78rem; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      box-shadow: 0 3px 10px rgba(0,0,0,.2);
+      white-space: nowrap;
+      position: absolute;
+    `;
+    btn.textContent = liveIcon + ' 문의하기';
+  } else {
+    btn.style.cssText = `
+      width: 44px; height: 44px;
+      border-radius: ${br};
+      background: ${liveColor}; color: ${textColor};
+      border: none; font-size: 1.15rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 3px 12px rgba(0,0,0,.2);
+      position: absolute;
+    `;
+    btn.textContent = liveIcon;
+  }
+
+  // 위치
+  btn.style.removeProperty('bottom');
+  btn.style.removeProperty('right');
+  btn.style.removeProperty('left');
+  btn.style.removeProperty('top');
+  if (livePos === 'br') { btn.style.bottom = '12px'; btn.style.right = '12px'; }
+  else if (livePos === 'bl') { btn.style.bottom = '12px'; btn.style.left = '12px'; }
+  else if (livePos === 'tr') { btn.style.top = '12px'; btn.style.right = '12px'; }
+}
+
+function setColor(el) {
+  document.querySelectorAll('.opt-color').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  liveColor = el.getAttribute('data-color');
+  syncLivePreview();
+  updateEditorColor(liveColor);
+}
+
+function setShape(val) {
+  liveShape = val;
+  syncLivePreview();
+}
+
+function setIcon(val) {
+  liveIcon = val;
+  syncLivePreview();
+}
+
+function setPos(val) {
+  livePos = val;
+  syncLivePreview();
+}
+
+function updateEditorColor(color) {
+  // 에디터 코드 내 색상만 교체 (간단 버전)
+  const code = textarea.value;
+  textarea.value = code.replace(/#[0-9a-fA-F]{6}/g, (match, offset) => {
+    // background 근처 색상만 교체 (단순 휴리스틱)
+    const before = code.substring(Math.max(0, offset - 40), offset);
+    if (before.includes('background')) return color;
+    return match;
+  });
+}
+
+/* ────────────────────────────────────────
+   복사 & 리셋
+──────────────────────────────────────── */
+function copyEditor(btn) {
+  navigator.clipboard.writeText(textarea.value).then(() => {
+    btn.textContent = '✓ copied!';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('ok'); }, 1800);
+  });
+}
+
+function resetEditor() {
+  loadCode(currentCode);
+}
+
+function copyBlock(btn, id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el ? el.innerText : '').then(() => {
+    btn.textContent = '✓ copied!';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('ok'); }, 1800);
+  });
+}
+
+/* ────────────────────────────────────────
+   네비게이션 (iframe 연동)
+──────────────────────────────────────── */
+function navTo(url) {
+  if (window.parent !== window && typeof window.parent.loadTool === 'function') {
+    window.parent.loadTool(url);
+  } else {
+    location.href = url;
+  }
+}
+
+/* ────────────────────────────────────────
+   iframe 감지: 헤더·푸터 숨김
+──────────────────────────────────────── */
+(function() {
+  if (self === top) return;
+  const nav = document.querySelector('.site-nav');
+  if (nav) nav.style.display = 'none';
+  const hero = document.querySelector('.hero');
+  if (hero) hero.style.paddingTop = '40px';
+  document.querySelectorAll('html').forEach(el => {
+    el.style.scrollPaddingTop = '24px';
+  });
+  const footer = document.querySelector('.site-footer');
+  if (footer) footer.style.display = 'none';
+  document.querySelectorAll('a[href$=".html"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href && !href.startsWith('http') && window.parent.loadTool) {
+        e.preventDefault();
+        window.parent.loadTool(href);
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

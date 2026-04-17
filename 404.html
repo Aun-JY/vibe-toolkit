@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>페이지를 찾을 수 없어요 (404) — 바이브툴킷</title>
+  <meta name="description" content="요청하신 페이지를 찾을 수 없어요. 바이브툴킷 홈으로 돌아가 원하는 도구를 찾아보세요.">
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://aun-jy.github.io/vibe-toolkit/404.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+  :root {
+    --accent: #4f46e5; --accent-s: #eef2ff; --accent-b: #c7d2fe;
+    --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+    --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563;
+    --gray-700: #374151; --gray-900: #111827;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--gray-50); color: var(--gray-700);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 24px; text-align: center;
+  }
+  .err-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7rem; font-weight: 700; line-height: 1;
+    color: var(--gray-200); margin-bottom: 8px;
+    letter-spacing: -.04em;
+  }
+  .err-emoji { font-size: 3.5rem; margin-bottom: 20px; }
+  h1 { font-size: 1.6rem; font-weight: 700; color: var(--gray-900); margin-bottom: 12px; }
+  .err-desc {
+    font-size: .95rem; color: var(--gray-500);
+    line-height: 1.8; max-width: 420px; margin: 0 auto 36px;
+  }
+
+  .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
+  .btn-home {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent); color: #fff;
+    font-weight: 700; font-size: .9rem;
+    padding: 12px 24px; border-radius: 8px;
+    text-decoration: none; transition: opacity .15s;
+  }
+  .btn-home:hover { opacity: .88; }
+  .btn-back {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #fff; color: var(--gray-700);
+    font-weight: 600; font-size: .9rem;
+    padding: 12px 24px; border-radius: 8px;
+    border: 1px solid var(--gray-200);
+    text-decoration: none; transition: border-color .15s;
+    cursor: pointer; font-family: inherit;
+  }
+  .btn-back:hover { border-color: var(--accent-b); }
+
+  /* 빠른 링크 */
+  .quick-links {
+    background: #fff; border: 1px solid var(--gray-200);
+    border-radius: 12px; padding: 24px 28px;
+    max-width: 420px; width: 100%;
+    text-align: left;
+  }
+  .quick-links h3 {
+    font-size: .85rem; font-weight: 700; color: var(--gray-500);
+    text-transform: uppercase; letter-spacing: .06em;
+    margin-bottom: 14px;
+  }
+  .quick-link {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--gray-100);
+    text-decoration: none; color: var(--gray-700);
+    transition: color .15s;
+  }
+  .quick-link:last-child { border-bottom: none; }
+  .quick-link:hover { color: var(--accent); }
+  .ql-icon { font-size: 1.1rem; width: 24px; text-align: center; flex-shrink: 0; }
+  .ql-text { flex: 1; font-size: .88rem; font-weight: 500; }
+  .ql-arrow { font-size: .75rem; color: var(--gray-400); }
+
+  /* 하단 */
+  .footer-note {
+    margin-top: 32px;
+    font-size: .78rem; color: var(--gray-400);
+  }
+  .footer-note a { color: var(--gray-500); text-decoration: none; }
+  .footer-note a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <div class="err-code">404</div>
+  <div class="err-emoji">🔍</div>
+  <h1>페이지를 찾을 수 없어요</h1>
+  <p class="err-desc">
+    요청하신 주소의 페이지가 존재하지 않거나 이동되었어요.<br>
+    URL을 다시 확인하거나, 아래 링크로 이동해보세요.
+  </p>
+
+  <div class="btn-group">
+    <a href="index.html" class="btn-home">🏠 홈으로 돌아가기</a>
+    <button class="btn-back" onclick="history.back()">← 이전 페이지</button>
+  </div>
+
+  <div class="quick-links">
+    <h3>🗂️ 주요 페이지</h3>
+    <a href="index.html" class="quick-link">
+      <span class="ql-icon">🛠️</span>
+      <span class="ql-text">전체 도구 목록</span>
+      <span class="ql-arrow">›</span>
+    </a>
+    <a href="favicon-sample.html" class="quick-link">
+      <span class="ql-icon">🌐</span>
+      <span class="ql-text">파비콘 (Favicon) 도구</span>
+      <span class="ql-arrow">›</span>
+    </a>
+    <a href="about.html" class="quick-link">
+      <span class="ql-icon">ℹ️</span>
+      <span class="ql-text">바이브툴킷 소개</span>
+      <span class="ql-arrow">›</span>
+    </a>
+    <a href="contact.html" class="quick-link">
+      <span class="ql-icon">✉️</span>
+      <span class="ql-text">문의하기</span>
+      <span class="ql-arrow">›</span>
+    </a>
+  </div>
+
+  <p class="footer-note">
+    찾는 페이지가 계속 없다면 <a href="contact.html">문의하기</a>로 알려주세요.
+    &nbsp;·&nbsp;
+    <a href="index.html">바이브툴킷 홈</a>
+  </p>
+
+</body>
+</html>

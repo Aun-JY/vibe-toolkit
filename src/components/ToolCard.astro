@@ -1,0 +1,143 @@
+---
+// src/components/ToolCard.astro
+// 홈페이지 도구 목록에 쓰이는 카드
+
+interface Props {
+  title: string;
+  description: string;
+  href: string;
+  icon: string;
+  tags?: string[];
+  isNew?: boolean;
+  isComingSoon?: boolean;
+}
+
+const { title, description, href, icon, tags = [], isNew = false, isComingSoon = false } = Astro.props;
+---
+
+<a href={isComingSoon ? undefined : href} class:list={['tool-card', { 'coming-soon': isComingSoon }]}>
+  <div class="card-icon">{icon}</div>
+
+  <div class="card-body">
+    <div class="card-title-row">
+      <h3>{title}</h3>
+      {isNew && <span class="badge new">NEW</span>}
+      {isComingSoon && <span class="badge soon">준비중</span>}
+    </div>
+    <p>{description}</p>
+    {tags.length > 0 && (
+      <div class="card-tags">
+        {tags.map(tag => <span class="tag">{tag}</span>)}
+      </div>
+    )}
+  </div>
+
+  <div class="card-arrow">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M5 12h14M12 5l7 7-7 7"/>
+    </svg>
+  </div>
+</a>
+
+<style>
+.tool-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all var(--duration) var(--ease);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tool-card:hover:not(.coming-soon) {
+  border-color: var(--accent);
+  background: var(--bg-elevated);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 24px var(--accent-glow);
+}
+
+.tool-card.coming-soon {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+
+.card-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.card-body h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.card-body p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+}
+
+.badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 0.15em 0.5em;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+.badge.new {
+  background: rgba(63, 185, 80, 0.15);
+  color: var(--green);
+  border: 1px solid rgba(63, 185, 80, 0.25);
+}
+.badge.soon {
+  background: rgba(210, 153, 34, 0.15);
+  color: var(--yellow);
+  border: 1px solid rgba(210, 153, 34, 0.25);
+}
+
+.card-arrow {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: all var(--duration) var(--ease);
+  margin-top: 2px;
+}
+.tool-card:hover .card-arrow {
+  color: var(--accent);
+  transform: translateX(3px);
+}
+</style>

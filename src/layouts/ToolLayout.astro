@@ -1,0 +1,254 @@
+---
+// src/layouts/ToolLayout.astro
+// 각 도구 페이지에 공통으로 사용되는 레이아웃
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  icon: string;
+  category: string;
+  keywords?: string[];
+  publishDate?: string;
+  prevTool?: { title: string; href: string };
+  nextTool?: { title: string; href: string };
+}
+
+const {
+  title,
+  description,
+  icon,
+  category,
+  keywords,
+  publishDate,
+  prevTool,
+  nextTool,
+} = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  type="article"
+  publishDate={publishDate}
+  keywords={keywords}
+>
+  <div class="tool-page">
+
+    <!-- 페이지 헤더 -->
+    <div class="tool-hero">
+      <div class="content-container">
+        <div class="breadcrumb">
+          <a href="/ko/">홈</a>
+          <span>›</span>
+          <a href="/ko/tools/">도구 모음</a>
+          <span>›</span>
+          <span>{title}</span>
+        </div>
+
+        <div class="hero-content">
+          <div class="hero-icon">{icon}</div>
+          <div class="hero-text">
+            <div class="hero-meta">
+              <span class="tag green">{category}</span>
+              {publishDate && (
+                <span class="publish-date">
+                  {new Date(publishDate).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </span>
+              )}
+            </div>
+            <h1>{title}</h1>
+            <p class="hero-desc">{description}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 본문 -->
+    <div class="tool-body content-container">
+      <slot />
+    </div>
+
+    <!-- 이전/다음 도구 네비게이션 -->
+    {(prevTool || nextTool) && (
+      <div class="tool-nav content-container">
+        <hr />
+        <div class="nav-links">
+          {prevTool ? (
+            <a href={prevTool.href} class="nav-prev">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </svg>
+              <span>
+                <small>이전 도구</small>
+                <strong>{prevTool.title}</strong>
+              </span>
+            </a>
+          ) : <div />}
+
+          {nextTool && (
+            <a href={nextTool.href} class="nav-next">
+              <span>
+                <small>다음 도구</small>
+                <strong>{nextTool.title}</strong>
+              </span>
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          )}
+        </div>
+      </div>
+    )}
+
+  </div>
+</BaseLayout>
+
+<style>
+.tool-hero {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-light);
+  padding: var(--space-12) 0;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-6);
+}
+.breadcrumb a { color: var(--text-secondary); }
+.breadcrumb a:hover { color: var(--accent); }
+.breadcrumb span:not([class]) { color: var(--text-muted); }
+
+.hero-content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+.hero-icon {
+  font-size: 3rem;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+}
+
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.publish-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.hero-text h1 {
+  margin-bottom: var(--space-3);
+}
+
+.hero-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 600px;
+}
+
+.tool-body {
+  padding-top: var(--space-12);
+  padding-bottom: var(--space-12);
+}
+
+/* 본문 내 기본 스타일 */
+.tool-body :global(h2) {
+  margin-top: var(--space-12);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.tool-body :global(h3) {
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-3);
+}
+
+.tool-body :global(p) {
+  margin-bottom: var(--space-4);
+  line-height: 1.8;
+}
+
+.tool-body :global(ul), .tool-body :global(ol) {
+  padding-left: var(--space-6);
+  margin-bottom: var(--space-4);
+  color: var(--text-secondary);
+}
+
+.tool-body :global(li) {
+  margin-bottom: var(--space-2);
+  line-height: 1.7;
+}
+
+/* 이전/다음 네비게이션 */
+.tool-nav {
+  padding-bottom: var(--space-12);
+}
+
+.nav-links {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.nav-prev, .nav-next {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all var(--duration) var(--ease);
+  flex: 1;
+  max-width: 280px;
+}
+.nav-next { margin-left: auto; }
+
+.nav-prev:hover, .nav-next:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: var(--accent-dim);
+}
+
+.nav-prev span, .nav-next span {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-prev small, .nav-next small {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.nav-prev strong, .nav-next strong {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .hero-content { flex-direction: column; }
+  .hero-icon { width: 56px; height: 56px; font-size: 2rem; }
+}
+</style>

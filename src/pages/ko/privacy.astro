@@ -1,0 +1,51 @@
+---
+// src/pages/ko/privacy.astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="개인정보처리방침"
+  description="바이브툴킷 개인정보처리방침"
+>
+  <div class="content-container" style="padding: 4rem 1.5rem;">
+    <h1>개인정보처리방침</h1>
+    <p style="color: var(--text-muted); font-size: 0.85rem;">최종 수정일: 2025년 1월 1일</p>
+
+    <p>바이브툴킷(이하 "사이트")은 방문자의 개인정보를 소중히 여깁니다. 이 방침은 사이트 이용 시 수집되는 정보와 활용 방법을 설명합니다.</p>
+
+    <h2>수집하는 정보</h2>
+    <p>사이트는 직접적으로 개인정보를 수집하지 않습니다. 다만 다음의 제3자 서비스를 통해 익명화된 방문 통계가 수집될 수 있습니다:</p>
+    <ul>
+      <li><strong>Google Analytics</strong> (추후 적용 예정): 방문자 수, 페이지뷰, 체류 시간 등 익명 통계</li>
+      <li><strong>Google AdSense</strong> (추후 적용 예정): 광고 최적화를 위한 쿠키 사용</li>
+    </ul>
+
+    <h2>쿠키</h2>
+    <p>이 사이트는 자체 쿠키를 사용하지 않습니다. 단, Google의 서비스를 통해 광고 및 분석 쿠키가 사용될 수 있습니다. 브라우저 설정에서 쿠키를 비활성화할 수 있습니다.</p>
+
+    <h2>광고</h2>
+    <p>이 사이트는 Google AdSense를 통한 광고를 게재할 수 있습니다. Google은 방문자의 관심사에 맞는 광고를 표시하기 위해 쿠키를 사용할 수 있습니다. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google 개인정보처리방침</a>에서 자세한 내용을 확인하세요.</p>
+
+    <h2>외부 링크</h2>
+    <p>이 사이트는 외부 링크를 포함할 수 있으며, 외부 사이트의 개인정보 처리에 대해서는 책임지지 않습니다.</p>
+
+    <h2>문의</h2>
+    <p>개인정보처리방침에 대한 문의는 GitHub 이슈를 통해 연락해 주세요.</p>
+  </div>
+</BaseLayout>
+
+<style>
+h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+}
+ul {
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+li {
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
+</style>

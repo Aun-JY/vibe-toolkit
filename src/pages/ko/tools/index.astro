@@ -1,0 +1,76 @@
+---
+// src/pages/ko/tools/index.astro
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ToolCard from '../../../components/ToolCard.astro';
+
+const tools = [
+  {
+    title: '파비콘 (Favicon)',
+    description: '브라우저 탭에 표시되는 작은 아이콘. SVG, PNG, ICO 형식별 코드와 동작 원리를 알아보세요.',
+    href: '/ko/tools/favicon/',
+    icon: '🌐',
+    tags: ['HTML', 'SVG', 'SEO'],
+    isNew: true,
+  },
+  {
+    title: '플로팅 버튼',
+    description: '화면 하단에 고정되는 플로팅 액션 버튼. 순수 CSS와 JS로 구현하는 방법을 소개합니다.',
+    href: '/ko/tools/floating-button/',
+    icon: '🔘',
+    tags: ['CSS', 'JS'],
+    isComingSoon: true,
+  },
+  {
+    title: '로딩 스피너',
+    description: '데이터 로딩 중 보여주는 애니메이션. CSS only로 만드는 10가지 스피너 모음.',
+    href: '/ko/tools/loading-spinner/',
+    icon: '⏳',
+    tags: ['CSS', 'Animation'],
+    isComingSoon: true,
+  },
+  {
+    title: '토스트 알림',
+    description: '화면 모서리에 잠깐 보이는 알림 메시지 컴포넌트.',
+    href: '/ko/tools/toast-notification/',
+    icon: '🔔',
+    tags: ['HTML', 'CSS', 'JS'],
+    isComingSoon: true,
+  },
+];
+---
+
+<BaseLayout
+  title="도구 모음"
+  description="바이브 코딩 초보 개발자를 위한 실용 웹 UI 도구 모음. 파비콘, 플로팅 버튼, 로딩 스피너 등 바로 복사해 쓸 수 있는 코드."
+>
+  <div class="page-header">
+    <div class="container">
+      <h1>도구 모음</h1>
+      <p>하나씩 추가하고 있어요.</p>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+    <div class="tools-grid">
+      {tools.map(tool => <ToolCard {...tool} />)}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+.page-header {
+  padding: var(--space-12) 0 var(--space-6);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-card);
+}
+.page-header p { margin-top: var(--space-2); }
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--space-4);
+}
+@media (max-width: 640px) {
+  .tools-grid { grid-template-columns: 1fr; }
+}
+</style>

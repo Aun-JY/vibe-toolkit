@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>바이브툴킷 소개 — 바이브 코딩 초보자를 위한 도구 모음</title>
+  <meta name="description" content="바이브툴킷은 AI와 함께 웹사이트를 만드는 초보 개발자를 위한 무료 실전 도구 모음입니다. 파비콘부터 애드센스까지 하나씩 완성해 봐요.">
+  <meta name="keywords" content="바이브코딩, 바이브 코딩, 초보 개발자, AI 코딩, 웹개발 입문, 파비콘, 무료 도구">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="바이브툴킷 소개 — 바이브 코딩 초보자를 위한 도구 모음">
+  <meta property="og:description" content="AI와 함께 웹사이트를 만드는 초보 개발자를 위한 무료 실전 도구 모음. 파비콘부터 애드센스까지.">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://aun-jy.github.io/vibe-toolkit/about.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+  :root {
+    --header-h:   60px;
+    --accent:     #4f46e5;
+    --accent-s:   #eef2ff;
+    --accent-b:   #c7d2fe;
+    --green:      #16a34a;
+    --green-s:    #f0fdf4;
+    --amber:      #d97706;
+    --amber-s:    #fffbeb;
+    --gray-50:    #f9fafb;
+    --gray-100:   #f3f4f6;
+    --gray-200:   #e5e7eb;
+    --gray-300:   #d1d5db;
+    --gray-400:   #9ca3af;
+    --gray-500:   #6b7280;
+    --gray-600:   #4b5563;
+    --gray-700:   #374151;
+    --gray-900:   #111827;
+    --r:          10px;
+    --sh-sm:      0 1px 3px rgba(0,0,0,.07);
+    --sh:         0 4px 12px rgba(0,0,0,.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-700);
+    line-height: 1.8;
+    font-size: 15px;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .header {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--header-h); background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex; align-items: center;
+    padding: 0 24px; gap: 16px; z-index: 300;
+    box-shadow: var(--sh-sm);
+  }
+  .logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+  .logo-mark {
+    width: 32px; height: 32px; background: var(--accent); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: .78rem; font-weight: 700; color: #fff;
+  }
+  .logo-name { font-size: .95rem; font-weight: 700; color: var(--gray-900); }
+
+  .header-nav { margin-left: auto; display: flex; align-items: center; gap: 20px; font-size: .85rem; }
+  .header-nav a { color: var(--gray-600); text-decoration: none; }
+  .header-nav a:hover { color: var(--accent); }
+
+  .page-wrap { margin-top: var(--header-h); min-height: calc(100vh - var(--header-h)); display: flex; flex-direction: column; }
+
+  /* 히어로 */
+  .about-hero {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    padding: 64px 24px 56px;
+    text-align: center;
+    color: #fff;
+  }
+  .about-hero-badge {
+    display: inline-block; margin-bottom: 16px;
+    background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
+    border-radius: 20px; padding: 4px 14px;
+    font-size: .8rem; font-weight: 600; letter-spacing: .04em;
+  }
+  .about-hero h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: 16px; line-height: 1.3; }
+  .about-hero p { font-size: 1rem; opacity: .85; max-width: 540px; margin: 0 auto; line-height: 1.8; }
+
+  .hero-cta {
+    margin-top: 28px;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: #fff; color: var(--accent);
+    font-weight: 700; font-size: .9rem;
+    padding: 11px 22px; border-radius: 8px;
+    text-decoration: none; transition: opacity .15s;
+  }
+  .btn-primary:hover { opacity: .9; text-decoration: none; }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,.15); color: #fff;
+    font-weight: 600; font-size: .9rem;
+    padding: 11px 22px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.35);
+    text-decoration: none; transition: background .15s;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,.25); text-decoration: none; }
+
+  /* 콘텐츠 */
+  .page-content { flex: 1; max-width: 860px; width: 100%; margin: 0 auto; padding: 60px 24px 80px; }
+
+  /* 섹션 공통 */
+  .section-title {
+    font-size: 1.5rem; font-weight: 700; color: var(--gray-900);
+    margin-bottom: 8px;
+  }
+  .section-sub {
+    font-size: .9rem; color: var(--gray-500); margin-bottom: 36px; line-height: 1.7;
+  }
+
+  /* "왜 만들었나?" */
+  .story-block { margin-bottom: 64px; }
+  .story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .story-card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--r);
+    padding: 24px; box-shadow: var(--sh-sm);
+  }
+  .story-card .s-icon { font-size: 2rem; margin-bottom: 12px; }
+  .story-card h3 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+  .story-card p { font-size: .88rem; color: var(--gray-500); line-height: 1.7; }
+
+  /* 바이브코딩이란 */
+  .vibe-block { margin-bottom: 64px; }
+  .vibe-explain {
+    background: var(--accent-s); border: 1px solid var(--accent-b); border-radius: var(--r);
+    padding: 28px 32px; margin-bottom: 24px;
+  }
+  .vibe-explain .ve-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .vibe-explain .ve-icon { font-size: 2rem; }
+  .vibe-explain h3 { font-size: 1.2rem; font-weight: 700; color: var(--gray-900); }
+  .vibe-explain p { color: var(--gray-600); line-height: 1.8; }
+
+  .flow-steps { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+  .flow-step {
+    display: flex; align-items: flex-start; gap: 16px;
+    background: #fff; border: 1px solid var(--gray-200); border-radius: 8px; padding: 16px 20px;
+  }
+  .flow-step .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; background: var(--accent); color: #fff;
+    border-radius: 50%; font-size: .8rem; font-weight: 700; flex-shrink: 0;
+  }
+  .flow-step .step-text h4 { font-size: .95rem; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; }
+  .flow-step .step-text p { font-size: .85rem; color: var(--gray-500); line-height: 1.6; }
+
+  /* 도구 목록 */
+  .tools-block { margin-bottom: 64px; }
+  .roadmap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .roadmap-card {
+    display: flex; align-items: center; gap: 14px;
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--r);
+    padding: 16px 20px; text-decoration: none; color: inherit;
+    transition: box-shadow .15s, border-color .15s;
+  }
+  .roadmap-card:hover { border-color: var(--accent-b); box-shadow: var(--sh); text-decoration: none; }
+  .roadmap-card .rc-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .roadmap-card .rc-body { flex: 1; min-width: 0; }
+  .roadmap-card .rc-title { font-size: .95rem; font-weight: 700; color: var(--gray-900); margin-bottom: 3px; }
+  .roadmap-card .rc-desc { font-size: .8rem; color: var(--gray-500); line-height: 1.5; }
+  .rc-badge {
+    font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .rc-badge.done { background: var(--green-s); color: var(--green); }
+  .rc-badge.soon { background: var(--gray-100); color: var(--gray-500); }
+
+  /* 가치관 */
+  .values-block { margin-bottom: 64px; }
+  .values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .value-card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--r);
+    padding: 24px 20px; text-align: center; box-shadow: var(--sh-sm);
+  }
+  .value-card .v-icon { font-size: 2.2rem; margin-bottom: 12px; }
+  .value-card h3 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+  .value-card p { font-size: .84rem; color: var(--gray-500); line-height: 1.7; }
+
+  /* 만든이 */
+  .maker-block {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--r);
+    padding: 32px; display: flex; align-items: center; gap: 24px;
+    margin-bottom: 64px; box-shadow: var(--sh-sm);
+  }
+  .maker-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; flex-shrink: 0;
+  }
+  .maker-info h3 { font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
+  .maker-info p { font-size: .88rem; color: var(--gray-500); line-height: 1.7; }
+  .maker-info .maker-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .maker-tag {
+    font-size: .75rem; background: var(--accent-s); color: var(--accent);
+    border: 1px solid var(--accent-b); border-radius: 20px; padding: 2px 10px;
+  }
+
+  /* CTA */
+  .cta-block {
+    background: linear-gradient(135deg, var(--accent-s), #faf5ff);
+    border: 1px solid var(--accent-b); border-radius: var(--r);
+    padding: 40px; text-align: center; margin-bottom: 32px;
+  }
+  .cta-block h2 { font-size: 1.4rem; font-weight: 700; color: var(--gray-900); margin-bottom: 10px; }
+  .cta-block p { font-size: .9rem; color: var(--gray-500); margin-bottom: 24px; }
+  .cta-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .cta-btn-main {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--accent); color: #fff;
+    font-weight: 700; font-size: .9rem;
+    padding: 12px 24px; border-radius: 8px;
+    text-decoration: none; transition: opacity .15s;
+  }
+  .cta-btn-main:hover { opacity: .9; text-decoration: none; }
+  .cta-btn-sub {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: #fff; color: var(--gray-700);
+    font-weight: 600; font-size: .9rem;
+    padding: 12px 24px; border-radius: 8px;
+    border: 1px solid var(--gray-200);
+    text-decoration: none; transition: border-color .15s;
+  }
+  .cta-btn-sub:hover { border-color: var(--accent-b); text-decoration: none; }
+
+  /* 푸터 */
+  .site-footer { background: var(--gray-900); color: #9ca3af; }
+  .footer-inner {
+    max-width: 1200px; margin: 0 auto; padding: 48px 24px 32px;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
+  }
+  .footer-brand .footer-logo-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .footer-logo-mark {
+    width: 30px; height: 30px; background: var(--accent); border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem; font-weight: 700; color: #fff;
+  }
+  .footer-logo-name { font-size: .9rem; font-weight: 700; color: #f9fafb; }
+  .footer-desc { font-size: .82rem; line-height: 1.7; margin-bottom: 12px; }
+  .footer-copy { font-size: .75rem; color: var(--gray-500); }
+  .footer-col h4 { font-size: .8rem; font-weight: 700; color: #f9fafb; margin-bottom: 14px; text-transform: uppercase; letter-spacing: .06em; }
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 9px; }
+  .footer-links a { font-size: .83rem; color: #9ca3af; text-decoration: none; }
+  .footer-links a:hover { color: #f9fafb; }
+  .footer-bottom {
+    border-top: 1px solid #374151; padding: 20px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px; font-size: .78rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .footer-bottom-links { display: flex; gap: 20px; }
+  .footer-bottom-links a { color: #9ca3af; text-decoration: none; }
+  .footer-bottom-links a:hover { color: #f9fafb; }
+
+  @media (max-width: 768px) {
+    .story-grid { grid-template-columns: 1fr; }
+    .roadmap-grid { grid-template-columns: 1fr; }
+    .values-grid { grid-template-columns: 1fr 1fr; }
+    .maker-block { flex-direction: column; text-align: center; }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+    .footer-brand { grid-column: 1 / -1; }
+    .header-nav { display: none; }
+    .about-hero h1 { font-size: 1.7rem; }
+  }
+  @media (max-width: 480px) {
+    .values-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr; }
+  }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">VT</div>
+    <span class="logo-name">바이브툴킷</span>
+  </a>
+  <nav class="header-nav">
+    <a href="index.html">홈</a>
+    <a href="favicon-sample.html">파비콘 도구</a>
+    <a href="about.html">소개</a>
+    <a href="contact.html">문의</a>
+  </nav>
+</header>
+
+<div class="page-wrap">
+
+  <!-- 히어로 -->
+  <div class="about-hero">
+    <div class="about-hero-badge">🚀 바이브툴킷 v0.1 베타</div>
+    <h1>바이브 코딩을 배우는 모든 분들을 위한<br>실전 도구 모음</h1>
+    <p>AI에게 코드를 받았는데 어디에 어떻게 쓰는지 모르겠다면? 바이브툴킷이 단계별로 안내해 드려요. 파비콘부터 애드센스까지, 하나씩 완성해봐요.</p>
+    <div class="hero-cta">
+      <a href="index.html" class="btn-primary">🗂️ 전체 도구 보기</a>
+      <a href="favicon-sample.html" class="btn-secondary">🌐 파비콘 만들기 →</a>
+    </div>
+  </div>
+
+  <main class="page-content">
+
+    <!-- 왜 만들었나? -->
+    <div class="story-block">
+      <h2 class="section-title">왜 바이브툴킷을 만들었나요?</h2>
+      <p class="section-sub">ChatGPT나 Claude로 코드를 받아도 "이걸 어디에 어떻게 쓰지?" 하는 순간, 누구나 한 번쯤 막막했을 거예요.</p>
+      <div class="story-grid">
+        <div class="story-card">
+          <div class="s-icon">😰</div>
+          <h3>AI가 코드를 줬는데…</h3>
+          <p>HTML, CSS, JS를 처음 배우는 분들이 AI에게 코드를 받고 나서 "이 코드를 어디다 붙여 넣어야 하지?", "왜 안 되지?" 하며 막히는 경우가 너무 많아요.</p>
+        </div>
+        <div class="story-card">
+          <div class="s-icon">🔍</div>
+          <h3>구글 검색은 너무 어렵고</h3>
+          <p>검색을 해봐도 Stack Overflow의 영어 답변, 3년 전 블로그 글… 초보자 눈높이에 맞는 한국어 실전 자료가 너무 부족했어요.</p>
+        </div>
+        <div class="story-card">
+          <div class="s-icon">💡</div>
+          <h3>직접 만들어 써봐야 안다</h3>
+          <p>코드는 읽는 것만으론 절대 익혀지지 않아요. 직접 수정하고, 눈으로 확인하고, 내 사이트에 적용해봐야 진짜 배우게 돼요.</p>
+        </div>
+        <div class="story-card">
+          <div class="s-icon">🎯</div>
+          <h3>그래서 만들었어요</h3>
+          <p>복붙만 해도 동작하는 코드, 실시간으로 수정해볼 수 있는 에디터, 한국어로 친절하게 설명하는 가이드. 이게 바이브툴킷이에요.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 바이브코딩이란? -->
+    <div class="vibe-block">
+      <h2 class="section-title">바이브 코딩이 뭔가요?</h2>
+      <p class="section-sub">2025년 가장 핫한 코딩 방식. AI와 대화하면서 실시간으로 코드를 만들어가는 방법이에요.</p>
+
+      <div class="vibe-explain">
+        <div class="ve-head">
+          <span class="ve-icon">🤖</span>
+          <h3>AI + 나 = 바이브 코딩</h3>
+        </div>
+        <p>
+          "바이브 코딩(Vibe Coding)"은 2025년 Andrej Karpathy가 처음 명명한 개념으로, 개발자가 AI(ChatGPT, Claude 등)와 자연어로 대화하면서 코드를 작성하는 방식이에요. 완벽한 코드 문법을 몰라도, 원하는 기능을 말로 설명하면 AI가 코드를 만들어줘요.
+        </p>
+      </div>
+
+      <div class="flow-steps">
+        <div class="flow-step">
+          <span class="step-num">1</span>
+          <div class="step-text">
+            <h4>💬 AI에게 요청하기</h4>
+            <p>ChatGPT나 Claude에게 "브라우저 탭에 보이는 파비콘 SVG 코드 만들어줘, 보라색 배경에 V 글자"처럼 원하는 것을 말로 설명해요.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">2</span>
+          <div class="step-text">
+            <h4>📋 코드 받아서 이해하기</h4>
+            <p>AI가 만들어준 코드를 받아요. 바이브툴킷의 해설을 참고해서 각 속성이 무슨 의미인지 파악해요.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">3</span>
+          <div class="step-text">
+            <h4>🔧 에디터에서 수정해보기</h4>
+            <p>바이브툴킷 에디터에 코드를 붙여넣고 색상, 크기, 모양을 직접 바꿔보며 결과를 실시간으로 확인해요.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">4</span>
+          <div class="step-text">
+            <h4>🚀 내 사이트에 적용!</h4>
+            <p>완성된 코드를 내 HTML 파일에 붙여넣으면 끝! 가이드대로만 따라 하면 누구든 적용할 수 있어요.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 도구 로드맵 -->
+    <div class="tools-block">
+      <h2 class="section-title">바이브툴킷이 제공하는 도구들</h2>
+      <p class="section-sub">웹사이트 하나를 완성하는 데 필요한 것들을 하나씩 만들어가고 있어요.</p>
+
+      <div class="roadmap-grid">
+        <a href="favicon-sample.html" class="roadmap-card">
+          <span class="rc-icon">🌐</span>
+          <div class="rc-body">
+            <div class="rc-title">파비콘 (Favicon)</div>
+            <div class="rc-desc">브라우저 탭에 표시되는 아이콘. SVG로 직접 만들어봐요.</div>
+          </div>
+          <span class="rc-badge done">✅ 완성</span>
+        </a>
+        <div class="roadmap-card" style="opacity:.75; cursor:default;">
+          <span class="rc-icon">💬</span>
+          <div class="rc-body">
+            <div class="rc-title">플로팅 버튼</div>
+            <div class="rc-desc">화면 오른쪽 하단에 고정되는 카카오톡 상담 버튼.</div>
+          </div>
+          <span class="rc-badge soon">준비중</span>
+        </div>
+        <div class="roadmap-card" style="opacity:.75; cursor:default;">
+          <span class="rc-icon">📸</span>
+          <div class="rc-body">
+            <div class="rc-title">오픈그래프 (OG)</div>
+            <div class="rc-desc">카카오톡·슬랙에 링크 공유 시 나오는 미리보기 이미지.</div>
+          </div>
+          <span class="rc-badge soon">준비중</span>
+        </div>
+        <div class="roadmap-card" style="opacity:.75; cursor:default;">
+          <span class="rc-icon">🏷️</span>
+          <div class="rc-body">
+            <div class="rc-title">메타 태그 (SEO)</div>
+            <div class="rc-desc">구글 검색 결과에 보이는 제목과 설명 최적화.</div>
+          </div>
+          <span class="rc-badge soon">준비중</span>
+        </div>
+        <div class="roadmap-card" style="opacity:.75; cursor:default;">
+          <span class="rc-icon">💰</span>
+          <div class="rc-body">
+            <div class="rc-title">구글 애드센스 가이드</div>
+            <div class="rc-desc">승인부터 첫 수익까지 단계별 체크리스트.</div>
+          </div>
+          <span class="rc-badge soon">준비중</span>
+        </div>
+        <div class="roadmap-card" style="opacity:.75; cursor:default;">
+          <span class="rc-icon">🗺️</span>
+          <div class="rc-body">
+            <div class="rc-title">사이트맵 (Sitemap)</div>
+            <div class="rc-desc">구글 색인을 빠르게 도와주는 XML 파일 생성.</div>
+          </div>
+          <span class="rc-badge soon">준비중</span>
+        </div>
+        <div class="roadmap-card" style="opacity:.75; cursor:default;">
+          <span class="rc-icon">📊</span>
+          <div class="rc-body">
+            <div class="rc-title">Google Analytics (GA4)</div>
+            <div class="rc-desc">방문자 분석 도구 설치와 기본 지표 해설.</div>
+          </div>
+          <span class="rc-badge soon">준비중</span>
+        </div>
+        <div class="roadmap-card" style="opacity:.75; cursor:default;">
+          <span class="rc-icon">🍪</span>
+          <div class="rc-body">
+            <div class="rc-title">쿠키 동의 배너</div>
+            <div class="rc-desc">애드센스 필수! GDPR 대응 쿠키 배너 만들기.</div>
+          </div>
+          <span class="rc-badge soon">준비중</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 가치관 -->
+    <div class="values-block">
+      <h2 class="section-title">바이브툴킷이 지키는 원칙</h2>
+      <p class="section-sub">도구를 만들면서 항상 이 세 가지를 최우선으로 생각해요.</p>
+      <div class="values-grid">
+        <div class="value-card">
+          <div class="v-icon">🆓</div>
+          <h3>완전 무료</h3>
+          <p>모든 도구와 코드는 영원히 무료예요. 회원가입 없이 바로 사용 가능해요.</p>
+        </div>
+        <div class="value-card">
+          <div class="v-icon">🇰🇷</div>
+          <h3>한국어 우선</h3>
+          <p>영어 자료가 넘치는 세상. 한국어로 쉽고 친절하게 설명하는 곳이 더 필요해요.</p>
+        </div>
+        <div class="value-card">
+          <div class="v-icon">✂️</div>
+          <h3>복붙하면 바로 동작</h3>
+          <p>예제 코드를 복사해서 붙여넣기만 해도 실제로 동작해야 한다고 믿어요.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 만든이 -->
+    <div class="maker-block">
+      <div class="maker-avatar">👨‍💻</div>
+      <div class="maker-info">
+        <h3>만든 사람</h3>
+        <p>
+          바이브툴킷은 AI와 코딩을 배우면서 "이런 게 있었으면 좋겠다"는 생각에서 시작했어요.
+          초보자가 느끼는 어려움을 함께 해결하고 싶어서 만들었습니다.
+          도구 제안, 오류 신고, 피드백은 언제든 환영해요!
+        </p>
+        <div class="maker-tags">
+          <span class="maker-tag">바이브코딩</span>
+          <span class="maker-tag">웹 개발</span>
+          <span class="maker-tag">UI/UX</span>
+          <span class="maker-tag">한국어 콘텐츠</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-block">
+      <h2>지금 바로 시작해봐요 🚀</h2>
+      <p>첫 번째 도구인 파비콘부터 만들어보세요. 10분이면 내 사이트에 아이콘을 달 수 있어요.</p>
+      <div class="cta-btns">
+        <a href="favicon-sample.html" class="cta-btn-main">🌐 파비콘 만들러 가기</a>
+        <a href="contact.html" class="cta-btn-sub">💡 도구 제안하기</a>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo-wrap">
+          <div class="footer-logo-mark">VT</div>
+          <span class="footer-logo-name">바이브툴킷</span>
+        </div>
+        <p class="footer-desc">바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 실전 도구 모음이에요.</p>
+        <p class="footer-copy">© 2025 바이브툴킷. All rights reserved.</p>
+      </div>
+      <div class="footer-col">
+        <h4>도구 모음</h4>
+        <ul class="footer-links">
+          <li><a href="favicon-sample.html">🌐 파비콘 (Favicon)</a></li>
+          <li><a href="#">💬 플로팅 버튼 (준비중)</a></li>
+          <li><a href="#">📸 오픈그래프 (준비중)</a></li>
+          <li><a href="#">🏷️ 메타 태그 (준비중)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>사이트 정보</h4>
+        <ul class="footer-links">
+          <li><a href="about.html">바이브툴킷 소개</a></li>
+          <li><a href="privacy.html">개인정보처리방침</a></li>
+          <li><a href="terms.html">이용약관</a></li>
+          <li><a href="sitemap.html">사이트맵</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>문의 / 지원</h4>
+        <ul class="footer-links">
+          <li><a href="contact.html">✉️ 문의하기</a></li>
+          <li><a href="contact.html">🐛 오류 신고</a></li>
+          <li><a href="contact.html">💡 도구 제안</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 바이브툴킷 · 바이브 코딩을 배우는 모든 분들을 위해 만들었어요 ❤️</span>
+      <div class="footer-bottom-links">
+        <a href="privacy.html">개인정보처리방침</a>
+        <a href="terms.html">이용약관</a>
+        <a href="contact.html">문의하기</a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  if (self === top) return;
+  const h = document.querySelector('.header'); if (h) h.style.display = 'none';
+  const w = document.querySelector('.page-wrap'); if (w) w.style.marginTop = '0';
+  const f = document.querySelector('.site-footer'); if (f) f.style.display = 'none';
+  document.querySelectorAll('a[href$=".html"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      if (window.parent.loadTool) { e.preventDefault(); window.parent.loadTool(this.getAttribute('href')); }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사이트맵 — 바이브툴킷</title>
+  <meta name="description" content="바이브툴킷 전체 페이지 목록입니다. 파비콘, 플로팅 버튼, 오픈그래프 등 모든 도구와 가이드를 한눈에 확인하세요.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://aun-jy.github.io/vibe-toolkit/sitemap.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+  :root {
+    --header-h:   60px;
+    --accent:     #4f46e5;
+    --accent-s:   #eef2ff;
+    --accent-b:   #c7d2fe;
+    --green:      #16a34a;
+    --green-s:    #f0fdf4;
+    --green-b:    #bbf7d0;
+    --gray-50:    #f9fafb;
+    --gray-100:   #f3f4f6;
+    --gray-200:   #e5e7eb;
+    --gray-300:   #d1d5db;
+    --gray-400:   #9ca3af;
+    --gray-500:   #6b7280;
+    --gray-600:   #4b5563;
+    --gray-700:   #374151;
+    --gray-900:   #111827;
+    --r:          10px;
+    --sh-sm:      0 1px 3px rgba(0,0,0,.07);
+    --sh:         0 4px 12px rgba(0,0,0,.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-700);
+    line-height: 1.8;
+    font-size: 15px;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .header {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--header-h); background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex; align-items: center;
+    padding: 0 24px; gap: 16px; z-index: 300;
+    box-shadow: var(--sh-sm);
+  }
+  .logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+  .logo-mark {
+    width: 32px; height: 32px; background: var(--accent); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: .78rem; font-weight: 700; color: #fff;
+  }
+  .logo-name { font-size: .95rem; font-weight: 700; color: var(--gray-900); }
+  .header-nav { margin-left: auto; display: flex; align-items: center; gap: 20px; font-size: .85rem; }
+  .header-nav a { color: var(--gray-600); text-decoration: none; }
+  .header-nav a:hover { color: var(--accent); }
+
+  .page-wrap { margin-top: var(--header-h); min-height: calc(100vh - var(--header-h)); display: flex; flex-direction: column; }
+
+  .page-hero {
+    background: #fff; border-bottom: 1px solid var(--gray-200);
+    padding: 48px 24px 40px; text-align: center;
+  }
+  .page-hero-icon { font-size: 2.8rem; margin-bottom: 12px; }
+  .page-hero h1 { font-size: 1.8rem; font-weight: 700; color: var(--gray-900); margin-bottom: 10px; }
+  .page-hero p { font-size: .9rem; color: var(--gray-500); max-width: 500px; margin: 0 auto; }
+
+  .page-content { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; }
+
+  /* 통계 배너 */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 48px;
+  }
+  .stat-card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--r);
+    padding: 20px; text-align: center; box-shadow: var(--sh-sm);
+  }
+  .stat-card .s-num { font-size: 1.8rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+  .stat-card .s-label { font-size: .8rem; color: var(--gray-500); }
+
+  /* 카테고리 섹션 */
+  .sitemap-section { margin-bottom: 48px; }
+  .sitemap-section h2 {
+    font-size: 1.1rem; font-weight: 700; color: var(--gray-900);
+    display: flex; align-items: center; gap: 10px;
+    padding-bottom: 12px; border-bottom: 2px solid var(--gray-200); margin-bottom: 16px;
+  }
+  .sitemap-section h2 .cat-icon { font-size: 1.3rem; }
+
+  .sitemap-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  }
+
+  .sitemap-card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--r);
+    padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;
+    text-decoration: none; color: inherit;
+    transition: border-color .15s, box-shadow .15s;
+    position: relative;
+  }
+  .sitemap-card:hover { border-color: var(--accent-b); box-shadow: var(--sh); text-decoration: none; }
+  .sitemap-card.disabled { opacity: .65; cursor: default; pointer-events: none; }
+
+  .sc-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .sc-title { font-size: .92rem; font-weight: 700; color: var(--gray-900); }
+  .sc-badge {
+    font-size: .68rem; font-weight: 700; padding: 2px 7px;
+    border-radius: 10px; white-space: nowrap; flex-shrink: 0;
+  }
+  .sc-badge.done { background: var(--green-s); color: var(--green); }
+  .sc-badge.soon { background: var(--gray-100); color: var(--gray-500); }
+  .sc-badge.core { background: var(--accent-s); color: var(--accent); }
+
+  .sc-url {
+    font-size: .76rem; color: var(--gray-400);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .sc-desc { font-size: .82rem; color: var(--gray-500); line-height: 1.5; }
+
+  /* XML 안내 */
+  .xml-tip {
+    background: var(--gray-900); color: #e2e8f0;
+    border-radius: var(--r); padding: 24px 28px; margin-bottom: 48px;
+  }
+  .xml-tip h3 {
+    font-size: 1rem; font-weight: 700; color: #f9fafb;
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .xml-tip p { font-size: .85rem; color: #94a3b8; margin-bottom: 16px; line-height: 1.7; }
+  .xml-code {
+    background: #0f172a; border-radius: 8px; padding: 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: .8rem;
+    color: #7dd3fc; overflow-x: auto; white-space: pre; line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .xml-tip small { font-size: .78rem; color: #64748b; }
+
+  /* 유용한 링크 */
+  .links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 48px; }
+  .link-card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--r);
+    padding: 20px 24px; box-shadow: var(--sh-sm);
+  }
+  .link-card h3 { font-size: .95rem; font-weight: 700; color: var(--gray-900); margin-bottom: 8px; }
+  .link-card p { font-size: .84rem; color: var(--gray-500); margin-bottom: 14px; line-height: 1.6; }
+  .ext-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .83rem; color: var(--accent); font-weight: 600;
+    text-decoration: none;
+  }
+  .ext-link:hover { text-decoration: underline; }
+
+  /* 푸터 */
+  .site-footer { background: var(--gray-900); color: #9ca3af; }
+  .footer-inner {
+    max-width: 1200px; margin: 0 auto; padding: 48px 24px 32px;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
+  }
+  .footer-brand .footer-logo-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .footer-logo-mark {
+    width: 30px; height: 30px; background: var(--accent); border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem; font-weight: 700; color: #fff;
+  }
+  .footer-logo-name { font-size: .9rem; font-weight: 700; color: #f9fafb; }
+  .footer-desc { font-size: .82rem; line-height: 1.7; margin-bottom: 12px; }
+  .footer-copy { font-size: .75rem; color: var(--gray-500); }
+  .footer-col h4 { font-size: .8rem; font-weight: 700; color: #f9fafb; margin-bottom: 14px; text-transform: uppercase; letter-spacing: .06em; }
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 9px; }
+  .footer-links a { font-size: .83rem; color: #9ca3af; text-decoration: none; }
+  .footer-links a:hover { color: #f9fafb; }
+  .footer-bottom {
+    border-top: 1px solid #374151; padding: 20px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px; font-size: .78rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .footer-bottom-links { display: flex; gap: 20px; }
+  .footer-bottom-links a { color: #9ca3af; text-decoration: none; }
+  .footer-bottom-links a:hover { color: #f9fafb; }
+
+  @media (max-width: 768px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .sitemap-grid { grid-template-columns: 1fr 1fr; }
+    .links-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+    .footer-brand { grid-column: 1 / -1; }
+    .header-nav { display: none; }
+  }
+  @media (max-width: 480px) {
+    .sitemap-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .footer-inner { grid-template-columns: 1fr; }
+  }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">VT</div>
+    <span class="logo-name">바이브툴킷</span>
+  </a>
+  <nav class="header-nav">
+    <a href="index.html">홈</a>
+    <a href="favicon-sample.html">파비콘 도구</a>
+    <a href="about.html">소개</a>
+    <a href="contact.html">문의</a>
+  </nav>
+</header>
+
+<div class="page-wrap">
+
+  <div class="page-hero">
+    <div class="page-hero-icon">🗺️</div>
+    <h1>사이트맵</h1>
+    <p>바이브툴킷의 모든 페이지 목록이에요. 원하는 도구를 빠르게 찾아보세요.</p>
+  </div>
+
+  <main class="page-content">
+
+    <!-- 통계 -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="s-num">1</div>
+        <div class="s-label">✅ 완성된 도구</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-num">8</div>
+        <div class="s-label">🕐 준비중 도구</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-num">5</div>
+        <div class="s-label">📄 사이트 페이지</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-num">9</div>
+        <div class="s-label">📁 전체 페이지 수</div>
+      </div>
+    </div>
+
+    <!-- 메인 페이지 -->
+    <div class="sitemap-section">
+      <h2><span class="cat-icon">🏠</span> 메인 페이지</h2>
+      <div class="sitemap-grid">
+        <a href="index.html" class="sitemap-card">
+          <div class="sc-head">
+            <span class="sc-title">홈 (메인)</span>
+            <span class="sc-badge core">핵심</span>
+          </div>
+          <span class="sc-url">index.html</span>
+          <span class="sc-desc">전체 도구 목록, 바이브코딩 소개, 검색 기능</span>
+        </a>
+        <a href="about.html" class="sitemap-card">
+          <div class="sc-head">
+            <span class="sc-title">사이트 소개</span>
+            <span class="sc-badge done">완성</span>
+          </div>
+          <span class="sc-url">about.html</span>
+          <span class="sc-desc">바이브툴킷을 만든 이유와 비전, 도구 로드맵</span>
+        </a>
+        <a href="contact.html" class="sitemap-card">
+          <div class="sc-head">
+            <span class="sc-title">문의하기</span>
+            <span class="sc-badge done">완성</span>
+          </div>
+          <span class="sc-url">contact.html</span>
+          <span class="sc-desc">오류 신고, 도구 제안, 협업 문의 접수</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- HTML 기초 도구 -->
+    <div class="sitemap-section">
+      <h2><span class="cat-icon">🌐</span> HTML 기초 도구</h2>
+      <div class="sitemap-grid">
+        <a href="favicon-sample.html" class="sitemap-card">
+          <div class="sc-head">
+            <span class="sc-title">파비콘 (Favicon)</span>
+            <span class="sc-badge done">✅ 완성</span>
+          </div>
+          <span class="sc-url">favicon-sample.html</span>
+          <span class="sc-desc">SVG 파비콘 생성, 갤러리, 실시간 코드 에디터</span>
+        </a>
+        <div class="sitemap-card disabled">
+          <div class="sc-head">
+            <span class="sc-title">플로팅 버튼</span>
+            <span class="sc-badge soon">준비중</span>
+          </div>
+          <span class="sc-url">floating-button.html</span>
+          <span class="sc-desc">화면 고정 카카오톡·채팅 버튼 만들기</span>
+        </div>
+        <div class="sitemap-card disabled">
+          <div class="sc-head">
+            <span class="sc-title">오픈그래프 (OG)</span>
+            <span class="sc-badge soon">준비중</span>
+          </div>
+          <span class="sc-url">opengraph.html</span>
+          <span class="sc-desc">SNS 공유 시 미리보기 이미지·제목 설정</span>
+        </div>
+        <div class="sitemap-card disabled">
+          <div class="sc-head">
+            <span class="sc-title">메타 태그 (SEO)</span>
+            <span class="sc-badge soon">준비중</span>
+          </div>
+          <span class="sc-url">meta-tags.html</span>
+          <span class="sc-desc">구글 검색 결과 제목·설명 최적화</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO/수익화 도구 -->
+    <div class="sitemap-section">
+      <h2><span class="cat-icon">💰</span> SEO / 수익화 도구</h2>
+      <div class="sitemap-grid">
+        <div class="sitemap-card disabled">
+          <div class="sc-head">
+            <span class="sc-title">애드센스 가이드</span>
+            <span class="sc-badge soon">준비중</span>
+          </div>
+          <span class="sc-url">adsense-guide.html</span>
+          <span class="sc-desc">승인부터 첫 수익까지 단계별 체크리스트</span>
+        </div>
+        <div class="sitemap-card disabled">
+          <div class="sc-head">
+            <span class="sc-title">사이트맵 만들기</span>
+            <span class="sc-badge soon">준비중</span>
+          </div>
+          <span class="sc-url">sitemap-generator.html</span>
+          <span class="sc-desc">XML 사이트맵 생성, robots.txt 작성법</span>
+        </div>
+        <div class="sitemap-card disabled">
+          <div class="sc-head">
+            <span class="sc-title">쿠키 동의 배너</span>
+            <span class="sc-badge soon">준비중</span>
+          </div>
+          <span class="sc-url">cookie-banner.html</span>
+          <span class="sc-desc">GDPR 대응 쿠키 동의 배너 코드 생성기</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 분석 도구 -->
+    <div class="sitemap-section">
+      <h2><span class="cat-icon">📊</span> 분석 도구</h2>
+      <div class="sitemap-grid">
+        <div class="sitemap-card disabled">
+          <div class="sc-head">
+            <span class="sc-title">Google Analytics</span>
+            <span class="sc-badge soon">준비중</span>
+          </div>
+          <span class="sc-url">google-analytics.html</span>
+          <span class="sc-desc">GA4 설치, 기본 지표 해설, 이벤트 추적</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 법적 페이지 -->
+    <div class="sitemap-section">
+      <h2><span class="cat-icon">📋</span> 사이트 정보 페이지</h2>
+      <div class="sitemap-grid">
+        <a href="privacy.html" class="sitemap-card">
+          <div class="sc-head">
+            <span class="sc-title">개인정보처리방침</span>
+            <span class="sc-badge done">완성</span>
+          </div>
+          <span class="sc-url">privacy.html</span>
+          <span class="sc-desc">수집 정보, 쿠키 정책, 제3자 서비스 안내</span>
+        </a>
+        <a href="terms.html" class="sitemap-card">
+          <div class="sc-head">
+            <span class="sc-title">이용약관</span>
+            <span class="sc-badge done">완성</span>
+          </div>
+          <span class="sc-url">terms.html</span>
+          <span class="sc-desc">서비스 이용 조건, 금지 행위, 면책 사항</span>
+        </a>
+        <a href="sitemap.html" class="sitemap-card">
+          <div class="sc-head">
+            <span class="sc-title">사이트맵</span>
+            <span class="sc-badge done">완성</span>
+          </div>
+          <span class="sc-url">sitemap.html</span>
+          <span class="sc-desc">전체 페이지 목록 (현재 페이지)</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- XML 사이트맵 안내 -->
+    <div class="xml-tip">
+      <h3>🤖 구글 검색엔진을 위한 XML 사이트맵</h3>
+      <p>
+        위 HTML 사이트맵은 사람이 보기 위한 것이에요. 구글이 사이트를 빠르게 색인하려면 <strong style="color:#f8fafc">XML 형식의 사이트맵</strong>도 필요해요.
+        GitHub Pages에 배포한다면 루트 디렉터리에 아래 파일을 만들어 주세요.
+      </p>
+      <div class="xml-code">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"&gt;
+  &lt;url&gt;
+    &lt;loc&gt;https://aun-jy.github.io/vibe-toolkit/&lt;/loc&gt;
+    &lt;changefreq&gt;weekly&lt;/changefreq&gt;
+    &lt;priority&gt;1.0&lt;/priority&gt;
+  &lt;/url&gt;
+  &lt;url&gt;
+    &lt;loc&gt;https://aun-jy.github.io/vibe-toolkit/favicon-sample.html&lt;/loc&gt;
+    &lt;changefreq&gt;monthly&lt;/changefreq&gt;
+    &lt;priority&gt;0.8&lt;/priority&gt;
+  &lt;/url&gt;
+  &lt;url&gt;
+    &lt;loc&gt;https://aun-jy.github.io/vibe-toolkit/about.html&lt;/loc&gt;
+    &lt;priority&gt;0.6&lt;/priority&gt;
+  &lt;/url&gt;
+&lt;/urlset&gt;</div>
+      <small>
+        💡 파일명을 <code style="color:#7dd3fc">sitemap.xml</code>로 저장하고, Google Search Console에서 제출하면 더 빠르게 색인돼요.
+        자세한 방법은 곧 출시될 "사이트맵 만들기" 도구에서 안내해 드릴게요.
+      </small>
+    </div>
+
+    <!-- 유용한 외부 링크 -->
+    <div class="links-grid">
+      <div class="link-card">
+        <h3>🔍 구글 서치 콘솔</h3>
+        <p>내 사이트가 구글에 어떻게 인덱싱되는지 확인하고, 사이트맵 XML을 제출할 수 있어요.</p>
+        <a href="https://search.google.com/search-console" target="_blank" rel="noopener" class="ext-link">
+          Google Search Console 바로가기 →
+        </a>
+      </div>
+      <div class="link-card">
+        <h3>📊 구글 애널리틱스</h3>
+        <p>방문자 수, 체류 시간, 유입 경로 등 사이트 통계를 무료로 확인할 수 있어요.</p>
+        <a href="https://analytics.google.com" target="_blank" rel="noopener" class="ext-link">
+          Google Analytics 바로가기 →
+        </a>
+      </div>
+      <div class="link-card">
+        <h3>💰 구글 애드센스</h3>
+        <p>사이트에 광고를 게재해서 수익을 얻을 수 있는 구글의 광고 플랫폼이에요.</p>
+        <a href="https://www.google.com/adsense" target="_blank" rel="noopener" class="ext-link">
+          Google AdSense 바로가기 →
+        </a>
+      </div>
+      <div class="link-card">
+        <h3>🌐 GitHub Pages</h3>
+        <p>무료로 정적 웹사이트를 호스팅할 수 있어요. 바이브툴킷도 여기서 운영돼요.</p>
+        <a href="https://pages.github.com" target="_blank" rel="noopener" class="ext-link">
+          GitHub Pages 바로가기 →
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo-wrap">
+          <div class="footer-logo-mark">VT</div>
+          <span class="footer-logo-name">바이브툴킷</span>
+        </div>
+        <p class="footer-desc">바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 실전 도구 모음이에요.</p>
+        <p class="footer-copy">© 2025 바이브툴킷. All rights reserved.</p>
+      </div>
+      <div class="footer-col">
+        <h4>도구 모음</h4>
+        <ul class="footer-links">
+          <li><a href="favicon-sample.html">🌐 파비콘 (Favicon)</a></li>
+          <li><a href="#">💬 플로팅 버튼 (준비중)</a></li>
+          <li><a href="#">📸 오픈그래프 (준비중)</a></li>
+          <li><a href="#">🏷️ 메타 태그 (준비중)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>사이트 정보</h4>
+        <ul class="footer-links">
+          <li><a href="about.html">바이브툴킷 소개</a></li>
+          <li><a href="privacy.html">개인정보처리방침</a></li>
+          <li><a href="terms.html">이용약관</a></li>
+          <li><a href="sitemap.html">사이트맵</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>문의 / 지원</h4>
+        <ul class="footer-links">
+          <li><a href="contact.html">✉️ 문의하기</a></li>
+          <li><a href="contact.html">🐛 오류 신고</a></li>
+          <li><a href="contact.html">💡 도구 제안</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 바이브툴킷 · 바이브 코딩을 배우는 모든 분들을 위해 만들었어요 ❤️</span>
+      <div class="footer-bottom-links">
+        <a href="privacy.html">개인정보처리방침</a>
+        <a href="terms.html">이용약관</a>
+        <a href="contact.html">문의하기</a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  if (self === top) return;
+  const h = document.querySelector('.header'); if (h) h.style.display = 'none';
+  const w = document.querySelector('.page-wrap'); if (w) w.style.marginTop = '0';
+  const f = document.querySelector('.site-footer'); if (f) f.style.display = 'none';
+  document.querySelectorAll('a[href$=".html"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      if (window.parent.loadTool) { e.preventDefault(); window.parent.loadTool(this.getAttribute('href')); }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

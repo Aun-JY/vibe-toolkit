@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>이용약관 — 바이브툴킷</title>
+  <meta name="description" content="바이브툴킷 서비스 이용약관입니다. 서비스 이용 조건, 금지 행위, 면책 사항 등을 안내합니다.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://aun-jy.github.io/vibe-toolkit/terms.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+  :root {
+    --header-h:   60px;
+    --accent:     #4f46e5;
+    --accent-s:   #eef2ff;
+    --accent-b:   #c7d2fe;
+    --gray-50:    #f9fafb;
+    --gray-100:   #f3f4f6;
+    --gray-200:   #e5e7eb;
+    --gray-300:   #d1d5db;
+    --gray-400:   #9ca3af;
+    --gray-500:   #6b7280;
+    --gray-600:   #4b5563;
+    --gray-700:   #374151;
+    --gray-900:   #111827;
+    --r:          10px;
+    --sh-sm:      0 1px 3px rgba(0,0,0,.07);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-700);
+    line-height: 1.8;
+    font-size: 15px;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .header {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--header-h);
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex; align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+    z-index: 300;
+    box-shadow: var(--sh-sm);
+  }
+  .logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+  .logo-mark {
+    width: 32px; height: 32px; background: var(--accent); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: .78rem; font-weight: 700; color: #fff;
+  }
+  .logo-name { font-size: .95rem; font-weight: 700; color: var(--gray-900); }
+
+  .header-nav { margin-left: auto; display: flex; align-items: center; gap: 20px; font-size: .85rem; }
+  .header-nav a { color: var(--gray-600); text-decoration: none; }
+  .header-nav a:hover { color: var(--accent); }
+
+  .page-wrap { margin-top: var(--header-h); min-height: calc(100vh - var(--header-h)); display: flex; flex-direction: column; }
+
+  .page-hero {
+    background: #fff; border-bottom: 1px solid var(--gray-200);
+    padding: 48px 24px 40px; text-align: center;
+  }
+  .page-hero-icon { font-size: 2.8rem; margin-bottom: 12px; }
+  .page-hero h1 { font-size: 1.8rem; font-weight: 700; color: var(--gray-900); margin-bottom: 10px; }
+  .page-hero p { font-size: .9rem; color: var(--gray-500); }
+  .page-hero .update-date {
+    display: inline-block; margin-top: 12px; font-size: .78rem;
+    background: var(--accent-s); color: var(--accent);
+    border: 1px solid var(--accent-b); border-radius: 20px; padding: 3px 12px;
+  }
+
+  .page-content { flex: 1; max-width: 800px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; }
+
+  .toc-box {
+    background: var(--accent-s); border: 1px solid var(--accent-b); border-radius: var(--r);
+    padding: 20px 24px; margin-bottom: 48px;
+  }
+  .toc-box h3 { font-size: .85rem; font-weight: 700; color: var(--accent); margin-bottom: 12px; text-transform: uppercase; letter-spacing: .06em; }
+  .toc-box ol { padding-left: 20px; font-size: .9rem; color: var(--gray-700); }
+  .toc-box li { margin-bottom: 6px; }
+  .toc-box a { color: var(--gray-700); }
+  .toc-box a:hover { color: var(--accent); text-decoration: none; }
+
+  .terms-section { margin-bottom: 48px; scroll-margin-top: 80px; }
+  .terms-section h2 {
+    font-size: 1.2rem; font-weight: 700; color: var(--gray-900);
+    padding-bottom: 12px; border-bottom: 2px solid var(--gray-200);
+    margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+  }
+  .terms-section h2 .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; background: var(--accent); color: #fff;
+    border-radius: 50%; font-size: .82rem; font-weight: 700; flex-shrink: 0;
+  }
+  .terms-section p { color: var(--gray-600); margin-bottom: 14px; }
+  .terms-section ul { padding-left: 22px; color: var(--gray-600); margin-bottom: 14px; }
+  .terms-section ul li { margin-bottom: 8px; line-height: 1.7; }
+
+  .highlight-box {
+    background: var(--gray-50); border: 1px solid var(--gray-200);
+    border-left: 4px solid var(--accent); border-radius: 0 var(--r) var(--r) 0;
+    padding: 16px 20px; margin: 16px 0; font-size: .9rem; color: var(--gray-600);
+  }
+  .highlight-box strong { color: var(--gray-900); }
+
+  .warn-box {
+    background: #fff7ed; border: 1px solid #fed7aa;
+    border-left: 4px solid #f97316; border-radius: 0 var(--r) var(--r) 0;
+    padding: 16px 20px; margin: 16px 0; font-size: .9rem; color: #7c2d12;
+  }
+
+  /* 금지행위 그리드 */
+  .forbidden-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0;
+  }
+  .forbidden-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px;
+    padding: 12px 14px; font-size: .87rem; color: #9f1239;
+  }
+  .forbidden-item .fi-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+  /* 푸터 */
+  .site-footer { background: var(--gray-900); color: #9ca3af; }
+  .footer-inner {
+    max-width: 1200px; margin: 0 auto; padding: 48px 24px 32px;
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
+  }
+  .footer-brand .footer-logo-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .footer-logo-mark {
+    width: 30px; height: 30px; background: var(--accent); border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem; font-weight: 700; color: #fff;
+  }
+  .footer-logo-name { font-size: .9rem; font-weight: 700; color: #f9fafb; }
+  .footer-desc { font-size: .82rem; line-height: 1.7; margin-bottom: 12px; }
+  .footer-copy { font-size: .75rem; color: var(--gray-500); }
+  .footer-col h4 { font-size: .8rem; font-weight: 700; color: #f9fafb; margin-bottom: 14px; text-transform: uppercase; letter-spacing: .06em; }
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 9px; }
+  .footer-links a { font-size: .83rem; color: #9ca3af; text-decoration: none; transition: color .15s; }
+  .footer-links a:hover { color: #f9fafb; text-decoration: none; }
+  .footer-bottom {
+    border-top: 1px solid #374151; padding: 20px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px; font-size: .78rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .footer-bottom-links { display: flex; gap: 20px; }
+  .footer-bottom-links a { color: #9ca3af; text-decoration: none; }
+  .footer-bottom-links a:hover { color: #f9fafb; }
+
+  @media (max-width: 768px) {
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+    .footer-brand { grid-column: 1 / -1; }
+    .header-nav { display: none; }
+    .forbidden-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) { .footer-inner { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">VT</div>
+    <span class="logo-name">바이브툴킷</span>
+  </a>
+  <nav class="header-nav">
+    <a href="index.html">홈</a>
+    <a href="favicon-sample.html">파비콘 도구</a>
+    <a href="about.html">소개</a>
+    <a href="contact.html">문의</a>
+  </nav>
+</header>
+
+<div class="page-wrap">
+
+  <div class="page-hero">
+    <div class="page-hero-icon">📜</div>
+    <h1>이용약관</h1>
+    <p>바이브툴킷 서비스를 이용하기 전에 아래 약관을 확인해 주세요.</p>
+    <span class="update-date">최종 업데이트: 2025년 1월 1일</span>
+  </div>
+
+  <main class="page-content">
+
+    <nav class="toc-box">
+      <h3>📋 목차</h3>
+      <ol>
+        <li><a href="#t1">약관의 목적 및 적용</a></li>
+        <li><a href="#t2">서비스 소개</a></li>
+        <li><a href="#t3">서비스 이용 조건</a></li>
+        <li><a href="#t4">금지 행위</a></li>
+        <li><a href="#t5">콘텐츠 및 지식재산권</a></li>
+        <li><a href="#t6">광고 및 외부 링크</a></li>
+        <li><a href="#t7">서비스 변경 및 중단</a></li>
+        <li><a href="#t8">면책 사항</a></li>
+        <li><a href="#t9">약관 변경</a></li>
+        <li><a href="#t10">문의 및 분쟁 해결</a></li>
+      </ol>
+    </nav>
+
+    <section class="terms-section" id="t1">
+      <h2><span class="num">1</span> 약관의 목적 및 적용</h2>
+      <p>이 이용약관(이하 "약관")은 바이브툴킷(이하 "사이트")이 제공하는 서비스의 이용 조건 및 절차, 이용자와 사이트 간의 권리·의무 및 책임 사항을 규정하는 것을 목적으로 합니다.</p>
+      <p>사이트를 이용함으로써 이 약관에 동의한 것으로 간주됩니다. 약관에 동의하지 않는 경우에는 서비스 이용을 중단해 주세요.</p>
+    </section>
+
+    <section class="terms-section" id="t2">
+      <h2><span class="num">2</span> 서비스 소개</h2>
+      <p>바이브툴킷은 바이브 코딩(AI와 함께 하는 코딩)을 배우는 초보 웹 개발자를 위해 실용적인 HTML/CSS/JS 도구, 코드 예제, 가이드를 무료로 제공하는 비영리 교육 목적 웹사이트입니다.</p>
+      <p>제공하는 주요 서비스:</p>
+      <ul>
+        <li>파비콘 생성 도구 및 SVG 코드 편집기</li>
+        <li>HTML·CSS·JS 코드 예제 및 해설 가이드</li>
+        <li>플로팅 버튼, 오픈그래프, 메타태그 등 실전 도구 (순차 출시)</li>
+        <li>SEO, Google AdSense 등 웹사이트 수익화 가이드</li>
+      </ul>
+      <div class="highlight-box">
+        <strong>무료 서비스:</strong> 바이브툴킷의 모든 도구와 콘텐츠는 무료로 제공됩니다. 회원가입, 결제, 개인정보 입력 없이도 모든 기능을 자유롭게 이용할 수 있습니다.
+      </div>
+    </section>
+
+    <section class="terms-section" id="t3">
+      <h2><span class="num">3</span> 서비스 이용 조건</h2>
+      <p>다음 조건에 따라 서비스를 이용하실 수 있습니다.</p>
+      <ul>
+        <li>본 서비스는 개인 학습 및 비상업적 프로젝트에서 자유롭게 사용 가능합니다.</li>
+        <li>상업적 목적의 이용 시에는 별도 문의 후 허가를 받아야 합니다.</li>
+        <li>제공된 코드 예제는 개인·상업 프로젝트에 자유롭게 활용할 수 있습니다 (코드 라이선스: MIT).</li>
+        <li>사이트의 구조, 디자인, 콘텐츠를 그대로 복제하여 동일한 서비스를 운영하는 것은 금지됩니다.</li>
+      </ul>
+    </section>
+
+    <section class="terms-section" id="t4">
+      <h2><span class="num">4</span> 금지 행위</h2>
+      <p>서비스 이용 시 다음 행위는 명시적으로 금지됩니다.</p>
+      <div class="forbidden-grid">
+        <div class="forbidden-item">
+          <span class="fi-icon">🚫</span>
+          <span>사이트 서버에 과도한 부하를 주는 자동화 크롤링·스크래핑</span>
+        </div>
+        <div class="forbidden-item">
+          <span class="fi-icon">🚫</span>
+          <span>서비스의 정상적인 운영을 방해하는 행위</span>
+        </div>
+        <div class="forbidden-item">
+          <span class="fi-icon">🚫</span>
+          <span>타인을 사칭하거나 허위 정보를 제출하는 행위</span>
+        </div>
+        <div class="forbidden-item">
+          <span class="fi-icon">🚫</span>
+          <span>악성 코드, 바이러스 등을 사이트를 통해 배포하는 행위</span>
+        </div>
+        <div class="forbidden-item">
+          <span class="fi-icon">🚫</span>
+          <span>사이트 콘텐츠를 무단으로 복제·배포·판매하는 행위</span>
+        </div>
+        <div class="forbidden-item">
+          <span class="fi-icon">🚫</span>
+          <span>법령에 위반되거나 공서양속에 반하는 행위</span>
+        </div>
+      </div>
+      <div class="warn-box">
+        ⚠️ 금지 행위 발생 시 사전 통보 없이 접근을 차단할 수 있으며, 필요한 경우 법적 조치를 취할 수 있습니다.
+      </div>
+    </section>
+
+    <section class="terms-section" id="t5">
+      <h2><span class="num">5</span> 콘텐츠 및 지식재산권</h2>
+      <p>사이트의 콘텐츠에 대한 지식재산권은 다음과 같이 구분됩니다.</p>
+      <ul>
+        <li><strong>사이트 디자인·레이아웃:</strong> 바이브툴킷 운영자의 저작물이며, 사전 허가 없이 무단 복제를 금지합니다.</li>
+        <li><strong>코드 예제 (HTML/CSS/JS/SVG):</strong> MIT 라이선스로 제공됩니다. 개인 및 상업 프로젝트에 자유롭게 활용 가능합니다.</li>
+        <li><strong>글 콘텐츠·가이드:</strong> 바이브툴킷의 저작물입니다. 출처를 명시한 인용은 허용합니다.</li>
+        <li><strong>외부 폰트·라이브러리:</strong> 각 라이브러리의 라이선스를 따릅니다 (Noto Sans KR: SIL OFL 1.1, JetBrains Mono: OFL 1.1).</li>
+      </ul>
+    </section>
+
+    <section class="terms-section" id="t6">
+      <h2><span class="num">6</span> 광고 및 외부 링크</h2>
+      <p>사이트는 서비스 운영 비용 충당을 위해 Google AdSense 광고를 게재할 수 있습니다.</p>
+      <ul>
+        <li>광고 콘텐츠는 Google이 자동으로 선정하며, 바이브툴킷은 광고 내용에 대해 책임지지 않습니다.</li>
+        <li>사이트에 게재된 외부 링크(제3자 사이트)는 정보 제공 목적이며, 해당 사이트의 콘텐츠·정책에 대해 책임지지 않습니다.</li>
+        <li>광고 관련 문의는 <a href="https://support.google.com/adsense" target="_blank" rel="noopener">Google AdSense 고객센터</a>로 문의해 주세요.</li>
+      </ul>
+    </section>
+
+    <section class="terms-section" id="t7">
+      <h2><span class="num">7</span> 서비스 변경 및 중단</h2>
+      <p>바이브툴킷은 서비스 개선, 기술적 문제, 운영상의 이유로 사전 통보 없이 서비스의 일부 또는 전체를 변경·일시 중단·종료할 수 있습니다.</p>
+      <ul>
+        <li>정기 점검, 서버 업그레이드 등으로 인해 일시적으로 서비스가 중단될 수 있습니다.</li>
+        <li>새로운 도구 추가, 기존 도구 개편 등 서비스 내용은 예고 없이 변경될 수 있습니다.</li>
+        <li>서비스 종료 시 최소 30일 전 사이트 공지를 통해 안내하겠습니다.</li>
+      </ul>
+    </section>
+
+    <section class="terms-section" id="t8">
+      <h2><span class="num">8</span> 면책 사항</h2>
+      <p>바이브툴킷이 제공하는 정보 및 코드는 "있는 그대로(as-is)" 제공되며, 다음 사항에 대해 책임을 지지 않습니다.</p>
+      <ul>
+        <li>제공된 코드·가이드를 이용자가 프로젝트에 적용한 결과로 발생하는 오류, 손실 또는 피해</li>
+        <li>외부 서비스(Google AdSense, Google Analytics 등)의 정책 변경으로 인한 영향</li>
+        <li>천재지변, 해킹, 인터넷 장애 등 불가항력적 사유로 인한 서비스 중단</li>
+        <li>이용자가 사이트에서 얻은 정보를 신뢰하여 발생한 경제적 손실</li>
+      </ul>
+      <div class="highlight-box">
+        사이트의 코드 예제는 학습 목적으로 제공됩니다. 프로덕션(실제 서비스) 환경에서는 보안 검토 후 사용해 주세요.
+      </div>
+    </section>
+
+    <section class="terms-section" id="t9">
+      <h2><span class="num">9</span> 약관 변경</h2>
+      <p>바이브툴킷은 관련 법령·서비스 변경에 따라 이 약관을 변경할 수 있습니다. 변경 시 사이트 내 공지 또는 이 페이지의 업데이트 날짜를 통해 알립니다.</p>
+      <p>변경된 약관은 공지 후 7일이 지나면 효력이 발생하며, 이후에도 서비스를 계속 이용하는 경우 변경 약관에 동의한 것으로 간주됩니다.</p>
+    </section>
+
+    <section class="terms-section" id="t10">
+      <h2><span class="num">10</span> 문의 및 분쟁 해결</h2>
+      <p>약관 관련 문의 또는 분쟁이 발생한 경우 아래로 연락해 주세요. 성실히 해결 방안을 모색하겠습니다.</p>
+      <ul>
+        <li><strong>이메일:</strong> <a href="mailto:jooyun87@gmail.com">jooyun87@gmail.com</a></li>
+        <li><strong>문의 페이지:</strong> <a href="contact.html">바이브툴킷 문의하기</a></li>
+      </ul>
+      <p>이 약관은 대한민국 법률에 따라 해석되며, 분쟁 발생 시 관할 법원은 대한민국 법원으로 합니다.</p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo-wrap">
+          <div class="footer-logo-mark">VT</div>
+          <span class="footer-logo-name">바이브툴킷</span>
+        </div>
+        <p class="footer-desc">바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 실전 도구 모음이에요.</p>
+        <p class="footer-copy">© 2025 바이브툴킷. All rights reserved.</p>
+      </div>
+      <div class="footer-col">
+        <h4>도구 모음</h4>
+        <ul class="footer-links">
+          <li><a href="favicon-sample.html">🌐 파비콘 (Favicon)</a></li>
+          <li><a href="#">💬 플로팅 버튼 (준비중)</a></li>
+          <li><a href="#">📸 오픈그래프 (준비중)</a></li>
+          <li><a href="#">🏷️ 메타 태그 (준비중)</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>사이트 정보</h4>
+        <ul class="footer-links">
+          <li><a href="about.html">바이브툴킷 소개</a></li>
+          <li><a href="privacy.html">개인정보처리방침</a></li>
+          <li><a href="terms.html">이용약관</a></li>
+          <li><a href="sitemap.html">사이트맵</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>문의 / 지원</h4>
+        <ul class="footer-links">
+          <li><a href="contact.html">✉️ 문의하기</a></li>
+          <li><a href="contact.html">🐛 오류 신고</a></li>
+          <li><a href="contact.html">💡 도구 제안</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 바이브툴킷 · 바이브 코딩을 배우는 모든 분들을 위해 만들었어요 ❤️</span>
+      <div class="footer-bottom-links">
+        <a href="privacy.html">개인정보처리방침</a>
+        <a href="terms.html">이용약관</a>
+        <a href="contact.html">문의하기</a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  if (self === top) return;
+  const h = document.querySelector('.header'); if (h) h.style.display = 'none';
+  const w = document.querySelector('.page-wrap'); if (w) w.style.marginTop = '0';
+  const f = document.querySelector('.site-footer'); if (f) f.style.display = 'none';
+  document.querySelectorAll('a[href$=".html"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      if (window.parent.loadTool) { e.preventDefault(); window.parent.loadTool(this.getAttribute('href')); }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

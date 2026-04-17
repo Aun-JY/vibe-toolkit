@@ -1,0 +1,179 @@
+---
+// src/components/CodeBlock.astro
+// 코드 + 복사 버튼이 있는 코드블록 컴포넌트
+// 사용법: <CodeBlock code={`코드내용`} lang="html" label="기본 파비콘" />
+
+interface Props {
+  code: string;
+  lang?: string;
+  label?: string;
+  filename?: string;
+}
+
+const { code, lang = 'html', label, filename } = Astro.props;
+const id = `cb-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div class="code-block-wrapper" id={id}>
+  <div class="code-block-header">
+    <div class="code-block-meta">
+      {filename && <span class="filename">{filename}</span>}
+      {label && <span class="label">{label}</span>}
+      <span class="lang-badge">{lang}</span>
+    </div>
+    <button class="copy-btn" data-target={id} aria-label="코드 복사">
+      <svg class="icon-copy" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="13" height="13" rx="2"/>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+      </svg>
+      <svg class="icon-check" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display:none">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <span class="copy-text">복사</span>
+    </button>
+  </div>
+
+  <div class="code-scroll">
+    <pre><code class={`language-${lang}`} data-code={id}>{code.trim()}</code></pre>
+  </div>
+</div>
+
+<style>
+.code-block-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin: var(--space-4) 0;
+}
+
+.code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem var(--space-4);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+}
+
+.code-block-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.filename {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.lang-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 0.15em 0.5em;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.3em 0.7em;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration) var(--ease);
+}
+.copy-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+.copy-btn.copied {
+  color: var(--green);
+  border-color: var(--green);
+  background: rgba(63, 185, 80, 0.1);
+}
+
+.code-scroll {
+  overflow-x: auto;
+  padding: var(--space-4);
+}
+
+pre {
+  margin: 0;
+  tab-size: 2;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  padding: 0;
+  white-space: pre;
+}
+
+/* 간단한 문법 강조 (라이브러리 없이) */
+code .kw  { color: #ff7b72; }  /* 키워드 */
+code .str { color: #a5d6ff; }  /* 문자열 */
+code .cmt { color: var(--text-muted); font-style: italic; } /* 주석 */
+code .tag { color: #7ee787; }  /* HTML 태그 */
+code .atr { color: #79c0ff; }  /* 속성 */
+</style>
+
+<script>
+// 복사 버튼 로직
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const targetId = btn.dataset.target;
+    const codeEl = document.querySelector(`#${targetId} code`);
+    if (!codeEl) return;
+
+    const text = codeEl.textContent || '';
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.classList.add('copied');
+      const copyText = btn.querySelector('.copy-text');
+      const iconCopy = btn.querySelector('.icon-copy');
+      const iconCheck = btn.querySelector('.icon-check');
+      if (copyText) copyText.textContent = '복사됨!';
+      if (iconCopy) iconCopy.style.display = 'none';
+      if (iconCheck) iconCheck.style.display = 'block';
+
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        if (copyText) copyText.textContent = '복사';
+        if (iconCopy) iconCopy.style.display = 'block';
+        if (iconCheck) iconCheck.style.display = 'none';
+      }, 2000);
+    } catch {
+      // 폴백: textarea 방식
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+  });
+});
+</script>

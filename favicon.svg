@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+  <defs>
+    <!--
+      바이브툴킷 파비콘
+      ─────────────────────────────────────────
+      세 가지 아이덴티티를 하나의 아이콘에 담았어요.
+
+      🟣 그라디언트 배경   → AI / 테크 느낌
+      💬 흰색 말풍선       → 상담원 (소통·도움)
+      ⌨️  /> 코드 심볼     → 코딩 (바이브코딩)
+      ✦  황금 4각별        → AI 인텔리전스
+    -->
+
+    <!-- 배경 그라디언트: 인디고(#4f46e5) → 퍼플(#7c3aed) -->
+    <!-- 색상 바꾸려면 아래 stop-color 값을 변경하세요 -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+
+    <!-- 말풍선 드롭 섀도우 (입체감) -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.5" flood-color="#00000030"/>
+    </filter>
+  </defs>
+
+  <!-- ① 배경: 둥근 사각형 -->
+  <!-- rx="11" = 앱 아이콘 느낌 / rx="0" = 각짐 / rx="26" = 원형 -->
+  <rect width="52" height="52" rx="11" fill="url(#bg)"/>
+
+  <!-- ② AI 스파클: 황금색 4각 별 (우상단) -->
+  <!-- 4각별 = AI 인텔리전스·마법 같은 느낌 -->
+  <!-- 별 색상: #fbbf24=황금, #ffffff=흰색, #34d399=민트 -->
+  <path d="M 43 4 L 44.4 7.6 L 48 9 L 44.4 10.4 L 43 14 L 41.6 10.4 L 38 9 L 41.6 7.6 Z"
+        fill="#fbbf24"/>
+
+  <!-- ③ 말풍선 바디 (상담원 아이덴티티) -->
+  <!-- 소통하고 도움을 주는 이미지 -->
+  <rect x="6" y="10" width="34" height="23" rx="6"
+        fill="white" filter="url(#shadow)"/>
+
+  <!-- 말풍선 꼬리 (좌하단 → 사람 방향) -->
+  <path d="M 9 33 L 6 42 L 20 33 Z" fill="white"/>
+
+  <!-- ④ 코딩 심볼: / 슬래시 (코딩 아이덴티티) -->
+  <!-- 왼쪽 아래에서 오른쪽 위로 올라가는 사선 -->
+  <!-- 심볼 색상을 바꾸려면 아래 두 stroke 값을 수정하세요 -->
+  <line x1="16" y1="28" x2="22" y2="14"
+        stroke="#4f46e5" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- ④ 코딩 심볼: > 꺾쇠 (코딩 아이덴티티) -->
+  <!-- 오른쪽을 가리키는 V자 → 실행·전진의 의미 -->
+  <polyline points="25,14 32,21 25,28"
+            fill="none"
+            stroke="#4f46e5" stroke-width="3.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+
+</svg>

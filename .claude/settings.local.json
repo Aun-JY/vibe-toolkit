@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Select-String -Path 'D:\\\\0.주연 업무\\\\vibe-toolkit\\\\favicon-sample.html' -Pattern '</script>' | Select-Object -Last 5\")",
+      "Bash(powershell -Command \"Select-String -Path 'D:\\\\0.주연 업무\\\\vibe-toolkit\\\\privacy.html' -Pattern '</body>' | Select-Object -Last 3\")",
+      "Bash(powershell -Command \"Select-String -Path 'D:\\\\0.주연 업무\\\\vibe-toolkit\\\\about.html' -Pattern '</body>' | Select-Object -Last 3\")",
+      "Bash(powershell -Command \"Select-String -Path 'D:\\\\0.주연 업무\\\\vibe-toolkit\\\\terms.html' -Pattern '</body>' | Select-Object -Last 3\")",
+      "Bash(powershell -Command \"Select-String -Path 'D:\\\\0.주연 업무\\\\vibe-toolkit\\\\contact.html' -Pattern '</body>' | Select-Object -Last 3\")",
+      "Bash(powershell -Command \"Select-String -Path 'D:\\\\0.주연 업무\\\\vibe-toolkit\\\\sitemap.html' -Pattern '</body>' | Select-Object -Last 3\")",
+      "Bash(powershell -Command \"Select-String -Path '*.html','*.txt','*.xml' -Pattern 'yourusername' | Select-Object Filename, LineNumber\")",
+      "Bash(powershell -Command \"Select-String -Path '*.html','*.txt','*.xml' -Pattern 'yourusername'\")",
+      "Bash(dir \"D:\\\\0.주연 업무\\\\vibe-toolkit\")",
+      "Bash(cmd /c \"dir /s /b \\\\\"D:\\\\0.주연 업무\\\\vibe-toolkit\\\\.github\\\\\"\")"
+    ]
+  }
+}
