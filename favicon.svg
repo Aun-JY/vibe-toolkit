@@ -1,41 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
-  <defs>
-    <style>
-      .f-orbit { fill:none; stroke:rgba(17,24,39,0.20); stroke-width:1.0; }
-      .f-edge  { stroke:rgba(17,24,39,0.40); stroke-width:0.9; stroke-linecap:round; fill:none; }
-      .f-wave  { fill:none; stroke:rgba(17,24,39,0.60); stroke-width:1.0; stroke-linecap:round; stroke-linejoin:round; }
-      .f-node  { fill:#111827; }
-    </style>
-  </defs>
 
-  <!-- Background -->
+  <!-- White background + black border -->
   <rect width="48" height="48" rx="11" fill="#ffffff"/>
-  <rect width="48" height="48" rx="11" fill="none" stroke="#111827" stroke-width="1.8"/>
+  <rect width="48" height="48" rx="11" fill="none" stroke="#111827" stroke-width="2"/>
 
-  <!-- Orbital rings (centered at 24,22) -->
-  <ellipse class="f-orbit" cx="24" cy="22" rx="15" ry="5.5"/>
-  <ellipse class="f-orbit" cx="24" cy="22" rx="15" ry="5.5" transform="rotate(60 24 22)" style="stroke:rgba(17,24,39,0.10)"/>
-  <ellipse class="f-orbit" cx="24" cy="22" rx="15" ry="5.5" transform="rotate(120 24 22)" style="stroke:rgba(17,24,39,0.06)"/>
+  <!-- Orbital rings (all inline, no CSS classes) -->
+  <ellipse cx="24" cy="22" rx="15" ry="5.5" fill="none" stroke="#111827" stroke-opacity="0.18" stroke-width="1"/>
+  <ellipse cx="24" cy="22" rx="15" ry="5.5" fill="none" stroke="#111827" stroke-opacity="0.10" stroke-width="1" transform="rotate(60 24 22)"/>
+  <ellipse cx="24" cy="22" rx="15" ry="5.5" fill="none" stroke="#111827" stroke-opacity="0.06" stroke-width="1" transform="rotate(120 24 22)"/>
 
   <!-- Neural edges -->
-  <line class="f-edge" x1="24" y1="8"  x2="10" y2="19"/>
-  <line class="f-edge" x1="24" y1="8"  x2="38" y2="19"/>
-  <line class="f-edge" x1="10" y1="19" x2="24" y2="32"/>
-  <line class="f-edge" x1="38" y1="19" x2="24" y2="32"/>
-  <line class="f-edge" x1="10" y1="19" x2="38" y2="19" style="stroke:rgba(17,24,39,0.22)"/>
-  <line class="f-edge" x1="24" y1="8"  x2="24" y2="32" style="stroke:rgba(17,24,39,0.18)"/>
+  <line x1="24" y1="8"  x2="10" y2="19" stroke="#111827" stroke-opacity="0.45" stroke-width="1" stroke-linecap="round"/>
+  <line x1="24" y1="8"  x2="38" y2="19" stroke="#111827" stroke-opacity="0.45" stroke-width="1" stroke-linecap="round"/>
+  <line x1="10" y1="19" x2="24" y2="32" stroke="#111827" stroke-opacity="0.45" stroke-width="1" stroke-linecap="round"/>
+  <line x1="38" y1="19" x2="24" y2="32" stroke="#111827" stroke-opacity="0.45" stroke-width="1" stroke-linecap="round"/>
+  <line x1="10" y1="19" x2="38" y2="19" stroke="#111827" stroke-opacity="0.22" stroke-width="1" stroke-linecap="round"/>
+  <line x1="24" y1="8"  x2="24" y2="32" stroke="#111827" stroke-opacity="0.18" stroke-width="1" stroke-linecap="round"/>
 
-  <!-- Waveform (bottom strip) -->
-  <polyline class="f-wave" points="4,42 7,42 9,39 12,45 15,40 18,43 24,35 30,43 33,40 36,45 39,39 41,42 44,42"/>
+  <!-- Waveform -->
+  <polyline points="4,42 7,42 9,39 12,45 15,40 18,43 24,35 30,43 33,40 36,45 39,39 41,42 44,42"
+    fill="none" stroke="#111827" stroke-opacity="0.65" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
 
   <!-- Neural nodes -->
-  <circle class="f-node" cx="24" cy="8"  r="2.2"/>
-  <circle class="f-node" cx="10" cy="19" r="2.0"/>
-  <circle class="f-node" cx="38" cy="19" r="2.0"/>
-  <circle class="f-node" cx="24" cy="32" r="1.7" style="opacity:.75"/>
+  <circle cx="24" cy="8"  r="2.2" fill="#111827"/>
+  <circle cx="10" cy="19" r="2.0" fill="#111827"/>
+  <circle cx="38" cy="19" r="2.0" fill="#111827"/>
+  <circle cx="24" cy="32" r="1.7" fill="#111827" opacity="0.75"/>
 
-  <!-- Core halo -->
-  <circle cx="24" cy="22" r="5" fill="rgba(17,24,39,0.05)"/>
   <!-- Core -->
+  <circle cx="24" cy="22" r="5" fill="#111827" opacity="0.06"/>
   <circle cx="24" cy="22" r="3.2" fill="#111827"/>
+
 </svg>
