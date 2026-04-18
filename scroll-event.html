@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스크롤 이벤트 완전 정복 | 바이브툴킷</title>
+  <meta name="description" content="스크롤 감지, 헤더 고정, 페이드인 애니메이션, 진행률 바까지. 스크롤 이벤트 실전 가이드.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://aun-jy.github.io/vibe-toolkit/scroll-event.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+  /* ════════════════════════════════════════
+     기본 설정
+  ════════════════════════════════════════ */
+  :root {
+    --accent:        #4f46e5;
+    --accent-soft:   #eef2ff;
+    --accent-border: #c7d2fe;
+    --green:         #16a34a;
+    --green-soft:    #f0fdf4;
+    --amber:         #d97706;
+    --amber-soft:    #fffbeb;
+    --red-soft:      #fff1f2;
+    --gray-50:       #f9fafb;
+    --gray-100:      #f3f4f6;
+    --gray-200:      #e5e7eb;
+    --gray-300:      #d1d5db;
+    --gray-400:      #9ca3af;
+    --gray-500:      #6b7280;
+    --gray-600:      #4b5563;
+    --gray-700:      #374151;
+    --gray-900:      #111827;
+    --code-bg:       #1e1e2e;
+    --code-surface:  #282a36;
+    --radius:        12px;
+    --radius-sm:     8px;
+    --shadow-sm:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    --shadow:        0 4px 12px rgba(0,0,0,.08);
+    --shadow-lg:     0 8px 28px rgba(0,0,0,.10);
+    --nav-h:         56px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 24px); }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fff;
+    color: var(--gray-700);
+    line-height: 1.75;
+    font-size: 16px;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  strong { color: var(--gray-900); font-weight: 600; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .83em;
+    background: var(--gray-100);
+    color: var(--accent);
+    padding: .1em .4em;
+    border-radius: 4px;
+    border: 1px solid var(--gray-200);
+  }
+
+  img { display: block; }
+
+  /* ════════════════════════════════════════
+     고정 상단 네비게이션
+  ════════════════════════════════════════ */
+  .site-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 500;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gray-200);
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--gray-900);
+    margin-right: 32px;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+  .nav-logo:hover { text-decoration: none; }
+
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem; font-weight: 700; color: #fff;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+
+  .nav-links a {
+    display: block;
+    padding: 6px 14px;
+    font-size: .85rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    transition: color .15s, background .15s;
+    text-decoration: none;
+  }
+  .nav-links a:hover { color: var(--gray-900); background: var(--gray-100); }
+  .nav-links a.active { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+
+  /* ════════════════════════════════════════
+     레이아웃
+  ════════════════════════════════════════ */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+  .section { padding: 72px 0; }
+  .section:nth-child(even) { background: var(--gray-50); }
+
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 3px 12px;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -.025em;
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+
+  .section-lead {
+    font-size: 1.05rem;
+    color: var(--gray-500);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 600px;
+  }
+
+  /* ════════════════════════════════════════
+     히어로
+  ════════════════════════════════════════ */
+  .hero {
+    padding: calc(var(--nav-h) + 56px) 0 64px;
+    background: linear-gradient(160deg, var(--accent-soft) 0%, #fff 60%);
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.9rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -.03em;
+    line-height: 1.2;
+    margin-bottom: 18px;
+  }
+  .hero h1 em { color: var(--accent); font-style: normal; }
+
+  .hero-desc {
+    font-size: 1.08rem;
+    color: var(--gray-500);
+    line-height: 1.75;
+    max-width: 540px;
+    margin-bottom: 32px;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: .82rem;
+    color: var(--gray-500);
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 5px; }
+
+  /* ════════════════════════════════════════
+     카드 그리드
+  ════════════════════════════════════════ */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .info-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow .2s, transform .2s;
+  }
+  .info-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .info-card-icon { font-size: 1.6rem; margin-bottom: 10px; }
+  .info-card h4 { font-size: .95rem; font-weight: 700; color: var(--gray-900); margin-bottom: 7px; }
+  .info-card p { font-size: .86rem; color: var(--gray-600); line-height: 1.7; }
+
+  .ic-accent { background: var(--accent-soft); border-color: var(--accent-border); }
+  .ic-green  { background: var(--green-soft);  border-color: #bbf7d0; }
+  .ic-amber  { background: var(--amber-soft);  border-color: #fde68a; }
+  .ic-red    { background: var(--red-soft);    border-color: #fecdd3; }
+  .ic-gray   { background: var(--gray-50);     border-color: var(--gray-200); }
+
+  /* ════════════════════════════════════════
+     콜아웃
+  ════════════════════════════════════════ */
+  .callout {
+    display: flex;
+    gap: 14px;
+    padding: 18px 20px;
+    border-radius: var(--radius);
+    margin: 24px 0;
+    font-size: .93rem;
+    line-height: 1.75;
+    color: var(--gray-700);
+  }
+  .callout-icon { font-size: 1.2rem; flex-shrink: 0; padding-top: 1px; }
+  .callout-body p { margin: 0; }
+  .callout-body p + p { margin-top: 6px; }
+
+  .co-blue  { background: var(--accent-soft);  border: 1px solid var(--accent-border); }
+  .co-green { background: var(--green-soft);   border: 1px solid #bbf7d0; }
+  .co-amber { background: var(--amber-soft);   border: 1px solid #fde68a; }
+
+  /* ════════════════════════════════════════
+     비교 테이블
+  ════════════════════════════════════════ */
+  .cmp-table {
+    width: 100%; border-collapse: collapse;
+    font-size: .88rem; margin-top: 24px;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .cmp-table th {
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 11px 16px;
+    text-align: left;
+    font-size: .78rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    color: var(--gray-600);
+  }
+  .cmp-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: top;
+    color: var(--gray-700);
+  }
+  .cmp-table tr:last-child td { border-bottom: none; }
+
+  .badge {
+    display: inline-block;
+    font-size: .7rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .bg { background: var(--green-soft);  color: var(--green); }
+  .bb { background: var(--gray-100);    color: var(--gray-600); }
+  .ba { background: var(--amber-soft);  color: var(--amber); }
+  .br { background: var(--red-soft);    color: #e11d48; }
+
+  /* ════════════════════════════════════════
+     바이브코더 TIP 박스
+  ════════════════════════════════════════ */
+  .vibe-tip {
+    background: linear-gradient(135deg, #faf5ff 0%, #eff6ff 100%);
+    border: 1px solid #e9d5ff;
+    border-left: 4px solid #8b5cf6;
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin: 32px 0;
+  }
+  .vibe-tip-label {
+    font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: #7c3aed;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+  }
+  .vibe-tip p { font-size: .92rem; color: var(--gray-700); margin-bottom: 10px; line-height: 1.75; }
+  .vibe-tip p:last-child { margin-bottom: 0; }
+  .vibe-tip code { background: #ede9fe; border-color: #ddd6fe; color: #7c3aed; }
+
+  /* ════════════════════════════════════════
+     코드 블록
+  ════════════════════════════════════════ */
+  .code-block {
+    background: var(--code-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 24px;
+    border: 1px solid #2d2d3f;
+    box-shadow: var(--shadow);
+  }
+  .cb-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: #13131f;
+    border-bottom: 1px solid #2d2d3f;
+  }
+  .cb-dots { display: flex; gap: 6px; }
+  .cb-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .cb-dot-r { background: #ff5f57; }
+  .cb-dot-y { background: #febc2e; }
+  .cb-dot-g { background: #28c840; }
+  .cb-file { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: #6272a4; }
+  .cb-copy {
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 5px; color: #94a3b8; padding: 3px 12px;
+    cursor: pointer; transition: background .15s, color .15s;
+  }
+  .cb-copy:hover { background: rgba(255,255,255,.15); color: #fff; }
+  .cb-copy.ok { color: #a6e3a1; border-color: #a6e3a1; }
+
+  .cb-body { padding: 20px; overflow-x: auto; }
+  .cb-body pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem; line-height: 1.75; color: #cdd6f4;
+    white-space: pre;
+  }
+  .tk { color: #89b4fa; }
+  .ta { color: #a6e3a1; }
+  .tv { color: #f9e2af; }
+  .tc { color: #6272a4; font-style: italic; }
+  .tp { color: #f38ba8; }
+
+  /* ════════════════════════════════════════
+     FAQ 아코디언
+  ════════════════════════════════════════ */
+  .faq-list { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
+
+  .faq-item {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .faq-item summary {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    cursor: pointer; list-style: none;
+    font-weight: 600; font-size: .95rem; color: var(--gray-900);
+    transition: background .15s;
+    user-select: none;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after {
+    content: '+';
+    font-size: 1.2rem; color: var(--gray-400);
+    transition: transform .2s;
+    flex-shrink: 0; margin-left: 12px;
+  }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
+  .faq-item summary:hover { background: var(--gray-50); }
+
+  .faq-body {
+    padding: 16px 20px 18px;
+    font-size: .92rem; color: var(--gray-600);
+    line-height: 1.8; border-top: 1px solid var(--gray-100);
+  }
+  .faq-body p + p { margin-top: 10px; }
+
+  /* ════════════════════════════════════════
+     다음 단계 카드
+  ════════════════════════════════════════ */
+  .next-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-top: 28px;
+  }
+
+  .next-card {
+    display: block;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 20px 18px;
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    transition: box-shadow .2s, border-color .2s, transform .2s;
+    cursor: pointer;
+  }
+  .next-card:hover {
+    box-shadow: var(--shadow);
+    border-color: var(--accent-border);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .next-card-icon { font-size: 1.6rem; margin-bottom: 10px; }
+  .next-card-title { font-size: .92rem; font-weight: 700; color: var(--gray-900); margin-bottom: 5px; }
+  .next-card-desc { font-size: .82rem; color: var(--gray-500); line-height: 1.6; }
+  .next-card-tag {
+    display: inline-block; margin-top: 10px;
+    font-size: .68rem; font-weight: 600;
+    background: var(--accent-soft); color: var(--accent);
+    border-radius: 4px; padding: 2px 7px;
+  }
+
+  /* ════════════════════════════════════════
+     인터랙티브 데모
+  ════════════════════════════════════════ */
+  .demo-wrap {
+    border: 2px solid var(--accent-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 28px;
+    box-shadow: var(--shadow);
+  }
+
+  .demo-header {
+    background: var(--accent-soft);
+    border-bottom: 1px solid var(--accent-border);
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .demo-header-title {
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .demo-scroll-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem;
+    color: var(--accent);
+    background: #fff;
+    border: 1px solid var(--accent-border);
+    border-radius: var(--radius-sm);
+    padding: 4px 12px;
+    min-width: 130px;
+    text-align: center;
+  }
+
+  /* 진행률 바 */
+  .progress-track {
+    height: 5px;
+    background: var(--gray-200);
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #818cf8);
+    width: 0%;
+    transition: width .1s linear;
+    border-radius: 0 3px 3px 0;
+  }
+
+  /* 스크롤 박스 */
+  .demo-scroll-box {
+    height: 400px;
+    overflow-y: scroll;
+    background: #fff;
+    padding: 0;
+    position: relative;
+    scroll-behavior: smooth;
+  }
+  .demo-scroll-box::-webkit-scrollbar { width: 6px; }
+  .demo-scroll-box::-webkit-scrollbar-track { background: var(--gray-100); }
+  .demo-scroll-box::-webkit-scrollbar-thumb { background: var(--accent-border); border-radius: 3px; }
+
+  .demo-inner {
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* 데모 카드 (fade-in 효과) */
+  .demo-card {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .55s ease, transform .55s ease;
+    background: #fff;
+  }
+  .demo-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .demo-card-num {
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .demo-card h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 8px;
+  }
+  .demo-card p {
+    font-size: .88rem;
+    color: var(--gray-600);
+    line-height: 1.7;
+  }
+  .demo-card-a { background: var(--accent-soft); border-color: var(--accent-border); }
+  .demo-card-b { background: var(--green-soft);  border-color: #bbf7d0; }
+  .demo-card-c { background: var(--amber-soft);  border-color: #fde68a; }
+  .demo-card-d { background: var(--red-soft);    border-color: #fecdd3; }
+
+  /* 맨 위로 버튼 */
+  .scroll-top-btn {
+    position: sticky;
+    bottom: 16px;
+    left: 100%;
+    margin-right: 16px;
+    width: 40px;
+    height: 40px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.7);
+    transition: opacity .3s, transform .3s;
+    pointer-events: none;
+    float: right;
+    clear: right;
+  }
+  .scroll-top-btn.show {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+
+  /* ════════════════════════════════════════
+     푸터
+  ════════════════════════════════════════ */
+  .site-footer {
+    background: var(--gray-900);
+    color: #9ca3af;
+    padding: 48px 24px 36px;
+    text-align: center;
+  }
+  .footer-logo {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 16px;
+  }
+  .footer-desc { font-size: .85rem; line-height: 1.7; margin-bottom: 20px; }
+  .footer-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 28px; }
+  .footer-links a { font-size: .82rem; color: #9ca3af; }
+  .footer-links a:hover { color: #fff; }
+  .footer-copy { font-size: .78rem; color: #6b7280; }
+
+  /* ════════════════════════════════════════
+     반응형
+  ════════════════════════════════════════ */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 1.7rem; }
+    .section-title { font-size: 1.4rem; }
+    .card-grid, .next-grid { grid-template-columns: 1fr; }
+    .container { padding: 0 16px; }
+    .nav-logo span { display: none; }
+    .demo-header { flex-wrap: wrap; gap: 8px; }
+  }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     고정 네비게이션
+══════════════════════════════════════════ -->
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark">VT</div>
+    <span>바이브툴킷</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#concept">① 개념</a></li>
+    <li><a href="#types">② 활용 유형</a></li>
+    <li><a href="#code">③ 코드 예제</a></li>
+    <li><a href="#demo">④ 데모</a></li>
+    <li><a href="#prompt">⑤ AI 프롬프트</a></li>
+    <li><a href="#faq">⑥ FAQ</a></li>
+  </ul>
+</nav>
+
+
+<!-- ══════════════════════════════════════════
+     히어로
+══════════════════════════════════════════ -->
+<section id="hero" class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">🖱️ JavaScript · 스크롤 · 인터랙션</div>
+    <h1>스크롤 이벤트 <em>완전 정복</em></h1>
+    <p class="hero-desc">
+      스크롤 위치 감지부터 헤더 변형, 페이드인 애니메이션, 읽기 진행률 바까지.<br>
+      실전 예제와 인터랙티브 데모로 스크롤 효과를 직접 경험해보세요.
+    </p>
+    <div class="hero-meta">
+      <span>⏱️ 약 15분</span>
+      <span>📅 2026년 4월</span>
+      <span>🏷️ JavaScript · Scroll · Animation</span>
+      <span>👶 입문~중급</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ① 개념
+══════════════════════════════════════════ -->
+<section id="concept" class="section">
+  <div class="container">
+
+    <div class="section-badge">① 개념</div>
+    <h2 class="section-title">스크롤 이벤트란 무엇인가요?</h2>
+    <p class="section-lead">사용자가 페이지를 위아래로 움직일 때마다 브라우저는 <code>scroll</code> 이벤트를 발생시킵니다. 이 이벤트를 활용하면 헤더 고정, 페이드인, 진행률 바 등 다양한 인터랙션을 구현할 수 있습니다.</p>
+
+    <p style="color:var(--gray-700);line-height:1.85;margin-bottom:20px;">
+      스크롤 이벤트의 핵심은 <strong>현재 스크롤 위치를 파악</strong>하는 것입니다. 브라우저에서 스크롤 위치를 읽는 방법은 크게 세 가지가 있어요. 첫 번째는 <code>window.scrollY</code>로, 페이지 최상단에서 현재까지 스크롤된 픽셀 수를 나타냅니다. 바이브 코딩에서 가장 많이 쓰이는 방법입니다. 두 번째는 <code>element.scrollTop</code>으로, 특정 요소 내부의 스크롤 위치를 읽을 때 사용합니다. 오버플로우가 있는 박스 안에서 스크롤 이벤트를 다룰 때 유용해요. 세 번째는 <code>getBoundingClientRect()</code>로, 요소가 현재 뷰포트 안에 얼마나 들어와 있는지를 정밀하게 측정할 수 있습니다. 하지만 이 방법은 최근 <strong>IntersectionObserver</strong>로 대체되는 추세입니다.
+    </p>
+
+    <div class="callout co-amber">
+      <div class="callout-icon">⚡</div>
+      <div class="callout-body">
+        <p><strong>스크롤 이벤트는 1초에 수십~수백 번 발생</strong>할 수 있습니다. 이벤트 핸들러 안에서 무거운 작업을 하면 페이지가 버벅이게 됩니다. <strong>throttle</strong> 또는 <strong>requestAnimationFrame</strong>으로 실행 횟수를 제한하는 것이 중요해요.</p>
+        <p>요소의 뷰포트 진입 여부만 감지하면 된다면, 스크롤 이벤트 대신 <strong>IntersectionObserver</strong>를 사용하세요. 브라우저가 최적화된 방식으로 처리하므로 성능이 훨씬 좋습니다.</p>
+      </div>
+    </div>
+
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>방법</th>
+          <th>용도</th>
+          <th>성능</th>
+          <th>브라우저 지원</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>window.scrollY</code></td>
+          <td>페이지 전체 스크롤 위치</td>
+          <td><span class="badge ba">주의 필요</span></td>
+          <td><span class="badge bg">전체</span></td>
+        </tr>
+        <tr>
+          <td><code>element.scrollTop</code></td>
+          <td>특정 박스 내부 스크롤</td>
+          <td><span class="badge ba">주의 필요</span></td>
+          <td><span class="badge bg">전체</span></td>
+        </tr>
+        <tr>
+          <td><code>getBoundingClientRect()</code></td>
+          <td>요소의 뷰포트 내 위치</td>
+          <td><span class="badge ba">주의 필요</span></td>
+          <td><span class="badge bg">전체</span></td>
+        </tr>
+        <tr>
+          <td><code>IntersectionObserver</code></td>
+          <td>요소 뷰포트 진입 감지</td>
+          <td><span class="badge bg">최적</span></td>
+          <td><span class="badge bg">모던 브라우저</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ② 활용 유형
+══════════════════════════════════════════ -->
+<section id="types" class="section">
+  <div class="container">
+
+    <div class="section-badge">② 활용 유형</div>
+    <h2 class="section-title">스크롤로 할 수 있는 4가지</h2>
+    <p class="section-lead">실무에서 자주 쓰이는 스크롤 인터랙션 유형입니다. 각 유형의 원리를 이해하면 어떤 사이트에든 적용할 수 있어요.</p>
+
+    <div class="card-grid">
+
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">📍</div>
+        <h4>스크롤 위치 감지</h4>
+        <p><code>window.scrollY</code> 값을 읽어 특정 지점을 넘었는지 확인합니다. 헤더 변형, 버튼 표시/숨김, 네비게이션 강조 등에 활용해요.</p>
+      </div>
+
+      <div class="info-card ic-green">
+        <div class="info-card-icon">📌</div>
+        <h4>헤더 고정 / 변형</h4>
+        <p>스크롤을 내리면 헤더에 그림자가 생기거나 배경이 불투명해집니다. <code>classList.add('scrolled')</code> 패턴으로 간단하게 구현할 수 있어요.</p>
+      </div>
+
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">🎭</div>
+        <h4>요소 뷰포트 진입 감지</h4>
+        <p>섹션이 화면에 들어올 때 페이드인, 슬라이드인 등의 애니메이션을 실행합니다. <strong>IntersectionObserver</strong>가 가장 성능이 좋은 방법입니다.</p>
+      </div>
+
+      <div class="info-card ic-red">
+        <div class="info-card-icon">📊</div>
+        <h4>스크롤 진행률 바</h4>
+        <p>페이지를 얼마나 읽었는지 상단에 막대로 표시합니다. <code>(scrollY / (totalHeight - windowHeight)) * 100</code> 공식으로 계산해요.</p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ③ 코드 예제
+══════════════════════════════════════════ -->
+<section id="code" class="section">
+  <div class="container">
+
+    <div class="section-badge">③ 코드 예제</div>
+    <h2 class="section-title">복사해서 바로 쓰는 코드</h2>
+    <p class="section-lead">각 예제를 복사해서 AI에게 붙여넣거나, 직접 HTML 파일에 추가해보세요. 어디서부터 시작해야 할지 모르겠다면 예제 1번부터 순서대로 따라 해보세요.</p>
+
+    <!-- 예제 1 -->
+    <h3 style="font-size:1.1rem;font-weight:700;color:var(--gray-900);margin-bottom:4px;margin-top:40px;">예제 1 — 스크롤 헤더 변형</h3>
+    <p style="font-size:.9rem;color:var(--gray-500);margin-bottom:0;">스크롤이 50px를 넘으면 헤더에 그림자를 추가하는 가장 기본적인 패턴입니다.</p>
+
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots">
+          <div class="cb-dot cb-dot-r"></div>
+          <div class="cb-dot cb-dot-y"></div>
+          <div class="cb-dot cb-dot-g"></div>
+        </div>
+        <span class="cb-file">script.js</span>
+        <button class="cb-copy" onclick="copyCode(this)">복사</button>
+      </div>
+      <div class="cb-body"><pre id="code1"><span class="tk">window</span>.<span class="ta">addEventListener</span>(<span class="tv">'scroll'</span>, <span class="tk">function</span>() {
+  <span class="tk">const</span> header = <span class="tk">document</span>.<span class="ta">querySelector</span>(<span class="tv">'header'</span>);
+  <span class="tk">if</span> (<span class="tk">window</span>.scrollY &gt; 50) {
+    header.classList.<span class="ta">add</span>(<span class="tv">'scrolled'</span>);
+  } <span class="tk">else</span> {
+    header.classList.<span class="ta">remove</span>(<span class="tv">'scrolled'</span>);
+  }
+});</pre></div>
+    </div>
+
+    <div class="code-block" style="margin-top:12px;">
+      <div class="cb-header">
+        <div class="cb-dots">
+          <div class="cb-dot cb-dot-r"></div>
+          <div class="cb-dot cb-dot-y"></div>
+          <div class="cb-dot cb-dot-g"></div>
+        </div>
+        <span class="cb-file">style.css</span>
+        <button class="cb-copy" onclick="copyCode(this)">복사</button>
+      </div>
+      <div class="cb-body"><pre id="code1css">header { <span class="ta">transition</span>: box-shadow .<span class="tv">3</span>s; }
+header.<span class="tp">scrolled</span> { <span class="ta">box-shadow</span>: <span class="tv">0 4px 12px rgba(0,0,0,.15)</span>; }</pre></div>
+    </div>
+
+    <!-- 예제 2 -->
+    <h3 style="font-size:1.1rem;font-weight:700;color:var(--gray-900);margin-bottom:4px;margin-top:40px;">예제 2 — IntersectionObserver 페이드인</h3>
+    <p style="font-size:.9rem;color:var(--gray-500);margin-bottom:0;">요소가 화면에 진입할 때 아래에서 위로 나타나는 효과입니다. 스크롤 이벤트보다 성능이 훨씬 좋습니다.</p>
+
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots">
+          <div class="cb-dot cb-dot-r"></div>
+          <div class="cb-dot cb-dot-y"></div>
+          <div class="cb-dot cb-dot-g"></div>
+        </div>
+        <span class="cb-file">script.js</span>
+        <button class="cb-copy" onclick="copyCode(this)">복사</button>
+      </div>
+      <div class="cb-body"><pre id="code2"><span class="tk">const</span> observer = <span class="tk">new</span> <span class="ta">IntersectionObserver</span>((entries) =&gt; {
+  entries.<span class="ta">forEach</span>(entry =&gt; {
+    <span class="tk">if</span> (entry.isIntersecting) {
+      entry.target.classList.<span class="ta">add</span>(<span class="tv">'visible'</span>);
+    }
+  });
+}, { threshold: <span class="tv">0.1</span> });
+
+<span class="tk">document</span>.<span class="ta">querySelectorAll</span>(<span class="tv">'.fade-in'</span>).<span class="ta">forEach</span>(el =&gt; observer.<span class="ta">observe</span>(el));</pre></div>
+    </div>
+
+    <div class="code-block" style="margin-top:12px;">
+      <div class="cb-header">
+        <div class="cb-dots">
+          <div class="cb-dot cb-dot-r"></div>
+          <div class="cb-dot cb-dot-y"></div>
+          <div class="cb-dot cb-dot-g"></div>
+        </div>
+        <span class="cb-file">style.css</span>
+        <button class="cb-copy" onclick="copyCode(this)">복사</button>
+      </div>
+      <div class="cb-body"><pre id="code2css">.<span class="tp">fade-in</span> { <span class="ta">opacity</span>: <span class="tv">0</span>; <span class="ta">transform</span>: <span class="tv">translateY(20px)</span>; <span class="ta">transition</span>: <span class="tv">all .6s</span>; }
+.<span class="tp">fade-in</span>.<span class="tp">visible</span> { <span class="ta">opacity</span>: <span class="tv">1</span>; <span class="ta">transform</span>: <span class="tv">translateY(0)</span>; }</pre></div>
+    </div>
+
+    <!-- 예제 3 -->
+    <h3 style="font-size:1.1rem;font-weight:700;color:var(--gray-900);margin-bottom:4px;margin-top:40px;">예제 3 — 스크롤 진행률 바</h3>
+    <p style="font-size:.9rem;color:var(--gray-500);margin-bottom:0;">페이지 상단에 읽기 진행도를 막대로 표시합니다. HTML에 <code>&lt;div id="progress-bar"&gt;&lt;/div&gt;</code>를 먼저 추가해주세요.</p>
+
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots">
+          <div class="cb-dot cb-dot-r"></div>
+          <div class="cb-dot cb-dot-y"></div>
+          <div class="cb-dot cb-dot-g"></div>
+        </div>
+        <span class="cb-file">script.js</span>
+        <button class="cb-copy" onclick="copyCode(this)">복사</button>
+      </div>
+      <div class="cb-body"><pre id="code3"><span class="tk">window</span>.<span class="ta">addEventListener</span>(<span class="tv">'scroll'</span>, <span class="tk">function</span>() {
+  <span class="tk">const</span> scrolled = <span class="tk">window</span>.scrollY;
+  <span class="tk">const</span> total = <span class="tk">document</span>.body.scrollHeight - <span class="tk">window</span>.innerHeight;
+  <span class="tk">const</span> progress = (scrolled / total) * <span class="tv">100</span>;
+  <span class="tk">document</span>.<span class="ta">getElementById</span>(<span class="tv">'progress-bar'</span>).style.width = progress + <span class="tv">'%'</span>;
+});</pre></div>
+    </div>
+
+    <!-- 예제 4 -->
+    <h3 style="font-size:1.1rem;font-weight:700;color:var(--gray-900);margin-bottom:4px;margin-top:40px;">예제 4 — throttle로 성능 최적화</h3>
+    <p style="font-size:.9rem;color:var(--gray-500);margin-bottom:0;">스크롤 이벤트 핸들러를 100ms마다 한 번만 실행하도록 제한해 성능을 높입니다.</p>
+
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots">
+          <div class="cb-dot cb-dot-r"></div>
+          <div class="cb-dot cb-dot-y"></div>
+          <div class="cb-dot cb-dot-g"></div>
+        </div>
+        <span class="cb-file">script.js</span>
+        <button class="cb-copy" onclick="copyCode(this)">복사</button>
+      </div>
+      <div class="cb-body"><pre id="code4"><span class="tk">function</span> <span class="ta">throttle</span>(fn, delay) {
+  <span class="tk">let</span> last = <span class="tv">0</span>;
+  <span class="tk">return function</span>(...args) {
+    <span class="tk">const</span> now = Date.<span class="ta">now</span>();
+    <span class="tk">if</span> (now - last &gt;= delay) {
+      last = now;
+      fn.<span class="ta">apply</span>(<span class="tk">this</span>, args);
+    }
+  };
+}
+
+<span class="tk">window</span>.<span class="ta">addEventListener</span>(<span class="tv">'scroll'</span>, <span class="ta">throttle</span>(handleScroll, <span class="tv">100</span>));</pre></div>
+    </div>
+
+    <div class="callout co-green" style="margin-top:32px;">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <p><strong>passive 옵션으로 추가 성능 향상!</strong> 스크롤 이벤트에 <code>{ passive: true }</code>를 추가하면 브라우저가 스크롤을 더 부드럽게 처리할 수 있습니다. 이벤트 핸들러 안에서 <code>preventDefault()</code>를 호출하지 않는다면 항상 붙여주세요.</p>
+        <p><code>window.addEventListener('scroll', handleScroll, { passive: true });</code></p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ④ 인터랙티브 데모
+══════════════════════════════════════════ -->
+<section id="demo" class="section">
+  <div class="container">
+
+    <div class="section-badge">④ 데모</div>
+    <h2 class="section-title">직접 스크롤해보세요!</h2>
+    <p class="section-lead">아래 박스 안에서 스크롤하면 진행률 바, 실시간 위치, 페이드인 효과, 맨 위로 버튼이 모두 동작합니다.</p>
+
+    <div class="demo-wrap">
+      <!-- 데모 헤더: 위치 표시 -->
+      <div class="demo-header">
+        <div class="demo-header-title">
+          <span>🎯</span> 스크롤 이벤트 데모
+        </div>
+        <div class="demo-scroll-info" id="demoScrollInfo">scrollY: 0px</div>
+      </div>
+
+      <!-- 진행률 바 -->
+      <div class="progress-track">
+        <div class="progress-fill" id="demoProgressFill"></div>
+      </div>
+
+      <!-- 스크롤 영역 -->
+      <div class="demo-scroll-box" id="demoBox">
+        <div class="demo-inner">
+
+          <div style="text-align:center;padding:16px 0 8px;color:var(--gray-500);font-size:.9rem;">
+            ⬇️ 아래로 스크롤하면 카드들이 나타납니다
+          </div>
+
+          <div class="demo-card demo-card-a" data-demo-card>
+            <div class="demo-card-num">카드 01</div>
+            <h4>📍 scrollY: 0px에서 시작</h4>
+            <p>스크롤을 내리면 진행률 바가 오른쪽으로 늘어나는 것을 확인하세요. 상단의 숫자도 실시간으로 업데이트됩니다. 이것이 바로 <code>scrollTop</code> 값을 읽어 UI를 업데이트하는 기본 패턴입니다.</p>
+          </div>
+
+          <div class="demo-card demo-card-b" data-demo-card>
+            <div class="demo-card-num">카드 02</div>
+            <h4>🎭 IntersectionObserver 페이드인</h4>
+            <p>이 카드는 화면에 진입하는 순간 아래에서 위로 부드럽게 나타납니다. <code>opacity: 0</code>에서 시작해 <code>visible</code> 클래스가 추가되면 <code>opacity: 1</code>로 전환됩니다. 스크롤 이벤트 없이 IntersectionObserver만으로 구현한 효과입니다.</p>
+          </div>
+
+          <div class="demo-card demo-card-c" data-demo-card>
+            <div class="demo-card-num">카드 03</div>
+            <h4>📊 진행률 계산 공식</h4>
+            <p>진행률 = <code>(scrollTop / (scrollHeight - clientHeight)) × 100</code>. 분모는 실제로 스크롤 가능한 최대 거리입니다. 이 값이 0이면 스크롤이 없는 상태이므로 예외 처리를 꼭 해줘야 합니다.</p>
+          </div>
+
+          <div class="demo-card demo-card-d" data-demo-card>
+            <div class="demo-card-num">카드 04</div>
+            <h4>⬆️ 맨 위로 버튼</h4>
+            <p>스크롤을 80px 이상 내리면 오른쪽 하단에 동그란 버튼이 나타납니다. 클릭하면 박스 상단으로 부드럽게 이동합니다. <code>scrollTo({ top: 0, behavior: 'smooth' })</code>를 사용합니다. 여기까지 읽었다면 스크롤 이벤트의 핵심은 모두 파악한 것입니다!</p>
+          </div>
+
+          <!-- 맨 위로 버튼 -->
+          <button class="scroll-top-btn" id="demoTopBtn" title="맨 위로">↑</button>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ⑤ AI 프롬프트 팁
+══════════════════════════════════════════ -->
+<section id="prompt" class="section">
+  <div class="container">
+
+    <div class="section-badge">⑤ AI 프롬프트 팁</div>
+    <h2 class="section-title">AI에게 이렇게 요청하세요</h2>
+    <p class="section-lead">스크롤 효과를 AI 코딩 도구로 빠르게 구현하고 싶다면 아래 프롬프트를 복사해서 바로 사용해보세요. 구체적인 조건을 명시할수록 원하는 결과를 얻기 쉽습니다.</p>
+
+    <div class="vibe-tip">
+      <div class="vibe-tip-label">✨ 바이브코더 프롬프트</div>
+      <p>아래 프롬프트를 Claude, ChatGPT, Cursor 등 AI 도구에 그대로 붙여넣어 보세요.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots">
+          <div class="cb-dot cb-dot-r"></div>
+          <div class="cb-dot cb-dot-y"></div>
+          <div class="cb-dot cb-dot-g"></div>
+        </div>
+        <span class="cb-file">AI 프롬프트</span>
+        <button class="cb-copy" onclick="copyCode(this)">복사</button>
+      </div>
+      <div class="cb-body"><pre id="codePrompt">내 웹페이지에 스크롤 효과를 추가해줘:
+1. 스크롤 내리면 헤더에 그림자 생기게
+2. 각 섹션이 화면에 들어올 때 아래에서 위로 페이드인
+3. 페이지 상단에 읽기 진행률 바 추가 (보라색)
+4. 스크롤 200px 이상 내리면 "맨 위로" 버튼 표시
+
+- 스크롤 이벤트는 passive 옵션 사용
+- IntersectionObserver로 페이드인 처리
+- 기존 HTML 구조는 유지하면서 JS/CSS만 추가</pre></div>
+    </div>
+
+    <div class="callout co-blue" style="margin-top:24px;">
+      <div class="callout-icon">🎯</div>
+      <div class="callout-body">
+        <p>프롬프트에 <strong>"기존 HTML 구조는 유지"</strong>라고 명시하면 AI가 전체 코드를 다시 짜는 대신 필요한 부분만 추가해줍니다. 큰 프로젝트에서 특히 유용한 팁이에요.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ⑥ FAQ
+══════════════════════════════════════════ -->
+<section id="faq" class="section">
+  <div class="container">
+
+    <div class="section-badge">⑥ FAQ</div>
+    <h2 class="section-title">자주 묻는 질문</h2>
+    <p class="section-lead">스크롤 이벤트를 처음 다루다 보면 맞닥뜨리게 되는 질문들을 모았습니다.</p>
+
+    <div class="faq-list">
+
+      <details class="faq-item">
+        <summary>scroll 이벤트가 너무 많이 발생해요. 어떻게 줄이나요?</summary>
+        <div class="faq-body">
+          <p><strong>throttle</strong> 함수를 사용해 일정 시간 간격으로만 핸들러가 실행되도록 제한하세요. 예제 4번 코드를 참고해주세요. 일반적으로 100ms 간격이면 충분합니다.</p>
+          <p>또는 <code>requestAnimationFrame</code>을 활용해 브라우저의 렌더링 주기에 맞춰 실행할 수도 있습니다. <code>let ticking = false</code> 플래그와 함께 사용하면 프레임당 한 번만 실행되도록 보장할 수 있습니다.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>IntersectionObserver와 scroll 이벤트, 언제 뭘 써야 하나요?</summary>
+        <div class="faq-body">
+          <p><strong>요소가 화면에 들어왔는지만 감지</strong>하면 된다면 무조건 <code>IntersectionObserver</code>를 쓰세요. 브라우저가 내부적으로 최적화해서 처리하므로 메인 스레드 부하가 없습니다.</p>
+          <p><strong>스크롤 위치에 따라 연속적인 값 변화</strong>가 필요할 때(진행률 바, 패럴랙스 효과 등)는 scroll 이벤트가 필요합니다. 이 경우 throttle 또는 requestAnimationFrame을 꼭 함께 사용하세요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>클릭하면 해당 섹션으로 부드럽게 이동하려면요?</summary>
+        <div class="faq-body">
+          <p>CSS 한 줄로 해결됩니다: <code>html &#123; scroll-behavior: smooth; &#125;</code></p>
+          <p>JavaScript에서 직접 이동할 때는 <code>element.scrollIntoView(&#123; behavior: 'smooth' &#125;)</code> 또는 <code>window.scrollTo(&#123; top: 0, behavior: 'smooth' &#125;)</code>를 사용하세요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>모바일에서 스크롤이 버벅여요.</summary>
+        <div class="faq-body">
+          <p>이벤트 리스너에 <code>&#123; passive: true &#125;</code> 옵션을 추가하세요.</p>
+          <p><code>window.addEventListener('scroll', handler, &#123; passive: true &#125;);</code></p>
+          <p>이 옵션은 브라우저에게 "이 핸들러에서 <code>preventDefault()</code>를 호출하지 않겠다"고 알려주어 스크롤 성능을 크게 향상시킵니다. 스크롤을 막을 필요가 없다면 항상 사용하는 것이 좋습니다.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>특정 div 안에서의 스크롤을 감지하려면요?</summary>
+        <div class="faq-body">
+          <p><code>window</code> 대신 해당 요소에 이벤트 리스너를 붙이고, <code>window.scrollY</code> 대신 <code>element.scrollTop</code>을 읽으면 됩니다.</p>
+          <p><code>const box = document.getElementById('myBox');</code><br>
+          <code>box.addEventListener('scroll', function() &#123; console.log(box.scrollTop); &#125;);</code></p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>스크롤 이벤트를 나중에 제거하려면요?</summary>
+        <div class="faq-body">
+          <p>핸들러 함수를 변수에 저장해두었다가 <code>removeEventListener</code>로 제거하세요. 익명 함수는 나중에 제거할 수 없으니 주의하세요.</p>
+          <p><code>function handleScroll() &#123; /* ... */ &#125;</code><br>
+          <code>window.addEventListener('scroll', handleScroll);</code><br>
+          <code>// 나중에 제거:</code><br>
+          <code>window.removeEventListener('scroll', handleScroll);</code></p>
+        </div>
+      </details>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     다음 단계
+══════════════════════════════════════════ -->
+<section id="next" class="section">
+  <div class="container">
+
+    <div class="section-badge">다음 단계</div>
+    <h2 class="section-title">이런 주제도 살펴보세요</h2>
+    <p class="section-lead">스크롤 이벤트를 배웠다면 다음 단계로 이어서 공부해보세요.</p>
+
+    <div class="next-grid">
+
+      <a href="click-event.html" class="next-card">
+        <div class="next-card-icon">🖱️</div>
+        <div class="next-card-title">클릭 이벤트</div>
+        <div class="next-card-desc">onclick, addEventListener, 이벤트 위임까지 클릭 이벤트 완전 정복</div>
+        <div class="next-card-tag">기초</div>
+      </a>
+
+      <a href="modal-popup.html" class="next-card">
+        <div class="next-card-icon">🪟</div>
+        <div class="next-card-title">모달 팝업</div>
+        <div class="next-card-desc">오버레이, 바깥 클릭 닫기, 접근성까지 모달 구현 완전 가이드</div>
+        <div class="next-card-tag">중급</div>
+      </a>
+
+      <a href="floating-button.html" class="next-card">
+        <div class="next-card-icon">🚀</div>
+        <div class="next-card-title">플로팅 버튼</div>
+        <div class="next-card-desc">고정 위치 버튼, 맨 위로 가기, 스크롤 연동 플로팅 UI</div>
+        <div class="next-card-tag">실전</div>
+      </a>
+
+      <a href="index.html" class="next-card">
+        <div class="next-card-icon">🏠</div>
+        <div class="next-card-title">전체 도구 보기</div>
+        <div class="next-card-desc">바이브툴킷의 모든 도구 목록으로 돌아가기</div>
+        <div class="next-card-tag">홈</div>
+      </a>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     푸터
+══════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-logo">
+    <div class="logo-mark">VT</div>
+    바이브툴킷
+  </div>
+  <p class="footer-desc">바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 도구 모음</p>
+  <div class="footer-links">
+    <a href="index.html">홈</a>
+    <a href="about.html">소개</a>
+    <a href="contact.html">문의</a>
+    <a href="sitemap.html">사이트맵</a>
+  </div>
+  <div class="footer-copy">© 2026 바이브툴킷. 콘텐츠는 자유롭게 참고하세요.</div>
+</footer>
+
+
+<!-- ══════════════════════════════════════════
+     JavaScript
+══════════════════════════════════════════ -->
+<script>
+/* ────────────────────────────────
+   코드 복사 버튼
+──────────────────────────────── */
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre ? pre.innerText : '';
+  navigator.clipboard.writeText(text).then(function() {
+    btn.textContent = '복사됨!';
+    btn.classList.add('ok');
+    setTimeout(function() {
+      btn.textContent = '복사';
+      btn.classList.remove('ok');
+    }, 1800);
+  }).catch(function() {
+    btn.textContent = '실패';
+    setTimeout(function() { btn.textContent = '복사'; }, 1800);
+  });
+}
+
+/* ────────────────────────────────
+   인터랙티브 데모
+──────────────────────────────── */
+(function() {
+  const box        = document.getElementById('demoBox');
+  const infoEl     = document.getElementById('demoScrollInfo');
+  const fillEl     = document.getElementById('demoProgressFill');
+  const topBtn     = document.getElementById('demoTopBtn');
+  const demoCards  = document.querySelectorAll('[data-demo-card]');
+
+  if (!box) return;
+
+  /* 스크롤 핸들러 */
+  function handleDemoScroll() {
+    const scrollTop    = box.scrollTop;
+    const scrollHeight = box.scrollHeight;
+    const clientHeight = box.clientHeight;
+    const maxScroll    = scrollHeight - clientHeight;
+
+    /* 위치 표시 */
+    infoEl.textContent = 'scrollY: ' + Math.round(scrollTop) + 'px';
+
+    /* 진행률 바 */
+    const pct = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0;
+    fillEl.style.width = pct.toFixed(1) + '%';
+
+    /* 맨 위로 버튼 */
+    if (scrollTop > 80) {
+      topBtn.classList.add('show');
+    } else {
+      topBtn.classList.remove('show');
+    }
+
+    /* 카드 fade-in (간이 IntersectionObserver 대체) */
+    demoCards.forEach(function(card) {
+      const rect = card.getBoundingClientRect();
+      const boxRect = box.getBoundingClientRect();
+      if (rect.top < boxRect.bottom - 40) {
+        card.classList.add('visible');
+      }
+    });
+  }
+
+  /* 첫 번째 카드는 바로 보이게 */
+  if (demoCards.length > 0) {
+    demoCards[0].classList.add('visible');
+  }
+
+  box.addEventListener('scroll', handleDemoScroll, { passive: true });
+
+  /* 맨 위로 버튼 클릭 */
+  topBtn.addEventListener('click', function() {
+    box.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+
+/* ────────────────────────────────
+   iframe 감지 & 부모 loadTool 연동
+──────────────────────────────── */
+(function(){
+  if(self===top)return;
+  var nav=document.querySelector('.site-nav'); if(nav)nav.style.display='none';
+  var hero=document.querySelector('.hero'); if(hero)hero.style.paddingTop='40px';
+  document.querySelectorAll('a[href$=".html"]').forEach(function(a){
+    a.addEventListener('click',function(e){
+      if(window.parent&&window.parent.loadTool){e.preventDefault();window.parent.loadTool(this.getAttribute('href'));}
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

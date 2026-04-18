@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>폼 유효성 검사 완전 정복 | 바이브툴킷</title>
+  <meta name="description" content="HTML5 + JavaScript로 실시간 폼 유효성 검사 구현하기. 이메일, 비밀번호, 빈칸 체크까지.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://aun-jy.github.io/vibe-toolkit/form-validation.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+  /* ════════════════════════════════════════
+     기본 설정
+  ════════════════════════════════════════ */
+  :root {
+    --accent:        #4f46e5;
+    --accent-soft:   #eef2ff;
+    --accent-border: #c7d2fe;
+    --green:         #16a34a;
+    --green-soft:    #f0fdf4;
+    --amber:         #d97706;
+    --amber-soft:    #fffbeb;
+    --red:           #e11d48;
+    --red-soft:      #fff1f2;
+    --gray-50:       #f9fafb;
+    --gray-100:      #f3f4f6;
+    --gray-200:      #e5e7eb;
+    --gray-300:      #d1d5db;
+    --gray-400:      #9ca3af;
+    --gray-500:      #6b7280;
+    --gray-600:      #4b5563;
+    --gray-700:      #374151;
+    --gray-900:      #111827;
+    --code-bg:       #1e1e2e;
+    --code-surface:  #282a36;
+    --radius:        12px;
+    --radius-sm:     8px;
+    --shadow-sm:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    --shadow:        0 4px 12px rgba(0,0,0,.08);
+    --shadow-lg:     0 8px 28px rgba(0,0,0,.10);
+    --nav-h:         56px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 24px); }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fff;
+    color: var(--gray-700);
+    line-height: 1.75;
+    font-size: 16px;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  strong { color: var(--gray-900); font-weight: 600; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .83em;
+    background: var(--gray-100);
+    color: var(--accent);
+    padding: .1em .4em;
+    border-radius: 4px;
+    border: 1px solid var(--gray-200);
+  }
+
+  /* ════════════════════════════════════════
+     고정 상단 네비게이션
+  ════════════════════════════════════════ */
+  .site-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 500;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gray-200);
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--gray-900);
+    margin-right: 32px;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+  .nav-logo:hover { text-decoration: none; }
+
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem; font-weight: 700; color: #fff;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+
+  .nav-links a {
+    display: block;
+    padding: 6px 14px;
+    font-size: .85rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    transition: color .15s, background .15s;
+    text-decoration: none;
+  }
+  .nav-links a:hover { color: var(--gray-900); background: var(--gray-100); }
+  .nav-links a.active { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+
+  /* ════════════════════════════════════════
+     레이아웃
+  ════════════════════════════════════════ */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+  .section { padding: 72px 0; }
+  .section:nth-child(even) { background: var(--gray-50); }
+
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 3px 12px;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -.025em;
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+
+  .section-lead {
+    font-size: 1.05rem;
+    color: var(--gray-500);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 600px;
+  }
+
+  /* ════════════════════════════════════════
+     히어로
+  ════════════════════════════════════════ */
+  .hero {
+    padding: calc(var(--nav-h) + 56px) 0 64px;
+    background: linear-gradient(160deg, var(--accent-soft) 0%, #fff 60%);
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.9rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -.03em;
+    line-height: 1.2;
+    margin-bottom: 18px;
+  }
+  .hero h1 em { color: var(--accent); font-style: normal; }
+
+  .hero-desc {
+    font-size: 1.08rem;
+    color: var(--gray-500);
+    line-height: 1.75;
+    max-width: 540px;
+    margin-bottom: 32px;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: .82rem;
+    color: var(--gray-500);
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 5px; }
+
+  /* ════════════════════════════════════════
+     카드 그리드
+  ════════════════════════════════════════ */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .info-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow .2s, transform .2s;
+  }
+  .info-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .info-card-icon { font-size: 1.6rem; margin-bottom: 10px; }
+  .info-card h4 { font-size: .95rem; font-weight: 700; color: var(--gray-900); margin-bottom: 7px; }
+  .info-card p { font-size: .86rem; color: var(--gray-600); line-height: 1.7; }
+
+  .ic-accent { background: var(--accent-soft); border-color: var(--accent-border); }
+  .ic-green  { background: var(--green-soft);  border-color: #bbf7d0; }
+  .ic-amber  { background: var(--amber-soft);  border-color: #fde68a; }
+  .ic-red    { background: var(--red-soft);    border-color: #fecdd3; }
+  .ic-gray   { background: var(--gray-50);     border-color: var(--gray-200); }
+
+  /* ════════════════════════════════════════
+     콜아웃
+  ════════════════════════════════════════ */
+  .callout {
+    display: flex;
+    gap: 14px;
+    padding: 18px 20px;
+    border-radius: var(--radius);
+    margin: 24px 0;
+    font-size: .93rem;
+    line-height: 1.75;
+    color: var(--gray-700);
+  }
+  .callout-icon { font-size: 1.2rem; flex-shrink: 0; padding-top: 1px; }
+  .callout-body p { margin: 0; }
+  .callout-body p + p { margin-top: 6px; }
+
+  .co-blue  { background: var(--accent-soft);  border: 1px solid var(--accent-border); }
+  .co-green { background: var(--green-soft);   border: 1px solid #bbf7d0; }
+  .co-amber { background: var(--amber-soft);   border: 1px solid #fde68a; }
+  .co-red   { background: var(--red-soft);     border: 1px solid #fecdd3; }
+
+  /* ════════════════════════════════════════
+     비교 테이블
+  ════════════════════════════════════════ */
+  .cmp-table {
+    width: 100%; border-collapse: collapse;
+    font-size: .88rem; margin-top: 24px;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .cmp-table th {
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 11px 16px;
+    text-align: left;
+    font-size: .78rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    color: var(--gray-600);
+  }
+  .cmp-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: top;
+    color: var(--gray-700);
+  }
+  .cmp-table tr:last-child td { border-bottom: none; }
+
+  .badge {
+    display: inline-block;
+    font-size: .7rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .bg { background: var(--green-soft);  color: var(--green); }
+  .bb { background: var(--gray-100);    color: var(--gray-600); }
+  .ba { background: var(--amber-soft);  color: var(--amber); }
+  .br { background: var(--red-soft);    color: var(--red); }
+
+  /* ════════════════════════════════════════
+     바이브코더 TIP 박스
+  ════════════════════════════════════════ */
+  .vibe-tip {
+    background: linear-gradient(135deg, #faf5ff 0%, #eff6ff 100%);
+    border: 1px solid #e9d5ff;
+    border-left: 4px solid #8b5cf6;
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin: 32px 0;
+  }
+  .vibe-tip-label {
+    font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: #7c3aed;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+  }
+  .vibe-tip p { font-size: .92rem; color: var(--gray-700); margin-bottom: 10px; line-height: 1.75; }
+  .vibe-tip p:last-child { margin-bottom: 0; }
+  .vibe-tip code { background: #ede9fe; border-color: #ddd6fe; color: #7c3aed; }
+
+  .prompt-box {
+    background: #1e1e2e;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-top: 14px;
+  }
+  .prompt-box pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem; line-height: 1.65; color: #cdd6f4;
+    white-space: pre-wrap; word-break: break-word;
+  }
+
+  /* ════════════════════════════════════════
+     유형별 검사 카드 (② 섹션)
+  ════════════════════════════════════════ */
+  .check-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow .2s, transform .2s;
+  }
+  .check-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+
+  .check-card-head {
+    padding: 16px 18px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .check-card-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+  }
+  .cci-green  { background: var(--green-soft); }
+  .cci-blue   { background: var(--accent-soft); }
+  .cci-amber  { background: var(--amber-soft); }
+  .cci-red    { background: var(--red-soft); }
+
+  .check-card-head h4 { font-size: .95rem; font-weight: 700; color: var(--gray-900); margin-bottom: 3px; }
+  .check-card-head p  { font-size: .82rem; color: var(--gray-500); line-height: 1.5; margin: 0; }
+
+  .check-card-body { padding: 16px 18px; }
+
+  /* 인라인 미니 데모 */
+  .mini-demo {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .mini-demo label {
+    display: block;
+    font-size: .78rem; font-weight: 600; color: var(--gray-600);
+    margin-bottom: 6px;
+  }
+  .mini-demo input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 7px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: .88rem;
+    color: var(--gray-900);
+    background: #fff;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .mini-demo input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .mini-demo input.valid   { border-color: var(--green); }
+  .mini-demo input.invalid { border-color: var(--red); }
+
+  .mini-msg {
+    margin-top: 5px;
+    font-size: .75rem; font-weight: 500;
+    min-height: 18px;
+  }
+  .mini-msg.ok  { color: var(--green); }
+  .mini-msg.err { color: var(--red); }
+
+  .code-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .74rem; line-height: 1.6;
+    color: var(--gray-600);
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: 6px;
+    padding: 8px 12px;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .code-hint .ck { color: #7c3aed; }
+  .code-hint .cv { color: var(--green); }
+  .code-hint .cc { color: var(--gray-400); font-style: italic; }
+
+  /* ════════════════════════════════════════
+     코드 블록 공통
+  ════════════════════════════════════════ */
+  .code-block {
+    background: var(--code-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 24px;
+    border: 1px solid #2d2d3f;
+    box-shadow: var(--shadow);
+  }
+  .cb-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: #13131f;
+    border-bottom: 1px solid #2d2d3f;
+  }
+  .cb-dots { display: flex; gap: 6px; }
+  .cb-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .cb-dot-r { background: #ff5f57; }
+  .cb-dot-y { background: #febc2e; }
+  .cb-dot-g { background: #28c840; }
+  .cb-file { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: #6272a4; }
+  .cb-copy {
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 5px; color: #94a3b8; padding: 3px 12px;
+    cursor: pointer; transition: background .15s, color .15s;
+  }
+  .cb-copy:hover { background: rgba(255,255,255,.15); color: #fff; }
+  .cb-copy.ok { color: #a6e3a1; border-color: #a6e3a1; }
+
+  .cb-body { padding: 20px; overflow-x: auto; }
+  .cb-body pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem; line-height: 1.75; color: #cdd6f4;
+    white-space: pre;
+  }
+  .tk { color: #89b4fa; }
+  .ta { color: #a6e3a1; }
+  .tv { color: #f9e2af; }
+  .tc { color: #6272a4; font-style: italic; }
+  .tp { color: #cba6f7; }
+
+  /* ════════════════════════════════════════
+     ④ 인터랙티브 데모 — 회원가입 폼
+  ════════════════════════════════════════ */
+  .demo-shell {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    max-width: 500px;
+    margin: 32px auto 0;
+  }
+
+  .demo-shell-head {
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .demo-dots { display: flex; gap: 6px; }
+  .demo-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .demo-dot-r { background: #ff5f57; }
+  .demo-dot-y { background: #febc2e; }
+  .demo-dot-g { background: #28c840; }
+  .demo-shell-title {
+    font-size: .78rem; color: var(--gray-500);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .demo-form-wrap { padding: 28px 28px 32px; }
+
+  .demo-form-title {
+    font-size: 1.2rem; font-weight: 700; color: var(--gray-900);
+    margin-bottom: 4px;
+  }
+  .demo-form-sub {
+    font-size: .83rem; color: var(--gray-500);
+    margin-bottom: 24px;
+  }
+
+  .field-wrap { margin-bottom: 18px; }
+
+  .field-wrap label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: .83rem; font-weight: 600; color: var(--gray-700);
+    margin-bottom: 6px;
+  }
+  .field-req {
+    font-size: .7rem; font-weight: 500;
+    color: var(--red); background: var(--red-soft);
+    padding: 1px 6px; border-radius: 4px;
+  }
+
+  .field-wrap input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 8px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: .93rem;
+    color: var(--gray-900);
+    background: #fff;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .field-wrap input::placeholder { color: var(--gray-400); }
+  .field-wrap input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .field-wrap input.valid {
+    border-color: var(--green);
+    background: var(--green-soft);
+  }
+  .field-wrap input.valid:focus {
+    box-shadow: 0 0 0 3px #bbf7d0;
+  }
+  .field-wrap input.invalid {
+    border-color: var(--red);
+    background: var(--red-soft);
+  }
+  .field-wrap input.invalid:focus {
+    box-shadow: 0 0 0 3px #fecdd3;
+  }
+
+  .field-msg {
+    display: block;
+    margin-top: 5px;
+    font-size: .77rem; font-weight: 500;
+    min-height: 18px;
+    transition: color .2s;
+  }
+  .field-msg.ok  { color: var(--green); }
+  .field-msg.err { color: var(--red); }
+
+  /* 비밀번호 강도 바 */
+  .pw-strength-wrap {
+    margin-top: 8px;
+    display: none;
+  }
+  .pw-strength-wrap.show { display: block; }
+  .pw-strength-bars {
+    display: flex; gap: 4px; margin-bottom: 4px;
+  }
+  .pw-bar {
+    flex: 1; height: 4px; border-radius: 2px;
+    background: var(--gray-200);
+    transition: background .3s;
+  }
+  .pw-bar.weak   { background: var(--red); }
+  .pw-bar.medium { background: var(--amber); }
+  .pw-bar.strong { background: var(--green); }
+  .pw-strength-label {
+    font-size: .72rem; font-weight: 600; color: var(--gray-500);
+  }
+  .pw-strength-label.weak   { color: var(--red); }
+  .pw-strength-label.medium { color: var(--amber); }
+  .pw-strength-label.strong { color: var(--green); }
+
+  /* 제출 버튼 */
+  .demo-submit {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: .95rem; font-weight: 700;
+    border: none; border-radius: 8px;
+    cursor: pointer;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    margin-top: 8px;
+    box-shadow: 0 2px 8px rgba(79,70,229,.3);
+  }
+  .demo-submit:hover {
+    background: #4338ca;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(79,70,229,.4);
+  }
+  .demo-submit:active { transform: translateY(0); }
+  .demo-submit:disabled {
+    background: var(--gray-300);
+    color: var(--gray-500);
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+
+  /* 토스트 */
+  .toast {
+    position: fixed;
+    bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--gray-900);
+    color: #fff;
+    padding: 13px 24px;
+    border-radius: 40px;
+    font-size: .9rem; font-weight: 600;
+    box-shadow: 0 8px 28px rgba(0,0,0,.2);
+    z-index: 9999;
+    opacity: 0;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1), opacity .3s;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  /* ════════════════════════════════════════
+     FAQ
+  ════════════════════════════════════════ */
+  .faq-list { margin-top: 28px; }
+  .faq-item {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .faq-q {
+    width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    background: none; border: none;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: .93rem; font-weight: 600; color: var(--gray-900);
+    cursor: pointer;
+    text-align: left;
+    gap: 12px;
+    transition: background .15s;
+  }
+  .faq-q:hover { background: var(--gray-50); }
+  .faq-q-icon {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .75rem; font-weight: 700; flex-shrink: 0;
+    transition: transform .25s;
+  }
+  .faq-item.open .faq-q-icon { transform: rotate(45deg); }
+
+  .faq-a {
+    max-height: 0; overflow: hidden;
+    transition: max-height .3s ease, padding .3s ease;
+    font-size: .9rem; color: var(--gray-600); line-height: 1.75;
+    padding: 0 20px;
+  }
+  .faq-item.open .faq-a {
+    max-height: 200px;
+    padding: 0 20px 18px;
+  }
+
+  /* ════════════════════════════════════════
+     푸터
+  ════════════════════════════════════════ */
+  .site-footer {
+    background: var(--gray-900);
+    color: var(--gray-400);
+    padding: 48px 24px 36px;
+    text-align: center;
+  }
+  .footer-logo {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; font-weight: 700; font-size: 1rem; color: #fff;
+    margin-bottom: 10px;
+  }
+  .footer-logo .logo-mark { background: var(--accent); }
+  .footer-desc { font-size: .85rem; line-height: 1.7; margin-bottom: 20px; }
+  .footer-links {
+    display: flex; justify-content: center; gap: 20px;
+    margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .footer-links a {
+    font-size: .83rem; color: var(--gray-400);
+    transition: color .15s;
+    text-decoration: none;
+  }
+  .footer-links a:hover { color: #fff; text-decoration: none; }
+  .footer-copy { font-size: .78rem; color: var(--gray-500); }
+
+  /* ════════════════════════════════════════
+     반응형
+  ════════════════════════════════════════ */
+  @media (max-width: 600px) {
+    .hero { padding: calc(var(--nav-h) + 36px) 0 48px; }
+    .section { padding: 52px 0; }
+    .card-grid { grid-template-columns: 1fr; }
+    .demo-form-wrap { padding: 20px 18px 24px; }
+  }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     고정 상단 네비게이션
+══════════════════════════════════════ -->
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark">VT</div>
+    바이브툴킷
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">홈</a></li>
+    <li><a href="favicon-generator.html">파비콘</a></li>
+    <li><a href="floating-button.html">플로팅 버튼</a></li>
+    <li><a href="modal-popup.html">모달 팝업</a></li>
+    <li><a href="form-validation.html" class="active">폼 유효성 검사</a></li>
+  </ul>
+</nav>
+
+<!-- ══════════════════════════════════════
+     히어로
+══════════════════════════════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">✅ 폼 유효성 검사</div>
+    <h1>폼 유효성 검사<br><em>완전 정복</em></h1>
+    <p class="hero-desc">사용자가 잘못된 정보를 입력했을 때 서버로 보내기 전에 미리 걸러내는 방법. HTML5 속성부터 JavaScript 실시간 검사, 비밀번호 강도 표시까지 — 바이브 코딩으로 회원가입 폼을 완성해 봅시다.</p>
+    <div class="hero-meta">
+      <span>📄 HTML5 + Vanilla JS</span>
+      <span>⚡ 실시간 피드백</span>
+      <span>🔐 비밀번호 강도 체크</span>
+      <span>📋 복사 가능한 코드</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ① 개념 섹션
+══════════════════════════════════════ -->
+<section class="section" id="concept">
+  <div class="container">
+    <div class="section-badge">① Concept</div>
+    <h2 class="section-title">폼 유효성 검사란?</h2>
+    <p class="section-lead">사용자가 입력한 값이 올바른지 서버로 보내기 전에 미리 확인하는 과정이에요. 잘못된 이메일, 짧은 비밀번호, 빈칸 제출을 막아 서버 부담을 줄이고 사용자 경험을 높여줍니다.</p>
+
+    <div class="callout co-blue">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <p><strong>왜 필요한가요?</strong> 서버는 데이터베이스에 저장하기 전에 값을 검증하지만, 그 전에 클라이언트(브라우저)에서 한 번 더 걸러주면 불필요한 네트워크 요청이 줄고 사용자는 즉각적인 피드백을 받을 수 있어요.</p>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">🖥️</div>
+        <h4>클라이언트 사이드 검사</h4>
+        <p>브라우저에서 바로 실행돼요. 서버 요청 없이 즉각 피드백을 줄 수 있어 UX가 좋아요. 단, JavaScript를 끄거나 개발자 도구로 우회할 수 있어 보안 검사로는 사용하면 안 돼요.</p>
+      </div>
+      <div class="info-card ic-green">
+        <div class="info-card-icon">🔒</div>
+        <h4>서버 사이드 검사</h4>
+        <p>서버에서 직접 검증해요. 우회가 불가능하므로 보안과 데이터 무결성에 필수예요. 클라이언트 검사는 편의를 위한 것이고, 실제 보안은 반드시 서버에서 담당해야 해요.</p>
+      </div>
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">🏷️</div>
+        <h4>HTML5 기본 검사</h4>
+        <p><code>required</code>, <code>type="email"</code>, <code>minlength</code>, <code>pattern</code> 속성만으로도 기본 검사가 가능해요. 단, 에러 메시지 커스터마이징이나 실시간 피드백은 JavaScript가 필요해요.</p>
+      </div>
+      <div class="info-card ic-red">
+        <div class="info-card-icon">⚡</div>
+        <h4>JavaScript 커스텀 검사</h4>
+        <p>입력 중 실시간으로 검사(input 이벤트), 포커스 벗어날 때 검사(blur 이벤트), 제출 시 최종 검사(submit 이벤트) 등 세밀한 타이밍 제어와 맞춤 메시지가 가능해요.</p>
+      </div>
+    </div>
+
+    <table class="cmp-table" style="margin-top:36px">
+      <thead>
+        <tr>
+          <th>방식</th>
+          <th>실행 위치</th>
+          <th>실시간 피드백</th>
+          <th>커스텀 메시지</th>
+          <th>보안</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>HTML5 속성</strong></td>
+          <td>브라우저</td>
+          <td><span class="badge bb">제출 시만</span></td>
+          <td><span class="badge bb">제한적</span></td>
+          <td><span class="badge br">우회 가능</span></td>
+        </tr>
+        <tr>
+          <td><strong>JS 클라이언트</strong></td>
+          <td>브라우저</td>
+          <td><span class="badge bg">가능</span></td>
+          <td><span class="badge bg">자유롭게</span></td>
+          <td><span class="badge br">우회 가능</span></td>
+        </tr>
+        <tr>
+          <td><strong>서버 사이드</strong></td>
+          <td>서버</td>
+          <td><span class="badge bb">응답 후</span></td>
+          <td><span class="badge bg">자유롭게</span></td>
+          <td><span class="badge bg">우회 불가</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ② 유형별 검사 카드 (4종)
+══════════════════════════════════════ -->
+<section class="section" id="types">
+  <div class="container">
+    <div class="section-badge">② Types</div>
+    <h2 class="section-title">유형별 검사 방법</h2>
+    <p class="section-lead">실무에서 가장 자주 쓰이는 네 가지 검사 유형이에요. 각 카드의 입력창에 직접 타이핑해서 결과를 확인해 보세요.</p>
+
+    <div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));">
+
+      <!-- 필수 입력 -->
+      <div class="check-card">
+        <div class="check-card-head">
+          <div class="check-card-icon cci-green">✏️</div>
+          <div>
+            <h4>필수 입력 검사</h4>
+            <p>빈칸으로 제출하는 것을 막아요. 가장 기본적인 검사예요.</p>
+          </div>
+        </div>
+        <div class="check-card-body">
+          <div class="mini-demo">
+            <label>이름</label>
+            <input type="text" id="demo-name" placeholder="이름을 입력하세요" oninput="miniCheck('demo-name','demo-name-msg', v => v.trim().length >= 2, '확인됐어요', '2자 이상 입력해주세요')">
+            <div class="mini-msg" id="demo-name-msg"></div>
+          </div>
+          <div class="code-hint"><span class="ck">if</span> (value.trim() === <span class="cv">''</span>) {
+  <span class="cc">// 빈칸 → 에러</span>
+  showError(<span class="cv">'필수 입력 항목이에요'</span>);
+}</div>
+        </div>
+      </div>
+
+      <!-- 이메일 형식 -->
+      <div class="check-card">
+        <div class="check-card-head">
+          <div class="check-card-icon cci-blue">📧</div>
+          <div>
+            <h4>이메일 형식 검사</h4>
+            <p>@ 기호와 도메인(.com 등)이 올바르게 포함됐는지 정규식으로 확인해요.</p>
+          </div>
+        </div>
+        <div class="check-card-body">
+          <div class="mini-demo">
+            <label>이메일</label>
+            <input type="text" id="demo-email" placeholder="example@email.com" oninput="miniCheck('demo-email','demo-email-msg', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), '올바른 이메일이에요', '이메일 형식이 맞지 않아요')">
+            <div class="mini-msg" id="demo-email-msg"></div>
+          </div>
+          <div class="code-hint"><span class="ck">const</span> re = <span class="cv">/^[^\s@]+@[^\s@]+\.[^\s@]+$/</span>;
+<span class="ck">if</span> (!re.test(value)) {
+  showError(<span class="cv">'이메일 형식이 맞지 않아요'</span>);
+}</div>
+        </div>
+      </div>
+
+      <!-- 비밀번호 강도 -->
+      <div class="check-card">
+        <div class="check-card-head">
+          <div class="check-card-icon cci-amber">🔐</div>
+          <div>
+            <h4>비밀번호 강도 검사</h4>
+            <p>최소 8자, 영문 + 숫자 포함 여부를 확인해요.</p>
+          </div>
+        </div>
+        <div class="check-card-body">
+          <div class="mini-demo">
+            <label>비밀번호</label>
+            <input type="password" id="demo-pw" placeholder="8자 이상, 영문+숫자" oninput="miniPwCheck(this)">
+            <div class="mini-msg" id="demo-pw-msg"></div>
+          </div>
+          <div class="code-hint"><span class="ck">const</span> hasLetter = <span class="cv">/[a-zA-Z]/</span>.test(v);
+<span class="ck">const</span> hasNumber = <span class="cv">/[0-9]/</span>.test(v);
+<span class="ck">if</span> (v.length < <span class="cv">8</span> || !hasLetter || !hasNumber) {
+  showError(<span class="cv">'8자 이상, 영문+숫자 필수'</span>);
+}</div>
+        </div>
+      </div>
+
+      <!-- 두 필드 일치 -->
+      <div class="check-card">
+        <div class="check-card-head">
+          <div class="check-card-icon cci-red">🔁</div>
+          <div>
+            <h4>두 필드 일치 검사</h4>
+            <p>비밀번호 확인처럼 두 입력값이 같은지 비교해요.</p>
+          </div>
+        </div>
+        <div class="check-card-body">
+          <div class="mini-demo">
+            <label>비밀번호 확인</label>
+            <input type="password" id="demo-pw2" placeholder="위 비밀번호와 동일하게" oninput="miniMatch()">
+            <div class="mini-msg" id="demo-pw2-msg"></div>
+          </div>
+          <div class="code-hint"><span class="ck">const</span> pw1 = document.getElementById(<span class="cv">'pw'</span>).value;
+<span class="ck">const</span> pw2 = document.getElementById(<span class="cv">'pw-confirm'</span>).value;
+<span class="ck">if</span> (pw1 !== pw2) {
+  showError(<span class="cv">'비밀번호가 일치하지 않아요'</span>);
+}</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ③ 코드 해설
+══════════════════════════════════════ -->
+<section class="section" id="code">
+  <div class="container">
+    <div class="section-badge">③ Code</div>
+    <h2 class="section-title">코드 해설</h2>
+    <p class="section-lead">폼 유효성 검사에 필요한 HTML 구조, CSS 상태 스타일, JavaScript 로직을 단계별로 살펴봐요.</p>
+
+    <!-- HTML -->
+    <h3 style="font-size:1.05rem; font-weight:700; color:var(--gray-900); margin-bottom:0">1단계 — HTML 구조</h3>
+    <p style="font-size:.9rem; color:var(--gray-500); margin:6px 0 0">각 필드를 <code>.field-wrap</code>으로 감싸고, 메시지를 표시할 <code>.field-msg</code>를 아래에 붙여요.</p>
+
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots">
+          <div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div>
+        </div>
+        <span class="cb-file">index.html</span>
+        <button class="cb-copy" onclick="copyBlock(this,'code-html')">copy</button>
+      </div>
+      <div class="cb-body">
+        <pre id="code-html"><span class="tc">&lt;!-- HTML 구조 --&gt;</span>
+<span class="tk">&lt;form</span> <span class="ta">id</span>=<span class="tv">"signup-form"</span><span class="tk">&gt;</span>
+  <span class="tk">&lt;div</span> <span class="ta">class</span>=<span class="tv">"field-wrap"</span><span class="tk">&gt;</span>
+    <span class="tk">&lt;label</span> <span class="ta">for</span>=<span class="tv">"email"</span><span class="tk">&gt;</span>이메일<span class="tk">&lt;/label&gt;</span>
+    <span class="tk">&lt;input</span> <span class="ta">type</span>=<span class="tv">"email"</span> <span class="ta">id</span>=<span class="tv">"email"</span>
+           <span class="ta">placeholder</span>=<span class="tv">"example@email.com"</span><span class="tk">&gt;</span>
+    <span class="tc">&lt;!-- 검사 결과 메시지가 여기 표시돼요 --&gt;</span>
+    <span class="tk">&lt;span</span> <span class="ta">class</span>=<span class="tv">"field-msg"</span> <span class="ta">id</span>=<span class="tv">"email-msg"</span><span class="tk">&gt;&lt;/span&gt;</span>
+  <span class="tk">&lt;/div&gt;</span>
+
+  <span class="tk">&lt;div</span> <span class="ta">class</span>=<span class="tv">"field-wrap"</span><span class="tk">&gt;</span>
+    <span class="tk">&lt;label</span> <span class="ta">for</span>=<span class="tv">"password"</span><span class="tk">&gt;</span>비밀번호<span class="tk">&lt;/label&gt;</span>
+    <span class="tk">&lt;input</span> <span class="ta">type</span>=<span class="tv">"password"</span> <span class="ta">id</span>=<span class="tv">"password"</span>
+           <span class="ta">placeholder</span>=<span class="tv">"8자 이상, 영문+숫자"</span><span class="tk">&gt;</span>
+    <span class="tk">&lt;span</span> <span class="ta">class</span>=<span class="tv">"field-msg"</span> <span class="ta">id</span>=<span class="tv">"pw-msg"</span><span class="tk">&gt;&lt;/span&gt;</span>
+  <span class="tk">&lt;/div&gt;</span>
+
+  <span class="tk">&lt;button</span> <span class="ta">type</span>=<span class="tv">"submit"</span><span class="tk">&gt;</span>가입하기<span class="tk">&lt;/button&gt;</span>
+<span class="tk">&lt;/form&gt;</span></pre>
+      </div>
+    </div>
+
+    <!-- CSS -->
+    <h3 style="font-size:1.05rem; font-weight:700; color:var(--gray-900); margin:40px 0 0">2단계 — CSS 검사 상태 스타일</h3>
+    <p style="font-size:.9rem; color:var(--gray-500); margin:6px 0 0">JavaScript가 <code>.valid</code> 또는 <code>.invalid</code> 클래스를 붙이면 아래 CSS가 테두리 색을 바꿔요.</p>
+
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots">
+          <div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div>
+        </div>
+        <span class="cb-file">style.css</span>
+        <button class="cb-copy" onclick="copyBlock(this,'code-css')">copy</button>
+      </div>
+      <div class="cb-body">
+        <pre id="code-css"><span class="tc">/* 검사 상태 스타일 */</span>
+<span class="ta">.field-wrap input.valid</span> {
+  <span class="tp">border-color</span>: <span class="tv">#16a34a</span>; <span class="tc">/* 초록 — 통과 */</span>
+  <span class="tp">background</span>: <span class="tv">#f0fdf4</span>;
+}
+<span class="ta">.field-wrap input.invalid</span> {
+  <span class="tp">border-color</span>: <span class="tv">#e11d48</span>; <span class="tc">/* 빨강 — 오류 */</span>
+  <span class="tp">background</span>: <span class="tv">#fff1f2</span>;
+}
+
+<span class="tc">/* 메시지 색상 */</span>
+<span class="ta">.field-msg.ok</span>  { <span class="tp">color</span>: <span class="tv">#16a34a</span>; }
+<span class="ta">.field-msg.err</span> { <span class="tp">color</span>: <span class="tv">#e11d48</span>; }</pre>
+      </div>
+    </div>
+
+    <!-- JS -->
+    <h3 style="font-size:1.05rem; font-weight:700; color:var(--gray-900); margin:40px 0 0">3단계 — JavaScript 실시간 검사</h3>
+    <p style="font-size:.9rem; color:var(--gray-500); margin:6px 0 0"><code>input</code> 이벤트로 타이핑할 때마다 검사하고, <code>setValid()</code> 헬퍼로 클래스와 메시지를 한 번에 설정해요.</p>
+
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots">
+          <div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div>
+        </div>
+        <span class="cb-file">script.js</span>
+        <button class="cb-copy" onclick="copyBlock(this,'code-js')">copy</button>
+      </div>
+      <div class="cb-body">
+        <pre id="code-js"><span class="tc">// 공통 헬퍼 함수</span>
+<span class="tp">function</span> <span class="ta">setValid</span>(input, msgId, isOk, okMsg, errMsg) {
+  <span class="tp">const</span> msg = document.getElementById(msgId);
+  input.classList.toggle(<span class="tv">'valid'</span>,   isOk);
+  input.classList.toggle(<span class="tv">'invalid'</span>, !isOk);
+  msg.textContent = isOk ? okMsg : errMsg;
+  msg.className = <span class="tv">'field-msg '</span> + (isOk ? <span class="tv">'ok'</span> : <span class="tv">'err'</span>);
+}
+
+<span class="tc">// 이메일 실시간 검사</span>
+document.getElementById(<span class="tv">'email'</span>)
+  .addEventListener(<span class="tv">'input'</span>, <span class="tp">function</span>() {
+    <span class="tp">const</span> re = <span class="tv">/^[^\s@]+@[^\s@]+\.[^\s@]+$/</span>;
+    setValid(
+      <span class="tp">this</span>, <span class="tv">'email-msg'</span>,
+      re.test(<span class="tp">this</span>.value),
+      <span class="tv">'올바른 이메일 형식이에요'</span>,
+      <span class="tv">'이메일 형식이 맞지 않아요'</span>
+    );
+  });
+
+<span class="tc">// 비밀번호 실시간 검사</span>
+document.getElementById(<span class="tv">'password'</span>)
+  .addEventListener(<span class="tv">'input'</span>, <span class="tp">function</span>() {
+    <span class="tp">const</span> v = <span class="tp">this</span>.value;
+    <span class="tp">const</span> ok = v.length >= <span class="tv">8</span>
+               && <span class="tv">/[a-zA-Z]/</span>.test(v)
+               && <span class="tv">/[0-9]/</span>.test(v);
+    setValid(
+      <span class="tp">this</span>, <span class="tv">'pw-msg'</span>, ok,
+      <span class="tv">'안전한 비밀번호예요'</span>,
+      <span class="tv">'8자 이상, 영문+숫자를 포함해주세요'</span>
+    );
+  });
+
+<span class="tc">// 제출 시 최종 검사</span>
+document.getElementById(<span class="tv">'signup-form'</span>)
+  .addEventListener(<span class="tv">'submit'</span>, <span class="tp">function</span>(e) {
+    e.preventDefault(); <span class="tc">// 실제 전송 막기</span>
+    <span class="tc">// 각 필드 검사 후 모두 통과 시 서버로 전송</span>
+  });</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ④ 인터랙티브 데모
+══════════════════════════════════════ -->
+<section class="section" id="demo">
+  <div class="container">
+    <div class="section-badge">④ Demo</div>
+    <h2 class="section-title">직접 체험해 보세요</h2>
+    <p class="section-lead">아래 폼은 실제로 동작하는 회원가입 폼이에요. 각 필드에 입력하면 즉시 초록/빨간 피드백이 나오고, 모든 항목을 통과해야 가입 버튼이 활성화돼요.</p>
+
+    <div class="demo-shell">
+      <div class="demo-shell-head">
+        <div class="demo-dots">
+          <div class="demo-dot demo-dot-r"></div>
+          <div class="demo-dot demo-dot-y"></div>
+          <div class="demo-dot demo-dot-g"></div>
+        </div>
+        <span class="demo-shell-title">signup-form.html — 라이브 데모</span>
+      </div>
+      <div class="demo-form-wrap">
+        <div class="demo-form-title">회원가입</div>
+        <div class="demo-form-sub">모든 항목을 올바르게 입력하면 가입 버튼이 활성화돼요.</div>
+
+        <form id="signup-form" novalidate>
+
+          <!-- 이름 -->
+          <div class="field-wrap">
+            <label for="f-name">이름 <span class="field-req">필수</span></label>
+            <input type="text" id="f-name" placeholder="홍길동" autocomplete="name">
+            <span class="field-msg" id="f-name-msg"></span>
+          </div>
+
+          <!-- 이메일 -->
+          <div class="field-wrap">
+            <label for="f-email">이메일 <span class="field-req">필수</span></label>
+            <input type="email" id="f-email" placeholder="example@email.com" autocomplete="email">
+            <span class="field-msg" id="f-email-msg"></span>
+          </div>
+
+          <!-- 비밀번호 -->
+          <div class="field-wrap">
+            <label for="f-pw">비밀번호 <span class="field-req">필수</span></label>
+            <input type="password" id="f-pw" placeholder="8자 이상, 영문+숫자 포함" autocomplete="new-password">
+            <span class="field-msg" id="f-pw-msg"></span>
+            <div class="pw-strength-wrap" id="pw-strength-wrap">
+              <div class="pw-strength-bars">
+                <div class="pw-bar" id="bar1"></div>
+                <div class="pw-bar" id="bar2"></div>
+                <div class="pw-bar" id="bar3"></div>
+              </div>
+              <span class="pw-strength-label" id="pw-strength-label"></span>
+            </div>
+          </div>
+
+          <!-- 비밀번호 확인 -->
+          <div class="field-wrap">
+            <label for="f-pw2">비밀번호 확인 <span class="field-req">필수</span></label>
+            <input type="password" id="f-pw2" placeholder="비밀번호를 다시 입력하세요" autocomplete="new-password">
+            <span class="field-msg" id="f-pw2-msg"></span>
+          </div>
+
+          <button class="demo-submit" id="demo-submit-btn" type="submit" disabled>
+            가입하기
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ⑤ AI 프롬프트 팁
+══════════════════════════════════════ -->
+<section class="section" id="prompt">
+  <div class="container">
+    <div class="section-badge">⑤ Prompt Tip</div>
+    <h2 class="section-title">AI 프롬프트 팁</h2>
+    <p class="section-lead">바이브 코딩할 때 AI에게 폼 유효성 검사를 요청하는 가장 효과적인 방법이에요. 아래 프롬프트를 복사해서 그대로 붙여넣어 보세요.</p>
+
+    <div class="vibe-tip">
+      <div class="vibe-tip-label">✦ 바이브코더 프롬프트</div>
+      <p>회원가입 폼에 실시간 유효성 검사를 추가하고 싶다면 아래 프롬프트를 AI에게 주세요. 구체적으로 요구할수록 완성도 높은 코드를 받을 수 있어요.</p>
+      <div class="prompt-box">
+        <pre>내 사이트 회원가입 폼에 실시간 유효성 검사를 추가해줘.
+
+요구사항:
+- 이름: 2자 이상
+- 이메일: 형식 확인 (@ 포함, 도메인 포함)
+- 비밀번호: 8자 이상, 영문+숫자 필수
+- 비밀번호 확인: 위 비밀번호와 일치해야 함
+
+동작 방식:
+- 각 필드 입력 중 실시간으로 에러/성공 메시지 표시
+- 통과한 필드는 초록 테두리, 실패한 필드는 빨간 테두리
+- 모든 필드 통과 시에만 제출 버튼 활성화
+- 제출 시 전체 재검사 후 성공 토스트 메시지 표시
+
+기술 조건:
+- 순수 HTML + CSS + Vanilla JS (라이브러리 없이)
+- 단일 HTML 파일로 완성</pre>
+      </div>
+    </div>
+
+    <div class="callout co-green" style="margin-top:0">
+      <div class="callout-icon">💬</div>
+      <div class="callout-body">
+        <p><strong>팁:</strong> "라이브러리 없이"를 명시하면 jQuery나 외부 validation 라이브러리 없이 바닐라 JS로만 구현된 깔끔한 코드를 받을 수 있어요. 프레임워크(React, Vue 등)를 쓴다면 해당 프레임워크명도 함께 적어주세요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ⑥ FAQ
+══════════════════════════════════════ -->
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-badge">⑥ FAQ</div>
+    <h2 class="section-title">자주 묻는 질문</h2>
+    <p class="section-lead">폼 유효성 검사를 처음 구현할 때 헷갈리는 부분들을 정리했어요.</p>
+
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          HTML5 <code>required</code> 속성만으로는 부족한가요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          <code>required</code>만 쓰면 브라우저 기본 에러 메시지가 나와요. 이 메시지는 브라우저마다 모양이 다르고, 한국어로 바꾸기 어려우며, 제출 전에 실시간 피드백을 줄 수 없어요. 사용자 경험을 높이려면 JavaScript로 커스텀 검사를 추가하는 것이 좋아요.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          정규식이 뭔가요? 꼭 써야 하나요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          정규식(Regular Expression)은 문자 패턴을 표현하는 규칙이에요. 이메일의 @ 포함 여부, 전화번호의 숫자+하이픈 형식처럼 복잡한 패턴을 한 줄로 표현할 수 있어요. AI에게 "이메일 검사 정규식 만들어줘"라고 하면 바로 코드를 받을 수 있어서 외울 필요는 없어요.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          클라이언트 검사만 하면 보안에 문제가 있나요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          네, 반드시 서버에서도 검사해야 해요. 브라우저 JavaScript는 개발자 도구나 직접 API 요청으로 완전히 우회할 수 있어요. 클라이언트 검사는 사용자 편의와 서버 부담 감소를 위한 것이고, 실제 보안과 데이터 무결성은 서버 사이드 검사가 담당해야 해요.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          비밀번호 보기/숨기기 토글은 어떻게 만드나요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          input의 <code>type</code> 속성을 <code>password</code>와 <code>text</code> 사이에서 전환하면 돼요. 눈 모양 아이콘 버튼을 만들고, 클릭할 때마다 <code>input.type = input.type === 'password' ? 'text' : 'password'</code>를 실행하면 간단하게 구현할 수 있어요.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          제출 버튼을 항상 비활성화 상태로 시작하면 좋나요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          UX에 따라 달라요. 비활성화 버튼은 "왜 클릭이 안 되지?" 하는 혼란을 줄 수 있어요. 대신 버튼은 항상 활성화하되, 클릭 시 모든 필드를 검사하고 오류를 한 번에 표시하는 방식도 자주 쓰여요. 이 페이지의 데모는 학습 목적으로 비활성화 방식을 사용했어요.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     푸터
+══════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-logo"><div class="logo-mark">VT</div>바이브툴킷</div>
+  <p class="footer-desc">바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 도구 모음</p>
+  <div class="footer-links">
+    <a href="index.html">홈</a>
+    <a href="about.html">소개</a>
+    <a href="contact.html">문의</a>
+    <a href="sitemap.html">사이트맵</a>
+  </div>
+  <div class="footer-copy">© 2026 바이브툴킷. 콘텐츠는 자유롭게 참고하세요.</div>
+</footer>
+
+<!-- 토스트 -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════
+     JavaScript
+══════════════════════════════════════ -->
+<script>
+/* ─── 공통 유틸 ─── */
+function setValid(input, msgId, isOk, okMsg, errMsg) {
+  const msg = document.getElementById(msgId);
+  if (!input || !msg) return;
+  input.classList.toggle('valid',   isOk);
+  input.classList.toggle('invalid', !isOk);
+  msg.textContent = isOk ? okMsg : errMsg;
+  msg.className   = 'field-msg ' + (isOk ? 'ok' : 'err');
+}
+
+function showToast(text) {
+  const t = document.getElementById('toast');
+  t.textContent = text;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ─── ② 유형별 카드 미니 데모 ─── */
+function miniCheck(inputId, msgId, testFn, ok, err) {
+  const el = document.getElementById(inputId);
+  if (!el || el.value.trim() === '') {
+    el.classList.remove('valid','invalid');
+    document.getElementById(msgId).textContent = '';
+    document.getElementById(msgId).className = 'mini-msg';
+    return;
+  }
+  const isOk = testFn(el.value);
+  el.classList.toggle('valid',   isOk);
+  el.classList.toggle('invalid', !isOk);
+  const msg = document.getElementById(msgId);
+  msg.textContent = isOk ? ('✓ ' + ok) : ('✗ ' + err);
+  msg.className   = 'mini-msg ' + (isOk ? 'ok' : 'err');
+}
+
+function miniPwCheck(input) {
+  const v = input.value;
+  const msgEl = document.getElementById('demo-pw-msg');
+  if (!v) {
+    input.classList.remove('valid','invalid');
+    msgEl.textContent = ''; msgEl.className = 'mini-msg'; return;
+  }
+  const hasLetter = /[a-zA-Z]/.test(v);
+  const hasNumber = /[0-9]/.test(v);
+  const isOk = v.length >= 8 && hasLetter && hasNumber;
+  input.classList.toggle('valid',   isOk);
+  input.classList.toggle('invalid', !isOk);
+  msgEl.textContent = isOk ? '✓ 안전한 비밀번호예요' : '✗ 8자 이상, 영문+숫자를 포함해주세요';
+  msgEl.className   = 'mini-msg ' + (isOk ? 'ok' : 'err');
+}
+
+function miniMatch() {
+  const pw1El = document.getElementById('demo-pw');
+  const pw2El = document.getElementById('demo-pw2');
+  const msgEl = document.getElementById('demo-pw2-msg');
+  if (!pw2El.value) {
+    pw2El.classList.remove('valid','invalid');
+    msgEl.textContent = ''; msgEl.className = 'mini-msg'; return;
+  }
+  const isOk = pw2El.value === pw1El.value && pw2El.value.length > 0;
+  pw2El.classList.toggle('valid',   isOk);
+  pw2El.classList.toggle('invalid', !isOk);
+  msgEl.textContent = isOk ? '✓ 비밀번호가 일치해요' : '✗ 비밀번호가 일치하지 않아요';
+  msgEl.className   = 'mini-msg ' + (isOk ? 'ok' : 'err');
+}
+
+/* ─── ④ 인터랙티브 데모 — 회원가입 폼 ─── */
+const fName   = document.getElementById('f-name');
+const fEmail  = document.getElementById('f-email');
+const fPw     = document.getElementById('f-pw');
+const fPw2    = document.getElementById('f-pw2');
+const submitBtn = document.getElementById('demo-submit-btn');
+
+const validators = {
+  name:  false,
+  email: false,
+  pw:    false,
+  pw2:   false,
+};
+
+function updateSubmitBtn() {
+  submitBtn.disabled = !Object.values(validators).every(Boolean);
+}
+
+/* 이름 */
+fName.addEventListener('input', function() {
+  const ok = this.value.trim().length >= 2;
+  validators.name = ok;
+  setValid(this, 'f-name-msg', ok, '✓ 이름이 확인됐어요', '✗ 이름은 2자 이상 입력해주세요');
+  updateSubmitBtn();
+});
+
+/* 이메일 */
+fEmail.addEventListener('input', function() {
+  if (!this.value) {
+    this.classList.remove('valid','invalid');
+    document.getElementById('f-email-msg').textContent = '';
+    validators.email = false;
+    updateSubmitBtn(); return;
+  }
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const ok = re.test(this.value);
+  validators.email = ok;
+  setValid(this, 'f-email-msg', ok, '✓ 올바른 이메일 형식이에요', '✗ 이메일 형식이 맞지 않아요');
+  updateSubmitBtn();
+});
+
+/* 비밀번호 강도 */
+function getPwStrength(v) {
+  if (!v) return 0;
+  let score = 0;
+  if (v.length >= 8) score++;
+  if (/[a-zA-Z]/.test(v) && /[0-9]/.test(v)) score++;
+  if (v.length >= 12 || /[^a-zA-Z0-9]/.test(v)) score++;
+  return score;
+}
+
+fPw.addEventListener('input', function() {
+  const v = this.value;
+  const strengthWrap  = document.getElementById('pw-strength-wrap');
+  const strengthLabel = document.getElementById('pw-strength-label');
+  const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3')];
+
+  if (!v) {
+    this.classList.remove('valid','invalid');
+    document.getElementById('f-pw-msg').textContent = '';
+    strengthWrap.classList.remove('show');
+    validators.pw = false;
+    updateSubmitBtn();
+    return;
+  }
+
+  strengthWrap.classList.add('show');
+  const score = getPwStrength(v);
+  const levelClass = ['','weak','medium','strong'][score] || 'weak';
+  const levelText  = ['','약함','보통','강함'][score] || '약함';
+
+  bars.forEach((bar, i) => {
+    bar.className = 'pw-bar';
+    if (i < score) bar.classList.add(levelClass);
+  });
+  strengthLabel.textContent = '비밀번호 강도: ' + levelText;
+  strengthLabel.className   = 'pw-strength-label ' + levelClass;
+
+  const ok = v.length >= 8 && /[a-zA-Z]/.test(v) && /[0-9]/.test(v);
+  validators.pw = ok;
+  setValid(this, 'f-pw-msg', ok, '✓ 안전한 비밀번호예요', '✗ 8자 이상, 영문+숫자를 포함해주세요');
+
+  // 비밀번호 확인도 재검사
+  if (fPw2.value) fPw2.dispatchEvent(new Event('input'));
+  updateSubmitBtn();
+});
+
+/* 비밀번호 확인 */
+fPw2.addEventListener('input', function() {
+  if (!this.value) {
+    this.classList.remove('valid','invalid');
+    document.getElementById('f-pw2-msg').textContent = '';
+    validators.pw2 = false;
+    updateSubmitBtn(); return;
+  }
+  const ok = this.value === fPw.value && this.value.length > 0;
+  validators.pw2 = ok;
+  setValid(this, 'f-pw2-msg', ok, '✓ 비밀번호가 일치해요', '✗ 비밀번호가 일치하지 않아요');
+  updateSubmitBtn();
+});
+
+/* 제출 */
+document.getElementById('signup-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  // 최종 재검사
+  fName.dispatchEvent(new Event('input'));
+  fEmail.dispatchEvent(new Event('input'));
+  fPw.dispatchEvent(new Event('input'));
+  fPw2.dispatchEvent(new Event('input'));
+
+  if (!Object.values(validators).every(Boolean)) return;
+
+  showToast('✅ 가입 완료! 환영합니다 🎉');
+
+  // 폼 초기화
+  setTimeout(() => {
+    this.reset();
+    [fName, fEmail, fPw, fPw2].forEach(el => el.classList.remove('valid','invalid'));
+    ['f-name-msg','f-email-msg','f-pw-msg','f-pw2-msg'].forEach(id => {
+      const el = document.getElementById(id);
+      el.textContent = ''; el.className = 'field-msg';
+    });
+    document.getElementById('pw-strength-wrap').classList.remove('show');
+    Object.keys(validators).forEach(k => validators[k] = false);
+    updateSubmitBtn();
+  }, 1500);
+});
+
+/* ─── 코드 복사 ─── */
+function copyBlock(btn, id) {
+  const pre = document.getElementById(id);
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'copied!';
+    btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+/* ─── FAQ 토글 ─── */
+function toggleFaq(btn) {
+  const item = btn.closest('.faq-item');
+  item.classList.toggle('open');
+}
+
+/* ─── iframe 감지 ─── */
+(function(){
+  if (self === top) return;
+  const nav  = document.querySelector('.site-nav');  if (nav)  nav.style.display  = 'none';
+  const hero = document.querySelector('.hero');       if (hero) hero.style.paddingTop = '40px';
+  document.querySelectorAll('a[href$=".html"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      if (window.parent && window.parent.loadTool) {
+        e.preventDefault();
+        window.parent.loadTool(this.getAttribute('href'));
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
