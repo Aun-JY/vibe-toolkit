@@ -731,13 +731,37 @@ document.getElementById('tool-frame').addEventListener('load', function() {
 });
 
 /* ══════════════════════════════════════
-   검색 → iframe(home.html)에 postMessage
+   검색 → iframe(home.html) postMessage + 사이드바 필터
 ══════════════════════════════════════ */
 function handleSearch(query) {
   const frame = document.getElementById('tool-frame');
   try {
     frame.contentWindow.postMessage({ type: 'search', q: query }, '*');
   } catch(e) {}
+  filterSidebar(query);
+}
+
+/* 사이드바 항목 검색 필터 */
+function filterSidebar(query) {
+  const q = query.trim().toLowerCase();
+  document.querySelectorAll('.sb-group').forEach(function(group) {
+    const items = group.querySelectorAll('.sb-item');
+    let anyVisible = false;
+    items.forEach(function(item) {
+      const text = item.textContent.toLowerCase();
+      const match = !q || text.includes(q);
+      item.style.display = match ? '' : 'none';
+      if (match) anyVisible = true;
+    });
+    /* 검색 중이면 매칭된 그룹 자동 열기 */
+    if (q && anyVisible) {
+      group.classList.add('open');
+    }
+    /* 검색어 없으면 전부 표시 복원 */
+    if (!q) {
+      items.forEach(function(item) { item.style.display = ''; });
+    }
+  });
 }
 
 /* ══════════════════════════════════════
