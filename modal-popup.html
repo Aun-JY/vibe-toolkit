@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모달 팝업 완전 정복 | 바이브툴킷</title>
+  <meta name="description" content="모달 팝업이란 무엇인지, 왜 필요한지, HTML·CSS·JS로 직접 만드는 방법까지. 바이브 코딩 초보자를 위한 모달 팝업 완전 가이드.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://aun-jy.github.io/vibe-toolkit/modal-popup.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+  /* ════════════════════════════════════════
+     기본 설정
+  ════════════════════════════════════════ */
+  :root {
+    --accent:        #4f46e5;
+    --accent-soft:   #eef2ff;
+    --accent-border: #c7d2fe;
+    --green:         #16a34a;
+    --green-soft:    #f0fdf4;
+    --amber:         #d97706;
+    --amber-soft:    #fffbeb;
+    --red-soft:      #fff1f2;
+    --gray-50:       #f9fafb;
+    --gray-100:      #f3f4f6;
+    --gray-200:      #e5e7eb;
+    --gray-300:      #d1d5db;
+    --gray-400:      #9ca3af;
+    --gray-500:      #6b7280;
+    --gray-600:      #4b5563;
+    --gray-700:      #374151;
+    --gray-900:      #111827;
+    --code-bg:       #1e1e2e;
+    --code-surface:  #282a36;
+    --radius:        12px;
+    --radius-sm:     8px;
+    --shadow-sm:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    --shadow:        0 4px 12px rgba(0,0,0,.08);
+    --shadow-lg:     0 8px 28px rgba(0,0,0,.10);
+    --nav-h:         56px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 24px); }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fff;
+    color: var(--gray-700);
+    line-height: 1.75;
+    font-size: 16px;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  strong { color: var(--gray-900); font-weight: 600; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .83em;
+    background: var(--gray-100);
+    color: var(--accent);
+    padding: .1em .4em;
+    border-radius: 4px;
+    border: 1px solid var(--gray-200);
+  }
+
+  img { display: block; }
+
+  /* ════════════════════════════════════════
+     고정 상단 네비게이션
+  ════════════════════════════════════════ */
+  .site-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 500;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gray-200);
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--gray-900);
+    margin-right: 32px;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+  .nav-logo:hover { text-decoration: none; }
+
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem; font-weight: 700; color: #fff;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+
+  .nav-links a {
+    display: block;
+    padding: 6px 14px;
+    font-size: .85rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    transition: color .15s, background .15s;
+    text-decoration: none;
+  }
+  .nav-links a:hover { color: var(--gray-900); background: var(--gray-100); }
+  .nav-links a.active { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+
+  /* ════════════════════════════════════════
+     레이아웃
+  ════════════════════════════════════════ */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+  .section { padding: 72px 0; }
+  .section:nth-child(even) { background: var(--gray-50); }
+
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 3px 12px;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -.025em;
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+
+  .section-lead {
+    font-size: 1.05rem;
+    color: var(--gray-500);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 600px;
+  }
+
+  /* ════════════════════════════════════════
+     히어로
+  ════════════════════════════════════════ */
+  .hero {
+    padding: calc(var(--nav-h) + 56px) 0 64px;
+    background: linear-gradient(160deg, var(--accent-soft) 0%, #fff 60%);
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.9rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -.03em;
+    line-height: 1.2;
+    margin-bottom: 18px;
+  }
+  .hero h1 em { color: var(--accent); font-style: normal; }
+
+  .hero-desc {
+    font-size: 1.08rem;
+    color: var(--gray-500);
+    line-height: 1.75;
+    max-width: 540px;
+    margin-bottom: 32px;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: .82rem;
+    color: var(--gray-500);
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 5px; }
+
+  /* ════════════════════════════════════════
+     카드 그리드
+  ════════════════════════════════════════ */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .info-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow .2s, transform .2s;
+  }
+  .info-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .info-card-icon { font-size: 1.6rem; margin-bottom: 10px; }
+  .info-card h4 { font-size: .95rem; font-weight: 700; color: var(--gray-900); margin-bottom: 7px; }
+  .info-card p { font-size: .86rem; color: var(--gray-600); line-height: 1.7; }
+
+  .ic-accent { background: var(--accent-soft); border-color: var(--accent-border); }
+  .ic-green  { background: var(--green-soft);  border-color: #bbf7d0; }
+  .ic-amber  { background: var(--amber-soft);  border-color: #fde68a; }
+  .ic-red    { background: var(--red-soft);    border-color: #fecdd3; }
+  .ic-gray   { background: var(--gray-50);     border-color: var(--gray-200); }
+
+  /* ════════════════════════════════════════
+     콜아웃
+  ════════════════════════════════════════ */
+  .callout {
+    display: flex;
+    gap: 14px;
+    padding: 18px 20px;
+    border-radius: var(--radius);
+    margin: 24px 0;
+    font-size: .93rem;
+    line-height: 1.75;
+    color: var(--gray-700);
+  }
+  .callout-icon { font-size: 1.2rem; flex-shrink: 0; padding-top: 1px; }
+  .callout-body p { margin: 0; }
+  .callout-body p + p { margin-top: 6px; }
+
+  .co-blue  { background: var(--accent-soft);  border: 1px solid var(--accent-border); }
+  .co-green { background: var(--green-soft);   border: 1px solid #bbf7d0; }
+  .co-amber { background: var(--amber-soft);   border: 1px solid #fde68a; }
+
+  /* ════════════════════════════════════════
+     비교 테이블
+  ════════════════════════════════════════ */
+  .cmp-table {
+    width: 100%; border-collapse: collapse;
+    font-size: .88rem; margin-top: 24px;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .cmp-table th {
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 11px 16px;
+    text-align: left;
+    font-size: .78rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+    color: var(--gray-600);
+  }
+  .cmp-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: top;
+    color: var(--gray-700);
+  }
+  .cmp-table tr:last-child td { border-bottom: none; }
+
+  .badge {
+    display: inline-block;
+    font-size: .7rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .bg { background: var(--green-soft);  color: var(--green); }
+  .bb { background: var(--gray-100);    color: var(--gray-600); }
+  .ba { background: var(--amber-soft);  color: var(--amber); }
+
+  /* ════════════════════════════════════════
+     갤러리 (모달 유형)
+  ════════════════════════════════════════ */
+  .modal-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .modal-preview-card {
+    background: #fff;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: border-color .2s, box-shadow .2s, transform .22s cubic-bezier(.34,1.56,.64,1);
+  }
+  .modal-preview-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow);
+    transform: translateY(-3px);
+  }
+
+  .modal-demo-area {
+    height: 160px;
+    background: repeating-conic-gradient(#f3f4f6 0% 25%, #e5e7eb 0% 50%) 0 0 / 16px 16px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .modal-demo-label {
+    position: absolute; top: 8px; left: 10px;
+    font-size: .65rem; color: var(--gray-400);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: .06em;
+  }
+
+  /* 미니 모달 미리보기 */
+  .mini-modal {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.22);
+    width: 180px;
+    padding: 16px;
+    position: relative;
+  }
+  .mini-modal-title {
+    font-size: .78rem; font-weight: 700; color: var(--gray-900);
+    margin-bottom: 6px;
+  }
+  .mini-modal-body {
+    font-size: .68rem; color: var(--gray-500); line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  .mini-modal-btn-row {
+    display: flex; gap: 6px; justify-content: flex-end;
+  }
+  .mini-btn {
+    font-size: .65rem; font-weight: 600; border: none;
+    border-radius: 5px; padding: 4px 10px; cursor: default;
+  }
+  .mini-btn-primary { background: var(--accent); color: #fff; }
+  .mini-btn-secondary { background: var(--gray-100); color: var(--gray-600); }
+
+  /* 이미지 라이트박스 미리보기 */
+  .mini-lightbox {
+    background: rgba(0,0,0,.7);
+    border-radius: 10px;
+    width: 180px;
+    height: 120px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .mini-lightbox-img {
+    width: 130px; height: 85px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+  }
+  .mini-lightbox-close {
+    position: absolute; top: 6px; right: 10px;
+    color: #fff; font-size: .8rem; font-weight: 700; cursor: default;
+  }
+
+  /* 확인 다이얼로그 미리보기 */
+  .mini-confirm {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.22);
+    width: 180px;
+    padding: 14px;
+    text-align: center;
+  }
+  .mini-confirm-icon { font-size: 1.4rem; margin-bottom: 6px; }
+  .mini-confirm-title { font-size: .75rem; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; }
+  .mini-confirm-body { font-size: .65rem; color: var(--gray-500); margin-bottom: 10px; }
+  .mini-confirm-row { display: flex; gap: 6px; }
+  .mini-btn-danger { background: #ef4444; color: #fff; font-size: .65rem; font-weight: 600; border: none; border-radius: 5px; padding: 4px 10px; cursor: default; flex: 1; }
+  .mini-btn-cancel { background: var(--gray-100); color: var(--gray-600); font-size: .65rem; font-weight: 600; border: none; border-radius: 5px; padding: 4px 10px; cursor: default; flex: 1; }
+
+  .modal-card-info {
+    padding: 14px 16px;
+    border-top: 1px solid var(--gray-100);
+  }
+  .modal-card-name {
+    font-size: .9rem; font-weight: 700; color: var(--gray-900);
+    margin-bottom: 4px;
+  }
+  .modal-card-desc {
+    font-size: .78rem; color: var(--gray-500); line-height: 1.55;
+    margin-bottom: 10px;
+  }
+  .open-modal-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .78rem; font-weight: 600;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: var(--radius-sm);
+    padding: 7px 16px; cursor: pointer;
+    transition: background .15s, transform .15s;
+  }
+  .open-modal-btn:hover { background: #4338ca; transform: translateY(-1px); }
+
+  /* ════════════════════════════════════════
+     코드 블록 공통
+  ════════════════════════════════════════ */
+  .code-block {
+    background: var(--code-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 24px;
+    border: 1px solid #2d2d3f;
+    box-shadow: var(--shadow);
+  }
+  .cb-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: #13131f;
+    border-bottom: 1px solid #2d2d3f;
+  }
+  .cb-dots { display: flex; gap: 6px; }
+  .cb-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .cb-dot-r { background: #ff5f57; }
+  .cb-dot-y { background: #febc2e; }
+  .cb-dot-g { background: #28c840; }
+  .cb-file { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: #6272a4; }
+  .cb-copy {
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 5px; color: #94a3b8; padding: 3px 12px;
+    cursor: pointer; transition: background .15s, color .15s;
+  }
+  .cb-copy:hover { background: rgba(255,255,255,.15); color: #fff; }
+  .cb-copy.ok { color: #a6e3a1; border-color: #a6e3a1; }
+
+  .cb-body { padding: 20px; overflow-x: auto; }
+  .cb-body pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem; line-height: 1.75; color: #cdd6f4;
+    white-space: pre;
+  }
+  .tk { color: #89b4fa; }
+  .ta { color: #a6e3a1; }
+  .tv { color: #f9e2af; }
+  .tc { color: #6272a4; font-style: italic; }
+  .tp { color: #cba6f7; }
+  .ts { color: #f38ba8; }
+
+  /* ════════════════════════════════════════
+     해설 카드 그리드
+  ════════════════════════════════════════ */
+  .explain-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .exp-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .exp-header {
+    padding: 12px 16px;
+    background: var(--code-bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem; color: #a6e3a1;
+    line-height: 1.5; word-break: break-all;
+  }
+  .exp-body { padding: 16px; }
+  .exp-title { font-size: .92rem; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
+  .exp-desc { font-size: .85rem; color: var(--gray-600); line-height: 1.75; }
+  .exp-example {
+    margin-top: 12px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .74rem; line-height: 1.65; color: var(--gray-700);
+  }
+  .ek { color: #7c3aed; }
+  .ev { color: var(--green); }
+  .ec { color: var(--gray-400); font-style: italic; }
+
+  /* ════════════════════════════════════════
+     인터랙티브 데모 섹션
+  ════════════════════════════════════════ */
+  .demo-section-box {
+    background: repeating-conic-gradient(#f3f4f6 0% 25%, #e5e7eb 0% 50%) 0 0 / 20px 20px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 40px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 28px;
+  }
+
+  .demo-open-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: .92rem; font-weight: 700;
+    border: none; border-radius: var(--radius-sm);
+    padding: 12px 22px; cursor: pointer;
+    transition: background .15s, transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .15s;
+    box-shadow: var(--shadow-sm);
+  }
+  .demo-open-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+
+  .demo-btn-primary { background: var(--accent); color: #fff; }
+  .demo-btn-primary:hover { background: #4338ca; }
+  .demo-btn-green { background: var(--green); color: #fff; }
+  .demo-btn-green:hover { background: #15803d; }
+  .demo-btn-danger { background: #ef4444; color: #fff; }
+  .demo-btn-danger:hover { background: #dc2626; }
+
+  /* ════════════════════════════════════════
+     실제 모달 오버레이 (데모용)
+  ════════════════════════════════════════ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .22s ease, visibility .22s ease;
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-box {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.18);
+    width: 100%;
+    max-width: 440px;
+    padding: 32px;
+    position: relative;
+    transform: translateY(16px) scale(.97);
+    transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+  }
+  .modal-overlay.open .modal-box {
+    transform: translateY(0) scale(1);
+  }
+
+  .modal-close-btn {
+    position: absolute; top: 16px; right: 16px;
+    width: 30px; height: 30px;
+    background: var(--gray-100); border: none; border-radius: 50%;
+    font-size: 1rem; color: var(--gray-500); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s, color .15s;
+  }
+  .modal-close-btn:hover { background: var(--gray-200); color: var(--gray-900); }
+
+  .modal-icon { font-size: 2.2rem; margin-bottom: 12px; }
+  .modal-title { font-size: 1.25rem; font-weight: 700; color: var(--gray-900); margin-bottom: 10px; }
+  .modal-body-text { font-size: .93rem; color: var(--gray-600); line-height: 1.75; margin-bottom: 24px; }
+  .modal-btn-row { display: flex; gap: 10px; justify-content: flex-end; }
+
+  .mbtn {
+    font-size: .88rem; font-weight: 600;
+    border: none; border-radius: var(--radius-sm);
+    padding: 10px 20px; cursor: pointer;
+    transition: background .15s, transform .15s;
+  }
+  .mbtn:hover { transform: translateY(-1px); }
+  .mbtn-primary { background: var(--accent); color: #fff; }
+  .mbtn-primary:hover { background: #4338ca; }
+  .mbtn-secondary { background: var(--gray-100); color: var(--gray-700); }
+  .mbtn-secondary:hover { background: var(--gray-200); }
+  .mbtn-danger { background: #ef4444; color: #fff; }
+  .mbtn-danger:hover { background: #dc2626; }
+
+  /* 라이트박스 전용 */
+  .modal-box.lightbox {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    max-width: 560px;
+  }
+  .modal-box.lightbox .modal-close-btn {
+    top: -14px; right: -14px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    width: 34px; height: 34px;
+  }
+  .lightbox-img-wrap {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+  }
+  .lightbox-img-placeholder {
+    width: 100%; height: 320px;
+    background: linear-gradient(135deg, #4f46e5 0%, #818cf8 50%, #a78bfa 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 4rem;
+    border-radius: 12px;
+  }
+  .lightbox-caption {
+    margin-top: 12px;
+    text-align: center;
+    font-size: .82rem; color: rgba(255,255,255,.7);
+  }
+
+  /* ════════════════════════════════════════
+     바이브코더 TIP 박스
+  ════════════════════════════════════════ */
+  .vibe-tip {
+    background: linear-gradient(135deg, #faf5ff 0%, #eff6ff 100%);
+    border: 1px solid #e9d5ff;
+    border-left: 4px solid #8b5cf6;
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin: 32px 0;
+  }
+  .vibe-tip-label {
+    font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: #7c3aed;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+  }
+  .vibe-tip p { font-size: .92rem; color: var(--gray-700); margin-bottom: 10px; line-height: 1.75; }
+  .vibe-tip p:last-child { margin-bottom: 0; }
+  .vibe-tip code { background: #ede9fe; border-color: #ddd6fe; color: #7c3aed; }
+
+  .prompt-box {
+    background: #1e1e2e;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-top: 14px;
+  }
+  .prompt-box pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem; line-height: 1.65; color: #cdd6f4;
+    white-space: pre-wrap; word-break: break-word;
+  }
+
+  /* ════════════════════════════════════════
+     FAQ 아코디언
+  ════════════════════════════════════════ */
+  .faq-list { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
+
+  .faq-item {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .faq-item summary {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    cursor: pointer; list-style: none;
+    font-weight: 600; font-size: .95rem; color: var(--gray-900);
+    transition: background .15s;
+    user-select: none;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after {
+    content: '+';
+    font-size: 1.2rem; color: var(--gray-400);
+    transition: transform .2s;
+    flex-shrink: 0; margin-left: 12px;
+  }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
+  .faq-item summary:hover { background: var(--gray-50); }
+  .faq-body {
+    padding: 16px 20px 18px;
+    font-size: .92rem; color: var(--gray-600);
+    line-height: 1.8; border-top: 1px solid var(--gray-100);
+  }
+  .faq-body p + p { margin-top: 10px; }
+
+  /* ════════════════════════════════════════
+     푸터
+  ════════════════════════════════════════ */
+  .site-footer {
+    background: var(--gray-900);
+    color: #9ca3af;
+    padding: 48px 24px 36px;
+    text-align: center;
+  }
+  .footer-logo {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 16px;
+  }
+  .footer-desc { font-size: .85rem; line-height: 1.7; margin-bottom: 20px; }
+  .footer-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 28px; }
+  .footer-links a { font-size: .82rem; color: #9ca3af; }
+  .footer-links a:hover { color: #fff; }
+  .footer-copy { font-size: .78rem; color: #6b7280; }
+
+  /* ════════════════════════════════════════
+     반응형
+  ════════════════════════════════════════ */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 1.7rem; }
+    .section-title { font-size: 1.4rem; }
+    .card-grid, .explain-grid, .modal-gallery-grid { grid-template-columns: 1fr; }
+    .container { padding: 0 16px; }
+    .nav-logo span { display: none; }
+    .demo-section-box { padding: 24px 16px; }
+    .lightbox-img-placeholder { height: 220px; }
+    .modal-box { padding: 24px 20px; }
+  }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     고정 네비게이션
+══════════════════════════════════════════ -->
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark">VT</div>
+    <span>바이브툴킷</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#concept">① 개념</a></li>
+    <li><a href="#gallery">② 유형</a></li>
+    <li><a href="#code">③ 코드 해설</a></li>
+    <li><a href="#demo">④ 데모</a></li>
+    <li><a href="#prompt">⑤ AI 프롬프트</a></li>
+    <li><a href="#faq">⑥ FAQ</a></li>
+  </ul>
+</nav>
+
+
+<!-- ══════════════════════════════════════════
+     히어로
+══════════════════════════════════════════ -->
+<section id="hero" class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">🪟 HTML · CSS · JavaScript · UI 패턴</div>
+    <h1>모달 팝업 <em>(Modal Popup)</em><br>완전 정복 가이드</h1>
+    <p class="hero-desc">
+      페이지 위에 레이어로 뜨는 그 창, 모달.<br>
+      개념부터 3가지 유형 구현까지 — 복붙 한 번에 내 사이트에 바로 적용해요.
+    </p>
+    <div class="hero-meta">
+      <span>⏱️ 약 15분</span>
+      <span>📅 2026년 4월</span>
+      <span>🏷️ HTML · CSS · JS</span>
+      <span>👶 입문 난이도</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ① 개념
+══════════════════════════════════════════ -->
+<section id="concept" class="section">
+  <div class="container">
+
+    <div class="section-badge">① 개념</div>
+    <h2 class="section-title">모달(Modal)이란 무엇인가요?</h2>
+    <p class="section-lead">현재 페이지를 떠나지 않고, 그 위에 레이어처럼 덮여서 나타나는 다이얼로그 창</p>
+
+    <p>
+      웹사이트에서 버튼을 클릭하면 화면이 어두워지면서 가운데에 창이 하나 떠오르는 걸 본 적 있죠?
+      그게 바로 <strong>모달 팝업</strong>이에요.
+      새 페이지로 이동하는 게 아니라, 현재 페이지 위에 <strong>반투명 오버레이</strong>를 깔고
+      그 위에 콘텐츠 박스(<code>.modal-box</code>)를 올리는 방식이에요.
+    </p>
+
+    <p style="margin-top:16px">
+      모달은 사용자의 주의를 특정 콘텐츠에 집중시킬 때 탁월해요.
+      삭제 확인, 로그인 폼, 이미지 확대 보기, 쿠키 동의 안내 등
+      <strong>"잠깐 이것 좀 봐주세요"</strong>가 필요한 상황에서 가장 많이 사용돼요.
+      구현 원리는 생각보다 단순해요 — CSS <code>position: fixed</code>와 <code>z-index</code>,
+      그리고 JavaScript 클래스 토글 몇 줄이면 완성이에요.
+    </p>
+
+    <p style="margin-top:16px">
+      모달이 열릴 때는 배경 스크롤을 막아야 자연스러워요.
+      JavaScript에서 <code>document.body.style.overflow = 'hidden'</code>을 설정하면
+      모달 뒤 페이지가 움직이지 않아요.
+      모달을 닫을 때는 반드시 <code>overflow</code>를 원래대로 복구해야 한다는 것도 기억해주세요.
+    </p>
+
+    <div class="card-grid" style="margin-top:32px">
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">🎯</div>
+        <h4>집중 유도</h4>
+        <p>배경을 어둡게 만들어 사용자의 시선을 모달 콘텐츠에만 집중시켜요. 중요한 메시지나 선택을 놓치지 않게 도와줘요.</p>
+      </div>
+      <div class="info-card ic-green">
+        <div class="info-card-icon">🔄</div>
+        <h4>페이지 이동 없음</h4>
+        <p>현재 페이지 맥락을 그대로 유지하면서 추가 정보나 폼을 보여줄 수 있어요. UX가 부드럽고 자연스러워요.</p>
+      </div>
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">⚙️</div>
+        <h4>다양한 용도</h4>
+        <p>알림, 확인 다이얼로그, 로그인 폼, 이미지 확대, 쿠키 동의 등 수많은 UI 패턴에 활용할 수 있어요.</p>
+      </div>
+      <div class="info-card ic-gray">
+        <div class="info-card-icon">💻</div>
+        <h4>순수 코드로 구현</h4>
+        <p>별도 라이브러리 없이 HTML + CSS + JS 30줄 내외로 완전히 구현할 수 있어요. 가볍고 빠르게 동작해요.</p>
+      </div>
+    </div>
+
+    <div class="callout co-blue" style="margin-top:32px">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <p><strong>모달 vs 팝업 vs 드로어 차이</strong> — <strong>모달</strong>은 페이지 가운데 뜨는 레이어, <strong>팝업</strong>은 새 브라우저 창(요즘은 차단됨), <strong>드로어(Drawer)</strong>는 화면 옆에서 슬라이드로 열리는 패널이에요. 대부분 "팝업"이라고 말하지만 실제로 구현하는 건 모달인 경우가 많아요.</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:1.15rem; font-weight:700; color:var(--gray-900); margin:40px 0 16px">언제 모달을 사용하면 좋을까요?</h3>
+
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>상황</th>
+          <th>적합한 모달 유형</th>
+          <th>효과</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>데이터 삭제 · 위험한 작업 전</td>
+          <td>확인 다이얼로그 (취소/확인)</td>
+          <td><span class="badge bg">실수 방지</span></td>
+        </tr>
+        <tr>
+          <td>갤러리 · 포트폴리오 이미지</td>
+          <td>라이트박스 (이미지 확대 보기)</td>
+          <td><span class="badge bg">몰입감 향상</span></td>
+        </tr>
+        <tr>
+          <td>회원가입 · 로그인 유도</td>
+          <td>폼 모달 (인풋 포함)</td>
+          <td><span class="badge ba">전환율 ↑</span></td>
+        </tr>
+        <tr>
+          <td>공지사항 · 이벤트 알림</td>
+          <td>기본 알림 모달</td>
+          <td><span class="badge ba">노출 강화</span></td>
+        </tr>
+        <tr>
+          <td>쿠키 · 개인정보 동의</td>
+          <td>하단 고정형 또는 중앙 모달</td>
+          <td><span class="badge bb">법적 요건</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout co-amber" style="margin-top:28px">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <p><strong>주의:</strong> 모달은 사용자 흐름을 강제로 끊어요. 꼭 필요한 경우에만 사용하고, 항상 쉽게 닫을 수 있어야 해요. 닫기 버튼(×) + 오버레이 클릭 + ESC 키, 세 가지 방법 모두 지원하는 게 좋은 UX예요.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ② 유형 갤러리
+══════════════════════════════════════════ -->
+<section id="gallery" class="section">
+  <div class="container">
+
+    <div class="section-badge">② 유형 갤러리</div>
+    <h2 class="section-title">모달 팝업 3가지 유형</h2>
+    <p class="section-lead">가장 자주 쓰이는 3가지 모달 패턴을 미리보기 카드로 확인하고, 직접 클릭해서 열어보세요.</p>
+
+    <div class="modal-gallery-grid">
+
+      <!-- 기본 알림 모달 -->
+      <div class="modal-preview-card">
+        <div class="modal-demo-area">
+          <span class="modal-demo-label">PREVIEW</span>
+          <div class="mini-modal">
+            <div class="mini-modal-title">🎉 이벤트 안내</div>
+            <div class="mini-modal-body">지금 가입하면 30일 무료 체험이 시작돼요. 놓치지 마세요!</div>
+            <div class="mini-modal-btn-row">
+              <button class="mini-btn mini-btn-primary">확인</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-card-info">
+          <div class="modal-card-name">기본 알림 모달</div>
+          <div class="modal-card-desc">제목 + 내용 + 확인 버튼으로 구성된 가장 기본적인 모달이에요. 공지, 이벤트, 안내 메시지에 사용해요.</div>
+          <button class="open-modal-btn" onclick="openModal('alert')">▶ 직접 열어보기</button>
+        </div>
+      </div>
+
+      <!-- 이미지 라이트박스 -->
+      <div class="modal-preview-card">
+        <div class="modal-demo-area">
+          <span class="modal-demo-label">PREVIEW</span>
+          <div class="mini-lightbox">
+            <div class="mini-lightbox-img">🖼️</div>
+            <div class="mini-lightbox-close">✕</div>
+          </div>
+        </div>
+        <div class="modal-card-info">
+          <div class="modal-card-name">이미지 라이트박스</div>
+          <div class="modal-card-desc">이미지를 클릭하면 어두운 배경 위에 크게 확대돼요. 포트폴리오·갤러리 페이지에서 필수 패턴이에요.</div>
+          <button class="open-modal-btn" onclick="openModal('lightbox')">▶ 직접 열어보기</button>
+        </div>
+      </div>
+
+      <!-- 확인 다이얼로그 -->
+      <div class="modal-preview-card">
+        <div class="modal-demo-area">
+          <span class="modal-demo-label">PREVIEW</span>
+          <div class="mini-confirm">
+            <div class="mini-confirm-icon">🗑️</div>
+            <div class="mini-confirm-title">정말 삭제할까요?</div>
+            <div class="mini-confirm-body">이 작업은 되돌릴 수 없어요.</div>
+            <div class="mini-confirm-row">
+              <button class="mini-btn-cancel">취소</button>
+              <button class="mini-btn-danger">삭제</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-card-info">
+          <div class="modal-card-name">확인 다이얼로그</div>
+          <div class="modal-card-desc">취소 + 확인(또는 삭제) 두 개의 버튼이 있어요. 위험한 작업 전에 한 번 더 확인을 받을 때 사용해요.</div>
+          <button class="open-modal-btn" onclick="openModal('confirm')">▶ 직접 열어보기</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ③ 코드 해설
+══════════════════════════════════════════ -->
+<section id="code" class="section">
+  <div class="container">
+
+    <div class="section-badge">③ 코드 해설</div>
+    <h2 class="section-title">모달 만드는 코드 완전 분석</h2>
+    <p class="section-lead">HTML 구조 → CSS 스타일링 → JavaScript 동작 순서로 한 줄씩 이해해요</p>
+
+    <!-- HTML 구조 해설 -->
+    <h3 style="font-size:1.1rem; font-weight:700; color:var(--gray-900); margin-bottom:20px">HTML: 오버레이 + 박스 구조</h3>
+
+    <div class="explain-grid">
+      <div class="exp-card">
+        <div class="exp-header">.modal-overlay</div>
+        <div class="exp-body">
+          <div class="exp-title">반투명 배경 레이어</div>
+          <div class="exp-desc">화면 전체를 덮는 어두운 레이어예요. 클릭하면 모달이 닫혀요. <code>position: fixed; inset: 0</code>으로 뷰포트 전체를 채워요.</div>
+          <div class="exp-example"><span class="ek">inset:</span> <span class="ev">0</span>; <span class="ec">/* top·right·bottom·left 모두 0 */</span></div>
+        </div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-header">.modal-box</div>
+        <div class="exp-body">
+          <div class="exp-title">콘텐츠 박스</div>
+          <div class="exp-desc">실제 내용이 들어가는 흰 박스예요. 오버레이 위에 올라가서 중앙에 배치돼요. <code>max-width</code>로 너비를 제한해요.</div>
+          <div class="exp-example"><span class="ek">max-width:</span> <span class="ev">440px</span>; <span class="ec">/* 적당한 너비 */</span></div>
+        </div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-header">z-index: 1000</div>
+        <div class="exp-body">
+          <div class="exp-title">레이어 순서 제어</div>
+          <div class="exp-desc">모달이 다른 모든 요소 위에 뜨도록 큰 z-index를 설정해요. 네비게이션(z-index:500)보다 높아야 해요.</div>
+          <div class="exp-example"><span class="ek">z-index:</span> <span class="ev">1000</span>; <span class="ec">/* nav보다 높게 */</span></div>
+        </div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-header">backdrop-filter: blur</div>
+        <div class="exp-body">
+          <div class="exp-title">배경 흐림 효과</div>
+          <div class="exp-desc">배경을 단순히 어둡게만 하지 않고 흐리게 만드는 효과예요. 현대적이고 깔끔한 느낌을 줘요.</div>
+          <div class="exp-example"><span class="ek">backdrop-filter:</span> <span class="ev">blur(4px)</span>;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 완전한 코드 블록 -->
+    <div class="code-block" style="margin-top:40px">
+      <div class="cb-header">
+        <div style="display:flex; align-items:center; gap:14px">
+          <div class="cb-dots">
+            <div class="cb-dot cb-dot-r"></div>
+            <div class="cb-dot cb-dot-y"></div>
+            <div class="cb-dot cb-dot-g"></div>
+          </div>
+          <span class="cb-file">modal.html — 완전한 예시 코드</span>
+        </div>
+        <button class="cb-copy" onclick="copyCode(this, 'full-code')">복사</button>
+      </div>
+      <div class="cb-body">
+        <pre id="full-code"><span class="tc">&lt;!-- HTML 구조 --&gt;</span>
+<span class="tk">&lt;button</span> <span class="ta">onclick</span>=<span class="tv">"openModal()"</span><span class="tk">&gt;</span>모달 열기<span class="tk">&lt;/button&gt;</span>
+
+<span class="tk">&lt;div</span> <span class="ta">class</span>=<span class="tv">"modal-overlay"</span> <span class="ta">id</span>=<span class="tv">"myModal"</span>
+     <span class="ta">onclick</span>=<span class="tv">"handleOverlayClick(event)"</span><span class="tk">&gt;</span>
+  <span class="tk">&lt;div</span> <span class="ta">class</span>=<span class="tv">"modal-box"</span><span class="tk">&gt;</span>
+    <span class="tk">&lt;button</span> <span class="ta">class</span>=<span class="tv">"modal-close"</span> <span class="ta">onclick</span>=<span class="tv">"closeModal()"</span><span class="tk">&gt;</span>✕<span class="tk">&lt;/button&gt;</span>
+    <span class="tk">&lt;h2&gt;</span>모달 제목<span class="tk">&lt;/h2&gt;</span>
+    <span class="tk">&lt;p&gt;</span>모달 내용이 여기에 들어가요.<span class="tk">&lt;/p&gt;</span>
+    <span class="tk">&lt;button</span> <span class="ta">onclick</span>=<span class="tv">"closeModal()"</span><span class="tk">&gt;</span>확인<span class="tk">&lt;/button&gt;</span>
+  <span class="tk">&lt;/div&gt;</span>
+<span class="tk">&lt;/div&gt;</span>
+
+<span class="tc">/* CSS 스타일 */</span>
+<span class="tp">.modal-overlay</span> {
+  <span class="ta">position</span>: <span class="tv">fixed</span>;
+  <span class="ta">inset</span>: <span class="tv">0</span>;                         <span class="tc">/* top:0; right:0; bottom:0; left:0 */</span>
+  <span class="ta">z-index</span>: <span class="tv">1000</span>;
+  <span class="ta">background</span>: <span class="tv">rgba(0, 0, 0, 0.55)</span>;
+  <span class="ta">backdrop-filter</span>: <span class="tv">blur(4px)</span>;
+  <span class="ta">display</span>: <span class="tv">flex</span>;
+  <span class="ta">align-items</span>: <span class="tv">center</span>;
+  <span class="ta">justify-content</span>: <span class="tv">center</span>;
+  <span class="ta">padding</span>: <span class="tv">24px</span>;
+  <span class="ta">opacity</span>: <span class="tv">0</span>;
+  <span class="ta">visibility</span>: <span class="tv">hidden</span>;
+  <span class="ta">transition</span>: <span class="tv">opacity .22s ease, visibility .22s ease</span>;
+}
+<span class="tp">.modal-overlay.open</span> {
+  <span class="ta">opacity</span>: <span class="tv">1</span>;
+  <span class="ta">visibility</span>: <span class="tv">visible</span>;
+}
+<span class="tp">.modal-box</span> {
+  <span class="ta">background</span>: <span class="tv">#fff</span>;
+  <span class="ta">border-radius</span>: <span class="tv">16px</span>;
+  <span class="ta">box-shadow</span>: <span class="tv">0 24px 64px rgba(0,0,0,.18)</span>;
+  <span class="ta">width</span>: <span class="tv">100%</span>;
+  <span class="ta">max-width</span>: <span class="tv">440px</span>;
+  <span class="ta">padding</span>: <span class="tv">32px</span>;
+  <span class="ta">position</span>: <span class="tv">relative</span>;
+  <span class="ta">transform</span>: <span class="tv">translateY(16px) scale(.97)</span>;
+  <span class="ta">transition</span>: <span class="tv">transform .25s cubic-bezier(.34,1.56,.64,1)</span>;
+}
+<span class="tp">.modal-overlay.open .modal-box</span> {
+  <span class="ta">transform</span>: <span class="tv">translateY(0) scale(1)</span>;
+}
+<span class="tp">.modal-close</span> {
+  <span class="ta">position</span>: <span class="tv">absolute</span>;
+  <span class="ta">top</span>: <span class="tv">16px</span>; <span class="ta">right</span>: <span class="tv">16px</span>;
+  <span class="ta">background</span>: <span class="tv">#f3f4f6</span>;
+  <span class="ta">border</span>: <span class="tv">none</span>;
+  <span class="ta">border-radius</span>: <span class="tv">50%</span>;
+  <span class="ta">width</span>: <span class="tv">30px</span>; <span class="ta">height</span>: <span class="tv">30px</span>;
+  <span class="ta">cursor</span>: <span class="tv">pointer</span>;
+}
+
+<span class="tc">// JavaScript</span>
+<span class="ts">function</span> <span class="ta">openModal</span>() {
+  <span class="ta">document</span>.getElementById(<span class="tv">'myModal'</span>).classList.add(<span class="tv">'open'</span>);
+  <span class="ta">document</span>.body.style.overflow = <span class="tv">'hidden'</span>;  <span class="tc">// 배경 스크롤 막기</span>
+}
+
+<span class="ts">function</span> <span class="ta">closeModal</span>() {
+  <span class="ta">document</span>.getElementById(<span class="tv">'myModal'</span>).classList.remove(<span class="tv">'open'</span>);
+  <span class="ta">document</span>.body.style.overflow = <span class="tv">''</span>;         <span class="tc">// 스크롤 복구</span>
+}
+
+<span class="ts">function</span> <span class="ta">handleOverlayClick</span>(e) {
+  <span class="ts">if</span> (e.target === e.currentTarget) closeModal(); <span class="tc">// 오버레이만 클릭 시</span>
+}
+
+<span class="tc">// ESC 키로 닫기</span>
+<span class="ta">document</span>.addEventListener(<span class="tv">'keydown'</span>, (e) => {
+  <span class="ts">if</span> (e.key === <span class="tv">'Escape'</span>) closeModal();
+});</pre>
+      </div>
+    </div>
+
+    <!-- 포인트 해설 -->
+    <div class="callout co-green" style="margin-top:32px">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        <p><strong>핵심 포인트 3가지</strong></p>
+        <p>① <code>visibility: hidden</code> + <code>opacity: 0</code>을 함께 쓰면 <code>display: none</code>과 달리 CSS 트랜지션(페이드 효과)이 부드럽게 작동해요.</p>
+        <p>② <code>transform: translateY(16px) scale(.97)</code>로 시작해서 <code>translateY(0) scale(1)</code>로 끝나면 모달이 살짝 위로 올라오며 열리는 느낌을 줘요.</p>
+        <p>③ 오버레이 클릭 감지 시 <code>e.target === e.currentTarget</code> 조건을 확인해야 해요. 모달 박스 안쪽을 클릭해도 닫히는 버그를 방지해요.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ④ 인터랙티브 데모
+══════════════════════════════════════════ -->
+<section id="demo" class="section">
+  <div class="container">
+
+    <div class="section-badge">④ 인터랙티브 데모</div>
+    <h2 class="section-title">직접 열어보는 모달 데모</h2>
+    <p class="section-lead">아래 버튼을 클릭해서 3가지 모달 유형을 직접 체험해보세요. 오버레이 클릭이나 ESC 키로 닫을 수 있어요.</p>
+
+    <div class="demo-section-box">
+      <button class="demo-open-btn demo-btn-primary" onclick="openModal('alert')">
+        🎉 알림 모달 열기
+      </button>
+      <button class="demo-open-btn demo-btn-green" onclick="openModal('lightbox')">
+        🖼️ 라이트박스 열기
+      </button>
+      <button class="demo-open-btn demo-btn-danger" onclick="openModal('confirm')">
+        🗑️ 확인 다이얼로그 열기
+      </button>
+    </div>
+
+    <div class="callout co-blue" style="margin-top:28px">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <p>모달을 닫는 방법: <strong>× 버튼</strong> 클릭 / <strong>어두운 배경(오버레이)</strong> 클릭 / 키보드 <strong>ESC 키</strong> 누르기</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ⑤ AI 프롬프트 팁
+══════════════════════════════════════════ -->
+<section id="prompt" class="section">
+  <div class="container">
+
+    <div class="section-badge">⑤ AI 프롬프트 팁</div>
+    <h2 class="section-title">바이브 코딩 — AI에게 이렇게 요청하세요</h2>
+    <p class="section-lead">모달을 만들 때 AI에게 어떻게 설명하면 좋은지, 실제로 잘 동작하는 프롬프트를 소개해요.</p>
+
+    <div class="vibe-tip">
+      <div class="vibe-tip-label">✨ 바이브코더 TIP</div>
+      <p>AI에게 모달을 요청할 때는 <strong>어떤 상황에서 열리는지</strong>, <strong>버튼이 몇 개인지</strong>, <strong>확인 시 어떤 동작을 할지</strong>를 구체적으로 알려주면 훨씬 정확한 코드를 받을 수 있어요.</p>
+      <p>아래 프롬프트를 복붙해서 바로 사용해보세요 👇</p>
+      <div class="prompt-box">
+        <pre>내 사이트에 확인 모달을 만들어줘.
+"삭제하시겠습니까?" 메시지와 취소/확인 버튼이 있고,
+확인 클릭 시 console.log('삭제 완료')가 실행되게 해줘.
+배경은 반투명 블러 처리해줘.
+닫는 방법은 × 버튼, 오버레이 클릭, ESC 키 세 가지 모두 지원해줘.
+모달이 열릴 때는 부드럽게 위로 올라오는 애니메이션도 넣어줘.</pre>
+      </div>
+    </div>
+
+    <h3 style="font-size:1.1rem; font-weight:700; color:var(--gray-900); margin: 32px 0 16px">상황별 추가 프롬프트 예시</h3>
+
+    <div class="card-grid">
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">🖼️</div>
+        <h4>이미지 라이트박스</h4>
+        <p style="font-size:.8rem; font-family:'JetBrains Mono',monospace; line-height:1.65; color:var(--gray-600)">img 태그를 클릭하면 모달이 열리면서 이미지가 크게 보이게 해줘. 배경은 거의 검은색으로 해줘.</p>
+      </div>
+      <div class="info-card ic-green">
+        <div class="info-card-icon">📋</div>
+        <h4>폼 입력 모달</h4>
+        <p style="font-size:.8rem; font-family:'JetBrains Mono',monospace; line-height:1.65; color:var(--gray-600)">이름과 이메일을 입력받는 폼이 있는 모달을 만들어줘. 제출 시 유효성 검사도 해줘.</p>
+      </div>
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">🍪</div>
+        <h4>쿠키 동의</h4>
+        <p style="font-size:.8rem; font-family:'JetBrains Mono',monospace; line-height:1.65; color:var(--gray-600)">페이지 처음 방문 시 쿠키 동의 모달이 뜨게 해줘. 동의하면 localStorage에 저장해서 다음엔 안 뜨게 해줘.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ⑥ FAQ
+══════════════════════════════════════════ -->
+<section id="faq" class="section">
+  <div class="container">
+
+    <div class="section-badge">⑥ FAQ</div>
+    <h2 class="section-title">자주 묻는 질문</h2>
+    <p class="section-lead">모달 구현 중 막히는 부분, 여기서 해결하세요.</p>
+
+    <div class="faq-list">
+
+      <details class="faq-item">
+        <summary>모달이 네비게이션 뒤에 가려져요</summary>
+        <div class="faq-body">
+          <p><code>z-index</code> 문제예요. 모달 오버레이에 <code>z-index: 1000</code> 이상의 값을 주세요. 사이트 네비게이션이 보통 <code>z-index: 100~500</code>을 사용하기 때문에, 모달은 그보다 훨씬 높은 값이어야 해요.</p>
+          <p>또한 부모 요소에 <code>transform</code>, <code>filter</code>, <code>will-change</code> 속성이 있으면 <code>position: fixed</code>가 해당 부모를 기준으로 동작해서 화면 전체를 덮지 못할 수 있어요. 모달을 <code>&lt;body&gt;</code>의 직계 자식으로 이동시켜 보세요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>모바일에서 모달 뒤 배경이 스크롤돼요</summary>
+        <div class="faq-body">
+          <p>모달이 열릴 때 <code>document.body.style.overflow = 'hidden'</code>을 설정하면 배경 스크롤이 막혀요. 모달을 닫을 때는 반드시 <code>document.body.style.overflow = ''</code>로 복구해야 해요.</p>
+          <p>iOS Safari에서는 추가로 <code>document.body.style.position = 'fixed'</code>와 <code>document.body.style.width = '100%'</code>가 필요할 수 있어요. 단, 이 경우 스크롤 위치가 초기화되므로 열기 전 스크롤 위치를 저장해뒀다가 닫을 때 복구해야 해요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>모달 열 때 애니메이션을 넣고 싶어요</summary>
+        <div class="faq-body">
+          <p>CSS <code>transition</code>을 활용하면 돼요. <code>visibility: hidden</code> + <code>opacity: 0</code> 상태에서 시작해서, <code>.open</code> 클래스가 추가될 때 <code>opacity: 1</code>로 전환하면 부드러운 페이드인이 만들어져요.</p>
+          <p>더 생동감 있는 효과를 원한다면 모달 박스에 <code>transform: translateY(20px)</code>을 초기값으로 주고, 열릴 때 <code>translateY(0)</code>으로 전환하세요. <code>cubic-bezier(.34,1.56,.64,1)</code> 이징을 쓰면 살짝 튀어오르는 느낌이 나요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>모달 안에서 스크롤이 안 돼요 (내용이 잘려요)</summary>
+        <div class="faq-body">
+          <p>모달 박스(<code>.modal-box</code>)에 <code>max-height: 90vh; overflow-y: auto;</code>를 추가하면 내용이 길어질 때 박스 안에서 스크롤이 생겨요. 모바일 대응을 위해 <code>padding: 24px</code>도 조정해주세요.</p>
+          <p>모달 헤더(제목 + 닫기버튼)와 푸터(버튼 영역)는 고정하고 가운데 콘텐츠만 스크롤되게 하려면 flex 레이아웃을 활용해보세요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>모달 여러 개를 동시에 관리하려면 어떻게 해요?</summary>
+        <div class="faq-body">
+          <p>각 모달에 고유한 <code>id</code>를 붙이고, <code>openModal('modalId')</code>처럼 ID를 인자로 받는 함수를 만들어요. 함수 안에서 <code>document.getElementById(id)</code>로 특정 모달만 열 수 있어요.</p>
+          <p>현재 열린 모달을 추적하는 변수를 하나 두면, ESC 키 이벤트도 하나로 처리할 수 있어요: <code>let currentModal = null;</code>로 선언하고, 열 때 <code>currentModal = modal</code>, 닫을 때 <code>currentModal = null</code>로 관리하세요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>화면이 작을 때 모달이 너무 크게 나와요</summary>
+        <div class="faq-body">
+          <p>오버레이에 <code>padding: 16px</code> 이상을 주면 모달 박스가 화면 가장자리에 딱 붙지 않아요. 모달 박스의 <code>width: 100%; max-width: 440px</code> 설정이 모바일에서는 100%, 큰 화면에서는 440px로 제한되도록 동작해요.</p>
+          <p>세로가 너무 긴 경우엔 <code>max-height: calc(100vh - 48px); overflow-y: auto;</code>를 추가해서 모달이 화면을 넘어가지 않도록 막아요.</p>
+        </div>
+      </details>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     푸터
+══════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-logo"><div class="logo-mark">VT</div>바이브툴킷</div>
+  <p class="footer-desc">바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 도구 모음</p>
+  <div class="footer-links">
+    <a href="index.html">홈</a><a href="about.html">소개</a>
+    <a href="contact.html">문의</a><a href="sitemap.html">사이트맵</a>
+  </div>
+  <div class="footer-copy">© 2026 바이브툴킷. 콘텐츠는 자유롭게 참고하세요.</div>
+</footer>
+
+
+<!-- ══════════════════════════════════════════
+     실제 모달 마크업 (3종)
+══════════════════════════════════════════ -->
+
+<!-- 1. 기본 알림 모달 -->
+<div class="modal-overlay" id="modal-alert" onclick="handleOverlayClick(event, 'alert')">
+  <div class="modal-box">
+    <button class="modal-close-btn" onclick="closeModal('alert')" aria-label="닫기">✕</button>
+    <div class="modal-icon">🎉</div>
+    <div class="modal-title">이벤트 안내</div>
+    <p class="modal-body-text">
+      지금 바이브툴킷에 가입하면 <strong>30일 무료 체험</strong>이 시작돼요!
+      코드 한 줄 없이도 멋진 웹사이트를 만들 수 있는 도구를 마음껏 사용해보세요.
+      이벤트는 이번 달 말까지만 진행돼요.
+    </p>
+    <div class="modal-btn-row">
+      <button class="mbtn mbtn-primary" onclick="closeModal('alert')">확인했어요</button>
+    </div>
+  </div>
+</div>
+
+<!-- 2. 이미지 라이트박스 -->
+<div class="modal-overlay" id="modal-lightbox" onclick="handleOverlayClick(event, 'lightbox')">
+  <div class="modal-box lightbox">
+    <button class="modal-close-btn" onclick="closeModal('lightbox')" aria-label="닫기">✕</button>
+    <div class="lightbox-img-wrap">
+      <div class="lightbox-img-placeholder">🖼️</div>
+    </div>
+    <div class="lightbox-caption">이미지를 클릭하면 이렇게 크게 볼 수 있어요. ESC 키나 배경을 클릭하면 닫혀요.</div>
+  </div>
+</div>
+
+<!-- 3. 확인 다이얼로그 -->
+<div class="modal-overlay" id="modal-confirm" onclick="handleOverlayClick(event, 'confirm')">
+  <div class="modal-box">
+    <button class="modal-close-btn" onclick="closeModal('confirm')" aria-label="닫기">✕</button>
+    <div class="modal-icon">🗑️</div>
+    <div class="modal-title">정말 삭제할까요?</div>
+    <p class="modal-body-text">
+      이 작업은 <strong>되돌릴 수 없어요.</strong>
+      삭제된 데이터는 복구할 수 없으니 신중하게 결정해주세요.
+    </p>
+    <div class="modal-btn-row">
+      <button class="mbtn mbtn-secondary" onclick="closeModal('confirm')">취소</button>
+      <button class="mbtn mbtn-danger" onclick="handleConfirmDelete()">삭제하기</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     JavaScript
+══════════════════════════════════════════ -->
+<script>
+  /* ── 모달 열기/닫기 ── */
+  let currentModal = null;
+
+  function openModal(type) {
+    const overlay = document.getElementById('modal-' + type);
+    if (!overlay) return;
+    if (currentModal) closeModal(currentModal);
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    currentModal = type;
+  }
+
+  function closeModal(type) {
+    const t = type || currentModal;
+    if (!t) return;
+    const overlay = document.getElementById('modal-' + t);
+    if (overlay) overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    currentModal = null;
+  }
+
+  function handleOverlayClick(e, type) {
+    if (e.target === e.currentTarget) closeModal(type);
+  }
+
+  /* ESC 키로 닫기 */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && currentModal) closeModal(currentModal);
+  });
+
+  /* 확인 다이얼로그 — 확인 버튼 */
+  function handleConfirmDelete() {
+    console.log('삭제 완료');
+    closeModal('confirm');
+    /* 삭제 완료 피드백 (간단 토스트 알림) */
+    const toast = document.createElement('div');
+    toast.textContent = '✅ 삭제가 완료됐어요.';
+    Object.assign(toast.style, {
+      position: 'fixed', bottom: '28px', left: '50%',
+      transform: 'translateX(-50%)',
+      background: '#111827', color: '#fff',
+      padding: '12px 24px', borderRadius: '8px',
+      fontSize: '.88rem', fontWeight: '600',
+      zIndex: '2000', boxShadow: '0 4px 16px rgba(0,0,0,.2)',
+      transition: 'opacity .3s'
+    });
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; }, 2200);
+    setTimeout(() => { toast.remove(); }, 2600);
+  }
+
+  /* ── 코드 복사 ── */
+  function copyCode(btn, id) {
+    const pre = document.getElementById(id);
+    if (!pre) return;
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = '복사됨 ✓';
+      btn.classList.add('ok');
+      setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('ok'); }, 2000);
+    });
+  }
+
+  /* ── 네비게이션 활성화 ── */
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => {
+          a.classList.toggle('active',
+            a.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+
+<!-- ══════════════════════════════════════════
+     iframe 감지 스크립트
+══════════════════════════════════════════ -->
+<script>
+(function() {
+  if (self === top) return;
+  const nav = document.querySelector('.site-nav');
+  if (nav) nav.style.display = 'none';
+  const hero = document.querySelector('.hero');
+  if (hero) hero.style.paddingTop = '40px';
+  document.querySelectorAll('a[href$=".html"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      if (window.parent && window.parent.loadTool) {
+        e.preventDefault();
+        window.parent.loadTool(this.getAttribute('href'));
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

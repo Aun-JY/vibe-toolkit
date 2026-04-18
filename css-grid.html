@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Grid 레이아웃 완전 정복 | 바이브툴킷</title>
+  <meta name="description" content="행(row)과 열(column)을 동시에 제어하는 CSS Grid 2D 레이아웃 완전 가이드. 인터랙티브 플레이그라운드로 바로 익혀봐요.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://aun-jy.github.io/vibe-toolkit/css-grid.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+  :root {
+    --accent:#4f46e5; --accent-soft:#eef2ff; --accent-border:#c7d2fe;
+    --green:#16a34a; --green-soft:#f0fdf4;
+    --amber:#d97706; --amber-soft:#fffbeb;
+    --red-soft:#fff1f2;
+    --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+    --gray-300:#d1d5db; --gray-400:#9ca3af; --gray-500:#6b7280;
+    --gray-600:#4b5563; --gray-700:#374151; --gray-900:#111827;
+    --code-bg:#1e1e2e; --radius:12px; --radius-sm:8px;
+    --shadow-sm:0 1px 3px rgba(0,0,0,.08); --shadow:0 4px 12px rgba(0,0,0,.08);
+    --nav-h:56px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + 24px)}
+  body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:#fff;color:var(--gray-700);line-height:1.75;font-size:16px}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  strong{color:var(--gray-900);font-weight:600}
+  code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:var(--gray-100);color:var(--accent);padding:.1em .4em;border-radius:4px;border:1px solid var(--gray-200)}
+
+  .site-nav{position:fixed;top:0;left:0;right:0;z-index:500;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);height:var(--nav-h);display:flex;align-items:center;padding:0 24px}
+  .nav-logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.95rem;color:var(--gray-900);margin-right:32px;flex-shrink:0;text-decoration:none}
+  .logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;color:#fff}
+  .nav-links{display:flex;align-items:center;gap:2px;list-style:none;overflow-x:auto;scrollbar-width:none}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{display:block;padding:6px 14px;font-size:.85rem;font-weight:500;color:var(--gray-500);border-radius:var(--radius-sm);white-space:nowrap;transition:color .15s,background .15s;text-decoration:none}
+  .nav-links a:hover{color:var(--gray-900);background:var(--gray-100)}
+
+  .container{max-width:860px;margin:0 auto;padding:0 24px}
+  .section{padding:72px 0}
+  .section:nth-child(even){background:var(--gray-50)}
+  .section-badge{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:20px;padding:3px 12px;margin-bottom:14px}
+  .section-title{font-size:1.75rem;font-weight:700;color:var(--gray-900);letter-spacing:-.025em;line-height:1.25;margin-bottom:10px}
+  .section-lead{font-size:1.05rem;color:var(--gray-500);line-height:1.7;margin-bottom:40px;max-width:600px}
+
+  .hero{padding:calc(var(--nav-h) + 56px) 0 64px;background:linear-gradient(160deg,var(--accent-soft) 0%,#fff 60%);border-bottom:1px solid var(--gray-200)}
+  .hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:20px;padding:4px 14px;margin-bottom:20px}
+  .hero h1{font-size:clamp(1.9rem,4vw,2.75rem);font-weight:700;color:var(--gray-900);letter-spacing:-.03em;line-height:1.2;margin-bottom:18px}
+  .hero h1 em{color:var(--accent);font-style:normal}
+  .hero-desc{font-size:1.08rem;color:var(--gray-500);line-height:1.75;max-width:540px;margin-bottom:32px}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:16px;font-size:.82rem;color:var(--gray-500)}
+
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:28px}
+  .info-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:22px 20px;box-shadow:var(--shadow-sm);transition:box-shadow .2s,transform .2s}
+  .info-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+  .info-card-icon{font-size:1.6rem;margin-bottom:10px}
+  .info-card h4{font-size:.95rem;font-weight:700;color:var(--gray-900);margin-bottom:7px}
+  .info-card p{font-size:.86rem;color:var(--gray-600);line-height:1.7}
+  .ic-accent{background:var(--accent-soft);border-color:var(--accent-border)}
+  .ic-green{background:var(--green-soft);border-color:#bbf7d0}
+  .ic-amber{background:var(--amber-soft);border-color:#fde68a}
+  .ic-gray{background:var(--gray-50);border-color:var(--gray-200)}
+
+  .callout{display:flex;gap:14px;padding:18px 20px;border-radius:var(--radius);margin:24px 0;font-size:.93rem;line-height:1.75;color:var(--gray-700)}
+  .callout-icon{font-size:1.2rem;flex-shrink:0;padding-top:1px}
+  .co-blue{background:var(--accent-soft);border:1px solid var(--accent-border)}
+  .co-green{background:var(--green-soft);border:1px solid #bbf7d0}
+  .co-amber{background:var(--amber-soft);border:1px solid #fde68a}
+
+  /* 코드블록 */
+  .code-block{background:var(--code-bg);border-radius:var(--radius);overflow:hidden;margin:24px 0;box-shadow:var(--shadow)}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#16162a;border-bottom:1px solid #2d2d4a}
+  .code-lang{font-size:.72rem;color:#7c7caa;font-family:'JetBrains Mono',monospace;letter-spacing:.06em}
+  .copy-btn{font-size:.72rem;font-weight:600;color:#7c7caa;background:#2d2d4a;border:none;border-radius:4px;padding:3px 10px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:color .15s,background .15s}
+  .copy-btn:hover{color:#cdd6f4;background:#3d3d5a}
+  .copy-btn.ok{color:#a6e3a1}
+  .code-block pre{padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.7;color:#cdd6f4}
+  .hl-tag{color:#89dceb} .hl-attr{color:#f38ba8} .hl-val{color:#a6e3a1} .hl-cmt{color:#6c7086;font-style:italic} .hl-kw{color:#cba6f7} .hl-str{color:#a6e3a1} .hl-prop{color:#89b4fa}
+
+  /* FAQ */
+  .faq-list{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+  .faq-item{border:1px solid var(--gray-200);border-radius:var(--radius);overflow:hidden}
+  .faq-q{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;cursor:pointer;font-weight:600;font-size:.95rem;color:var(--gray-900);background:#fff;transition:background .15s;user-select:none}
+  .faq-q:hover{background:var(--gray-50)}
+  .faq-chevron{font-size:.75rem;color:var(--gray-400);transition:transform .25s;flex-shrink:0}
+  .faq-item.open .faq-chevron{transform:rotate(180deg)}
+  .faq-a{display:none;padding:0 20px 18px;font-size:.92rem;color:var(--gray-600);line-height:1.8}
+  .faq-item.open .faq-a{display:block}
+
+  /* 다음단계 */
+  .next-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:28px}
+  .next-card{display:flex;flex-direction:column;gap:8px;padding:20px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);box-shadow:var(--shadow-sm);cursor:pointer;transition:box-shadow .2s,transform .2s;text-decoration:none;color:inherit}
+  .next-card:hover{box-shadow:var(--shadow);transform:translateY(-2px);text-decoration:none}
+  .next-card-icon{font-size:1.5rem}
+  .next-card-title{font-weight:700;font-size:.95rem;color:var(--gray-900)}
+  .next-card-desc{font-size:.82rem;color:var(--gray-500);line-height:1.6}
+
+  /* vibe tip */
+  .vibe-tip{background:linear-gradient(135deg,#faf5ff 0%,#eff6ff 100%);border:1px solid #e9d5ff;border-left:4px solid #8b5cf6;border-radius:var(--radius);padding:20px 22px;margin:32px 0}
+  .vibe-tip-label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7c3aed;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .vibe-tip p{font-size:.92rem;color:var(--gray-700);margin-bottom:10px;line-height:1.75}
+  .vibe-tip p:last-child{margin-bottom:0}
+  .vibe-tip pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--gray-700);line-height:1.7;white-space:pre-wrap;margin-top:8px}
+
+  /* 속성 카드 */
+  .prop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:24px}
+  .prop-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)}
+  .prop-card h4{font-size:.9rem;font-weight:700;margin-bottom:6px;font-family:'JetBrains Mono',monospace;color:var(--accent)}
+  .prop-card p{font-size:.84rem;color:var(--gray-600);line-height:1.7;margin-bottom:10px}
+  .prop-values{display:flex;flex-wrap:wrap;gap:5px}
+  .pv{display:inline-block;font-size:.72rem;font-family:'JetBrains Mono',monospace;background:var(--gray-100);border:1px solid var(--gray-200);border-radius:4px;padding:2px 7px;color:var(--gray-700)}
+  .pv.active{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent);font-weight:600}
+
+  /* Grid 비교 다이어그램 */
+  .compare-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:28px}
+  .compare-box{border-radius:var(--radius);overflow:hidden;border:1px solid var(--gray-200)}
+  .compare-box-title{padding:10px 16px;font-size:.82rem;font-weight:700;color:#fff}
+  .compare-box-title.flex-title{background:#7c3aed}
+  .compare-box-title.grid-title{background:var(--accent)}
+  .compare-inner{padding:16px;background:var(--gray-50)}
+  .flex-demo{display:flex;gap:6px;flex-wrap:wrap}
+  .flex-demo-item{background:#7c3aed;color:#fff;border-radius:6px;padding:8px 12px;font-size:.78rem;font-weight:700;font-family:'JetBrains Mono',monospace}
+  .grid-demo{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .grid-demo-item{background:var(--accent);color:#fff;border-radius:6px;padding:8px;font-size:.78rem;font-weight:700;font-family:'JetBrains Mono',monospace;text-align:center}
+  .grid-demo-item.span2{grid-column:span 2;background:#3730a3}
+  .compare-desc{padding:10px 16px 14px;font-size:.8rem;color:var(--gray-600);line-height:1.6}
+
+  /* 레이아웃 시각화 */
+  .layout-demo{margin:28px 0;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);padding:20px}
+  .layout-demo-title{font-size:.8rem;font-weight:700;color:var(--gray-700);margin-bottom:12px;font-family:'JetBrains Mono',monospace}
+  .layout-grid{display:grid;grid-template-areas:"header header" "sidebar main" "footer footer";grid-template-columns:120px 1fr;grid-template-rows:44px 100px 36px;gap:6px}
+  .lg-header{grid-area:header;background:#4f46e5;color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700}
+  .lg-sidebar{grid-area:sidebar;background:#7c3aed;color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700}
+  .lg-main{grid-area:main;background:#0891b2;color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700}
+  .lg-footer{grid-area:footer;background:#059669;color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700}
+
+  /* 플레이그라운드 */
+  .playground{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius);padding:24px;margin-top:24px}
+  .pg-controls{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+  .pg-control label{font-size:.8rem;font-weight:600;color:var(--gray-700);display:block;margin-bottom:5px}
+  .pg-control select{width:100%;padding:8px 10px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.85rem;font-family:inherit;color:var(--gray-700);background:#fff;cursor:pointer}
+  .pg-hint{font-size:.75rem;color:var(--gray-400);margin-bottom:12px;font-family:'JetBrains Mono',monospace}
+  .pg-preview{min-height:200px;border:2px dashed var(--gray-300);border-radius:var(--radius-sm);background:#fff;display:grid;padding:16px;gap:8px;transition:all .3s;position:relative}
+  .pg-preview::before{content:'grid container';position:absolute;top:6px;left:10px;font-size:.65rem;color:var(--gray-400);font-family:'JetBrains Mono',monospace;letter-spacing:.04em}
+  .pg-box{border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#fff;min-height:56px;cursor:pointer;transition:opacity .15s,transform .15s;user-select:none;position:relative}
+  .pg-box:hover{opacity:.85;transform:scale(.97)}
+  .pg-box.span2{grid-column:span 2}
+  .pg-box::after{content:'클릭 = span 2';position:absolute;bottom:4px;right:6px;font-size:.6rem;opacity:.6;font-family:'JetBrains Mono',monospace}
+  .pg-box.span2::after{content:'span 2 ✓'}
+  .pg-box:nth-child(1){background:#4f46e5}
+  .pg-box:nth-child(2){background:#7c3aed}
+  .pg-box:nth-child(3){background:#be185d}
+  .pg-box:nth-child(4){background:#0891b2}
+  .pg-box:nth-child(5){background:#059669}
+  .pg-box:nth-child(6){background:#d97706}
+  .pg-code{margin-top:14px;background:var(--code-bg);border-radius:var(--radius-sm);padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:.8rem;color:#cdd6f4;line-height:1.6;white-space:pre}
+
+  .site-footer{background:var(--gray-900);color:#9ca3af;padding:48px 24px 36px;text-align:center}
+  .footer-logo{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:1rem;color:#fff;margin-bottom:16px}
+  .footer-desc{font-size:.85rem;line-height:1.7;margin-bottom:20px}
+  .footer-links{display:flex;justify-content:center;gap:20px;margin-bottom:28px;flex-wrap:wrap}
+  .footer-links a{font-size:.82rem;color:#9ca3af} .footer-links a:hover{color:#fff}
+  .footer-copy{font-size:.78rem;color:#6b7280}
+
+  @media(max-width:640px){
+    .hero h1{font-size:1.7rem}
+    .section-title{font-size:1.4rem}
+    .card-grid,.prop-grid,.next-grid{grid-template-columns:1fr}
+    .container{padding:0 16px}
+    .pg-controls{grid-template-columns:1fr 1fr}
+    .compare-wrap{grid-template-columns:1fr}
+  }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark">VT</div>
+    <span>바이브툴킷</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#concept">① 개념</a></li>
+    <li><a href="#props">② 핵심 속성</a></li>
+    <li><a href="#code">③ 코드</a></li>
+    <li><a href="#playground">④ 플레이그라운드</a></li>
+    <li><a href="#vibe-tip">⑤ AI 팁</a></li>
+    <li><a href="#faq">⑥ FAQ</a></li>
+  </ul>
+</nav>
+
+<section id="hero" class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">⊞ CSS 레이아웃 · 2차원 그리드</div>
+    <h1>CSS Grid <em>레이아웃</em><br>완전 정복 가이드</h1>
+    <p class="hero-desc">
+      행(row)과 열(column)을 동시에 제어하는 2차원 레이아웃 시스템 CSS Grid.<br>
+      카드 그리드부터 전체 페이지 레이아웃까지, 인터랙티브 데모로 바로 익혀봐요.
+    </p>
+    <div class="hero-meta">
+      <span>⏱️ 약 15분</span>
+      <span>📅 2026년 4월</span>
+      <span>🏷️ CSS · 레이아웃</span>
+      <span>👶 입문 난이도</span>
+    </div>
+  </div>
+</section>
+
+
+<section id="concept" class="section">
+  <div class="container">
+    <div class="section-badge">① 개념</div>
+    <h2 class="section-title">CSS Grid란 무엇인가요?</h2>
+    <p class="section-lead">행(row)과 열(column)을 동시에 다루는 웹의 2차원 레이아웃 시스템</p>
+
+    <p>
+      웹 페이지를 만들다 보면 단순히 가로로 나열하는 것 이상이 필요할 때가 있어요.
+      헤더, 사이드바, 본문, 푸터가 격자처럼 맞물려야 하거나, 카드들이 깔끔하게 여러 열로 나뉘어야 하거나,
+      특정 요소가 여러 칸을 차지해야 하는 경우가 그래요.
+      <strong>CSS Grid</strong>는 이런 2차원 레이아웃을 가장 명확하고 직관적으로 만들 수 있는 CSS 시스템이에요.
+    </p>
+
+    <p style="margin-top:16px">
+      Grid는 <strong>부모(Container)</strong>에 <code>display: grid</code>를 선언하면 활성화돼요.
+      그러면 자식 요소(Item)들이 자동으로 격자 형태로 배치되고,
+      <code>grid-template-columns</code>와 <code>grid-template-rows</code>로 각 칸의 크기를 자유롭게 지정할 수 있어요.
+      나아가 <code>grid-template-areas</code>를 사용하면 이름만으로 복잡한 레이아웃도 한눈에 그릴 수 있어요.
+    </p>
+
+    <p style="margin-top:16px">
+      CSS Grid는 2017년 주요 브라우저에 정식 지원되기 시작했고, 지금은 전 세계 브라우저의 98% 이상에서 완벽하게 동작해요.
+      float, table, 절대 위치 지정 없이도 복잡한 레이아웃을 단 몇 줄로 구현할 수 있는 시대가 된 거예요.
+    </p>
+
+    <div class="compare-wrap">
+      <div class="compare-box">
+        <div class="compare-box-title flex-title">Flexbox — 1차원 (가로 OR 세로)</div>
+        <div class="compare-inner">
+          <div class="flex-demo">
+            <div class="flex-demo-item">A</div>
+            <div class="flex-demo-item">B</div>
+            <div class="flex-demo-item">C</div>
+            <div class="flex-demo-item">D</div>
+          </div>
+        </div>
+        <div class="compare-desc">한 방향(가로 또는 세로)으로만 아이템을 정렬해요. 버튼 그룹, 네비게이션, 카드 한 줄 나열에 최적이에요.</div>
+      </div>
+      <div class="compare-box">
+        <div class="compare-box-title grid-title">CSS Grid — 2차원 (가로 AND 세로)</div>
+        <div class="compare-inner">
+          <div class="grid-demo">
+            <div class="grid-demo-item span2">A (span 2)</div>
+            <div class="grid-demo-item">B</div>
+            <div class="grid-demo-item">C</div>
+            <div class="grid-demo-item">D</div>
+            <div class="grid-demo-item">E</div>
+          </div>
+        </div>
+        <div class="compare-desc">행과 열을 동시에 제어해요. 요소가 여러 칸을 차지하거나, 정해진 위치에 배치돼야 할 때 최적이에요.</div>
+      </div>
+    </div>
+
+    <div class="card-grid" style="margin-top:32px">
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">⊞</div>
+        <h4>전체 페이지 레이아웃</h4>
+        <p>헤더, 사이드바, 본문, 푸터가 모두 격자로 맞물리는 구조. Grid의 가장 강력한 활용처예요.</p>
+      </div>
+      <div class="info-card ic-green">
+        <div class="info-card-icon">🃏</div>
+        <h4>카드 그리드</h4>
+        <p>상품 목록, 블로그 포스트 등을 여러 열로 나열. <code>auto-fill</code>로 반응형까지 한 번에 해결해요.</p>
+      </div>
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">📰</div>
+        <h4>잡지형 레이아웃</h4>
+        <p>특정 카드가 2열을 차지하거나 2행을 차지하는 비대칭 레이아웃. <code>grid-column: span 2</code>로 쉽게 구현해요.</p>
+      </div>
+      <div class="info-card ic-gray">
+        <div class="info-card-icon">📊</div>
+        <h4>대시보드 / 위젯</h4>
+        <p>크기가 제각각인 위젯들을 격자 안에 깔끔하게 배치. Grid Area 이름 지정으로 직관적으로 관리해요.</p>
+      </div>
+    </div>
+
+    <div class="callout co-blue" style="margin-top:32px">
+      <span class="callout-icon">💡</span>
+      <div>
+        <p><strong>Flexbox vs Grid, 무엇을 쓰나요?</strong> 단순한 가로 정렬이나 버튼 그룹이라면 Flexbox가 더 간단해요.
+        2차원(행+열)이 동시에 필요하거나, 요소가 특정 칸에 정확히 위치해야 한다면 Grid가 정답이에요.
+        실무에서는 전체 페이지 구조는 Grid로, 그 안의 소소한 정렬은 Flexbox로 함께 쓰는 경우가 많아요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="props" class="section">
+  <div class="container">
+    <div class="section-badge">② 핵심 속성</div>
+    <h2 class="section-title">꼭 알아야 할 CSS Grid 속성 6가지</h2>
+    <p class="section-lead">Container에 적용하는 속성들 — 이것만 알면 대부분의 그리드 레이아웃이 가능해요</p>
+
+    <div class="prop-grid">
+      <div class="prop-card">
+        <h4>grid-template-columns</h4>
+        <p>열(column)의 개수와 크기를 정의해요. <code>fr</code> 단위로 비율 지정, <code>repeat()</code>로 반복 선언이 가능해요.</p>
+        <div class="prop-values">
+          <span class="pv active">repeat(3, 1fr)</span>
+          <span class="pv">200px 1fr</span>
+          <span class="pv">repeat(auto-fill, minmax(250px, 1fr))</span>
+        </div>
+      </div>
+      <div class="prop-card">
+        <h4>grid-template-rows</h4>
+        <p>행(row)의 크기를 정의해요. 보통은 콘텐츠 높이에 맞게 자동이지만, 헤더·푸터 같은 고정 높이에 유용해요.</p>
+        <div class="prop-values">
+          <span class="pv active">auto</span>
+          <span class="pv">60px 1fr 44px</span>
+          <span class="pv">repeat(3, 100px)</span>
+        </div>
+      </div>
+      <div class="prop-card">
+        <h4>gap</h4>
+        <p>행과 열 사이 간격이에요. <code>row-gap</code>과 <code>column-gap</code>을 따로 지정할 수도 있어요.</p>
+        <div class="prop-values">
+          <span class="pv">4px</span>
+          <span class="pv">8px</span>
+          <span class="pv active">16px</span>
+          <span class="pv">24px</span>
+          <span class="pv">16px 24px</span>
+        </div>
+      </div>
+      <div class="prop-card">
+        <h4>grid-column / grid-row</h4>
+        <p>아이템이 몇 번 줄부터 몇 번 줄까지 차지할지 지정해요. <code>span N</code>으로 N칸 차지도 가능해요.</p>
+        <div class="prop-values">
+          <span class="pv active">span 2</span>
+          <span class="pv">1 / 3</span>
+          <span class="pv">1 / -1</span>
+          <span class="pv">span 3</span>
+        </div>
+      </div>
+      <div class="prop-card">
+        <h4>grid-template-areas</h4>
+        <p>이름으로 레이아웃 영역을 지정해요. 코드만 봐도 레이아웃 구조가 한눈에 파악돼요.</p>
+        <div class="prop-values">
+          <span class="pv active">"header header"</span>
+          <span class="pv">"sidebar main"</span>
+          <span class="pv">"footer footer"</span>
+        </div>
+      </div>
+      <div class="prop-card">
+        <h4>auto-fill vs auto-fit</h4>
+        <p>반응형 그리드의 핵심. <code>auto-fill</code>은 빈 칸을 유지, <code>auto-fit</code>은 남은 공간을 아이템이 채워요.</p>
+        <div class="prop-values">
+          <span class="pv active">auto-fill</span>
+          <span class="pv">auto-fit</span>
+          <span class="pv">minmax(250px, 1fr)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout co-green" style="margin-top:32px">
+      <span class="callout-icon">📐</span>
+      <div>
+        <p><strong>fr 단위가 뭔가요?</strong> fraction(분수)의 약자예요. 사용 가능한 공간을 비율로 나눠 갖는 단위예요.
+        <code>repeat(3, 1fr)</code>이면 전체 너비를 3등분해요. <code>1fr 2fr</code>이면 1:2 비율로 나눠요.
+        픽셀(px)처럼 절대값이 아니라 남은 공간을 기준으로 계산하기 때문에 반응형에 아주 유용해요.</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin:36px 0 12px">grid-template-areas 시각화</h3>
+    <div class="layout-demo">
+      <div class="layout-demo-title">grid-template-areas: "header header" / "sidebar main" / "footer footer"</div>
+      <div class="layout-grid">
+        <div class="lg-header">header</div>
+        <div class="lg-sidebar">sidebar</div>
+        <div class="lg-main">main</div>
+        <div class="lg-footer">footer</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="code" class="section">
+  <div class="container">
+    <div class="section-badge">③ 코드</div>
+    <h2 class="section-title">자주 쓰는 CSS Grid 패턴 3가지</h2>
+    <p class="section-lead">복붙하면 바로 쓸 수 있는 실전 코드</p>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin-bottom:12px">① 3열 카드 그리드</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">CSS</span>
+        <button class="copy-btn" onclick="copyBlock(this,'code1')">copy</button>
+      </div>
+      <pre id="code1"><span class="hl-tag">.card-grid</span> {
+  <span class="hl-prop">display</span>: <span class="hl-val">grid</span>;
+  <span class="hl-prop">grid-template-columns</span>: <span class="hl-val">repeat(3, 1fr)</span>; <span class="hl-cmt">/* 3열, 균등 분배 */</span>
+  <span class="hl-prop">gap</span>: <span class="hl-val">20px</span>;
+}</pre>
+    </div>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin:28px 0 12px">② 홈페이지 레이아웃 (header + sidebar + main + footer)</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">CSS</span>
+        <button class="copy-btn" onclick="copyBlock(this,'code2')">copy</button>
+      </div>
+      <pre id="code2"><span class="hl-tag">.layout</span> {
+  <span class="hl-prop">display</span>: <span class="hl-val">grid</span>;
+  <span class="hl-prop">grid-template-areas</span>:
+    <span class="hl-str">"header header"</span>
+    <span class="hl-str">"sidebar main"</span>
+    <span class="hl-str">"footer footer"</span>;
+  <span class="hl-prop">grid-template-columns</span>: <span class="hl-val">240px 1fr</span>;
+  <span class="hl-prop">grid-template-rows</span>: <span class="hl-val">60px 1fr 44px</span>;
+  <span class="hl-prop">min-height</span>: <span class="hl-val">100vh</span>;
+}
+
+<span class="hl-tag">.header</span>  { <span class="hl-prop">grid-area</span>: <span class="hl-val">header</span>; }
+<span class="hl-tag">.sidebar</span> { <span class="hl-prop">grid-area</span>: <span class="hl-val">sidebar</span>; }
+<span class="hl-tag">.main</span>    { <span class="hl-prop">grid-area</span>: <span class="hl-val">main</span>; }
+<span class="hl-tag">.footer</span>  { <span class="hl-prop">grid-area</span>: <span class="hl-val">footer</span>; }</pre>
+    </div>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin:28px 0 12px">③ 반응형 카드 (auto-fill + minmax)</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">CSS</span>
+        <button class="copy-btn" onclick="copyBlock(this,'code3')">copy</button>
+      </div>
+      <pre id="code3"><span class="hl-tag">.responsive-grid</span> {
+  <span class="hl-prop">display</span>: <span class="hl-val">grid</span>;
+  <span class="hl-prop">grid-template-columns</span>: <span class="hl-val">repeat(auto-fill, minmax(250px, 1fr))</span>;
+  <span class="hl-cmt">/* 각 칸 최소 250px, 최대 1fr (남은 공간 균등 분배) */</span>
+  <span class="hl-cmt">/* 화면이 좁아지면 자동으로 열 수가 줄어들어요 */</span>
+  <span class="hl-prop">gap</span>: <span class="hl-val">16px</span>;
+}</pre>
+    </div>
+
+    <div class="vibe-tip" id="vibe-tip">
+      <div class="vibe-tip-label">🤖 AI 프롬프트 TIP</div>
+      <p>아래 프롬프트를 AI에게 그대로 붙여넣으면 완성도 높은 CSS Grid 레이아웃을 바로 받을 수 있어요.</p>
+      <pre>내 웹페이지에 CSS Grid로 3열 카드 레이아웃을 만들어줘.
+- 카드 최소 너비 280px, 최대 1fr
+- 카드 간격 20px
+- 모바일에서는 1열로 변경 (768px 이하)
+- 카드 hover 시 살짝 위로 올라오는 효과</pre>
+    </div>
+  </div>
+</section>
+
+
+<section id="playground" class="section">
+  <div class="container">
+    <div class="section-badge">④ 플레이그라운드</div>
+    <h2 class="section-title">직접 조작해보는 CSS Grid 데모</h2>
+    <p class="section-lead">속성을 바꾸면 박스들이 실시간으로 변해요. 박스를 클릭하면 span 2를 토글해요.</p>
+
+    <div class="playground">
+      <div class="pg-controls">
+        <div class="pg-control">
+          <label>columns (열 수)</label>
+          <select id="pg-cols" onchange="updatePlayground()">
+            <option value="1">1열</option>
+            <option value="2">2열</option>
+            <option value="3" selected>3열</option>
+            <option value="4">4열</option>
+          </select>
+        </div>
+        <div class="pg-control">
+          <label>gap (간격)</label>
+          <select id="pg-gap" onchange="updatePlayground()">
+            <option value="4px">4px</option>
+            <option value="8px">8px</option>
+            <option value="16px" selected>16px</option>
+            <option value="24px">24px</option>
+          </select>
+        </div>
+        <div class="pg-control">
+          <label>grid-template-areas</label>
+          <select id="pg-areas" onchange="updatePlayground()">
+            <option value="none">사용 안 함</option>
+            <option value="named">이름 영역 적용</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="pg-hint">아래 박스를 클릭하면 grid-column: span 2 가 토글돼요</p>
+
+      <div class="pg-preview" id="pg-preview">
+        <div class="pg-box" onclick="toggleSpan(this)">1</div>
+        <div class="pg-box" onclick="toggleSpan(this)">2</div>
+        <div class="pg-box" onclick="toggleSpan(this)">3</div>
+        <div class="pg-box" onclick="toggleSpan(this)">4</div>
+        <div class="pg-box" onclick="toggleSpan(this)">5</div>
+        <div class="pg-box" onclick="toggleSpan(this)">6</div>
+      </div>
+
+      <div class="pg-code" id="pg-code"></div>
+    </div>
+  </div>
+</section>
+
+
+<section id="faq" class="section">
+  <div class="container">
+    <div class="section-badge">⑥ FAQ</div>
+    <h2 class="section-title">자주 묻는 질문</h2>
+    <p class="section-lead">CSS Grid를 쓰다 보면 꼭 만나는 궁금증</p>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Grid와 Flexbox를 언제 각각 쓰나요? <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">
+          <strong>CSS Grid</strong>는 <strong>2차원 레이아웃</strong>에 써요. 행과 열이 동시에 관여하는 구조, 즉 전체 페이지 레이아웃이나 카드 그리드처럼 가로·세로가 함께 정해져야 할 때 최적이에요.<br><br>
+          <strong>Flexbox</strong>는 <strong>1차원 정렬</strong>에 써요. 버튼 그룹을 가로로 줄 세우거나, 아이콘과 텍스트를 나란히 놓거나, 내비게이션 링크를 세로로 나열할 때처럼 한 방향으로만 정렬할 때 적합해요.<br><br>
+          실무에서는 둘을 함께 써요. 예를 들어 전체 페이지 레이아웃은 Grid로 잡고, 각 카드 내부의 아이콘+텍스트 정렬은 Flexbox로 처리하는 식이에요.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">IE(인터넷 익스플로러)에서 CSS Grid가 안 된다고 들었어요 <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">
+          맞아요, IE는 2016년에 구버전 Grid 명세(접두사 필요)를 지원했지만 현대 표준과는 달라요. 하지만 마이크로소프트는 2022년에 IE를 공식 종료했고, 현재 IE의 전 세계 점유율은 0.5% 미만이에요.<br><br>
+          현대 브라우저(Chrome, Firefox, Safari, Edge)는 <strong>모두 CSS Grid를 완벽 지원</strong>해요. caniuse.com 기준 전 세계 지원율은 98% 이상이에요.<br><br>
+          특수한 공공기관·금융 서비스처럼 IE를 필수 지원해야 하는 환경이 아니라면, IE 걱정 없이 Grid를 마음껏 쓰세요.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">fr 단위가 정확히 뭔가요? <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">
+          <code>fr</code>은 <strong>fraction(분수)</strong>의 약자로, 그리드 컨테이너에서 <strong>남은 공간을 비율로 나누는 단위</strong>예요.<br><br>
+          예를 들어 <code>grid-template-columns: 1fr 2fr</code>이면 전체 너비에서 2:1로 나눠 첫 번째 열은 1/3, 두 번째 열은 2/3을 차지해요.<br><br>
+          <code>repeat(3, 1fr)</code>은 전체 너비를 균등하게 3등분해요. 고정 너비(px)와 함께 쓸 수도 있어요. 예: <code>240px 1fr</code> — 왼쪽 사이드바는 240px 고정, 나머지는 메인 콘텐츠가 다 가져가요.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">auto-fill과 auto-fit의 차이가 뭔가요? <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">
+          둘 다 <code>repeat()</code> 안에서 반응형 그리드를 만들 때 써요.<br><br>
+          <strong>auto-fill</strong> — 컨테이너 너비에 맞춰 최대한 많은 열을 만들어요. 아이템이 없어도 빈 열을 유지해요.<br>
+          <strong>auto-fit</strong> — 역시 최대한 열을 만들지만, 아이템이 없는 빈 열은 0px로 접어버려요. 덕분에 아이템이 적을 때 남은 공간을 기존 아이템이 채울 수 있어요.<br><br>
+          실무에서는 대부분 <code>auto-fill</code>이 예측하기 더 쉬워서 많이 써요. 아이템 수가 항상 열 수를 채운다면 둘의 차이는 없어요.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">grid-template-areas에서 점(.)은 뭔가요? <span class="faq-chevron">▼</span></div>
+        <div class="faq-a">
+          <code>grid-template-areas</code>에서 점(<code>.</code>)은 <strong>빈 셀</strong>을 의미해요. 해당 위치에 아무 아이템도 배치되지 않아요.<br><br>
+          예를 들어 <code>"sidebar . main"</code>처럼 쓰면 가운데 칸은 비어있고 좌우에만 콘텐츠가 들어가요.<br><br>
+          또한 area 이름은 반드시 직사각형 형태여야 해요. L자 모양처럼 비직사각형 영역은 만들 수 없어요.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="next" class="section">
+  <div class="container">
+    <div class="section-badge">이런 것도 배워봐요</div>
+    <h2 class="section-title">CSS Grid를 익혔다면</h2>
+    <p class="section-lead">자연스럽게 이어지는 주제들로 실력을 넓혀봐요</p>
+    <div class="next-grid">
+      <a class="next-card" href="flexbox.html">
+        <div class="next-card-icon">↔</div>
+        <div class="next-card-title">Flexbox 레이아웃</div>
+        <div class="next-card-desc">1차원 정렬의 정석. Grid와 함께 쓰면 최강 조합이에요</div>
+      </a>
+      <a class="next-card" href="css-variables.html">
+        <div class="next-card-icon">🎨</div>
+        <div class="next-card-title">CSS 변수 사용법</div>
+        <div class="next-card-desc">색상과 크기를 변수로 관리해서 유지보수를 쉽게</div>
+      </a>
+      <a class="next-card" href="floating-button.html">
+        <div class="next-card-icon">💬</div>
+        <div class="next-card-title">플로팅 버튼</div>
+        <div class="next-card-desc">Grid와 Flex로 배치한 플로팅 버튼 만들기</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<footer class="site-footer">
+  <div class="footer-logo"><div class="logo-mark">VT</div>바이브툴킷</div>
+  <p class="footer-desc">바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 도구 모음</p>
+  <div class="footer-links">
+    <a href="index.html">홈</a><a href="about.html">소개</a>
+    <a href="contact.html">문의</a><a href="sitemap.html">사이트맵</a>
+  </div>
+  <div class="footer-copy">© 2026 바이브툴킷. 콘텐츠는 자유롭게 참고하세요.</div>
+</footer>
+
+<script>
+function updatePlayground() {
+  const cols  = document.getElementById('pg-cols').value;
+  const gap   = document.getElementById('pg-gap').value;
+  const areas = document.getElementById('pg-areas').value;
+  const el    = document.getElementById('pg-preview');
+
+  if (areas === 'named') {
+    el.style.gridTemplateColumns = '1fr 1fr 1fr';
+    el.style.gridTemplateAreas  = '"a a b" "c d d" "e e f"';
+    const boxes = el.querySelectorAll('.pg-box');
+    const areaNames = ['a','b','c','d','e','f'];
+    boxes.forEach((b,i) => {
+      b.style.gridArea = areaNames[i] || '';
+      b.classList.remove('span2');
+    });
+  } else {
+    el.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    el.style.gridTemplateAreas  = '';
+    el.querySelectorAll('.pg-box').forEach(b => { b.style.gridArea = ''; });
+  }
+
+  el.style.gap = gap;
+  renderCode();
+}
+
+function toggleSpan(box) {
+  const areasEl = document.getElementById('pg-areas');
+  if (areasEl.value === 'named') return;
+  box.classList.toggle('span2');
+  renderCode();
+}
+
+function renderCode() {
+  const cols  = document.getElementById('pg-cols').value;
+  const gap   = document.getElementById('pg-gap').value;
+  const areas = document.getElementById('pg-areas').value;
+  const boxes = document.querySelectorAll('#pg-preview .pg-box');
+
+  let spanLines = '';
+  if (areas !== 'named') {
+    boxes.forEach((b, i) => {
+      if (b.classList.contains('span2')) {
+        spanLines += `\n\n/* 아이템 ${i+1} */\n.item-${i+1} {\n  grid-column: span 2;\n}`;
+      }
+    });
+  }
+
+  let code = '';
+  if (areas === 'named') {
+    code = `.grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr 1fr;\n  grid-template-areas:\n    "a a b"\n    "c d d"\n    "e e f";\n  gap: ${gap};\n}`;
+  } else {
+    code = `.grid {\n  display: grid;\n  grid-template-columns: repeat(${cols}, 1fr);\n  gap: ${gap};\n}${spanLines}`;
+  }
+
+  document.getElementById('pg-code').textContent = code;
+}
+
+updatePlayground();
+
+function toggleFaq(el) {
+  el.closest('.faq-item').classList.toggle('open');
+}
+
+function copyBlock(btn, id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el ? el.innerText : '').then(() => {
+    btn.textContent = '✓ copied!'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('ok'); }, 1800);
+  });
+}
+
+(function() {
+  if (self === top) return;
+  const nav = document.querySelector('.site-nav');
+  if (nav) nav.style.display = 'none';
+  const hero = document.querySelector('.hero');
+  if (hero) hero.style.paddingTop = '40px';
+  document.querySelectorAll('a[href$=".html"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      if (window.parent && window.parent.loadTool) {
+        e.preventDefault();
+        window.parent.loadTool(this.getAttribute('href'));
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

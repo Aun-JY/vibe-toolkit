@@ -4,7 +4,7 @@
   <!-- 메인 페이지 -->
   <url>
     <loc>https://aun-jy.github.io/vibe-toolkit/</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -12,7 +12,7 @@
   <!-- 도구 페이지 -->
   <url>
     <loc>https://aun-jy.github.io/vibe-toolkit/favicon-sample.html</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -104,38 +104,60 @@
     <priority>0.9</priority>
   </url>
 
+  <!-- HTML UI 페이지 -->
+  <url>
+    <loc>https://aun-jy.github.io/vibe-toolkit/modal-popup.html</loc>
+    <lastmod>2026-04-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://aun-jy.github.io/vibe-toolkit/hamburger-menu.html</loc>
+    <lastmod>2026-04-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://aun-jy.github.io/vibe-toolkit/css-grid.html</loc>
+    <lastmod>2026-04-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
   <!-- 사이트 정보 페이지 -->
   <url>
     <loc>https://aun-jy.github.io/vibe-toolkit/about.html</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://aun-jy.github.io/vibe-toolkit/contact.html</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://aun-jy.github.io/vibe-toolkit/privacy.html</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://aun-jy.github.io/vibe-toolkit/terms.html</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
 
   <url>
     <loc>https://aun-jy.github.io/vibe-toolkit/sitemap.html</loc>
-    <lastmod>2025-01-01</lastmod>
+    <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

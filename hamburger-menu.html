@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>햄버거 메뉴 완전 정복 | 바이브툴킷</title>
+  <meta name="description" content="모바일 반응형 햄버거 메뉴 만들기 가이드. 슬라이드 사이드바, 드롭다운, X자 애니메이션까지 — 복붙 한 번에 바로 적용하세요.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://aun-jy.github.io/vibe-toolkit/hamburger-menu.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+  /* ════════════════════════════════════════
+     기본 설정
+  ════════════════════════════════════════ */
+  :root {
+    --accent:        #4f46e5;
+    --accent-soft:   #eef2ff;
+    --accent-border: #c7d2fe;
+    --green:         #16a34a;
+    --green-soft:    #f0fdf4;
+    --amber:         #d97706;
+    --amber-soft:    #fffbeb;
+    --red-soft:      #fff1f2;
+    --gray-50:       #f9fafb;
+    --gray-100:      #f3f4f6;
+    --gray-200:      #e5e7eb;
+    --gray-300:      #d1d5db;
+    --gray-400:      #9ca3af;
+    --gray-500:      #6b7280;
+    --gray-600:      #4b5563;
+    --gray-700:      #374151;
+    --gray-900:      #111827;
+    --code-bg:       #1e1e2e;
+    --code-surface:  #282a36;
+    --radius:        12px;
+    --radius-sm:     8px;
+    --shadow-sm:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    --shadow:        0 4px 12px rgba(0,0,0,.08);
+    --shadow-lg:     0 8px 28px rgba(0,0,0,.10);
+    --nav-h:         56px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 24px); }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fff;
+    color: var(--gray-700);
+    line-height: 1.75;
+    font-size: 16px;
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  strong { color: var(--gray-900); font-weight: 600; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .83em;
+    background: var(--gray-100);
+    color: var(--accent);
+    padding: .1em .4em;
+    border-radius: 4px;
+    border: 1px solid var(--gray-200);
+  }
+
+  img { display: block; }
+
+  /* ════════════════════════════════════════
+     고정 상단 네비게이션
+  ════════════════════════════════════════ */
+  .site-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 500;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gray-200);
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--gray-900);
+    margin-right: 32px;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+  .nav-logo:hover { text-decoration: none; }
+
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem; font-weight: 700; color: #fff;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
+
+  .nav-links a {
+    display: block;
+    padding: 6px 14px;
+    font-size: .85rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    transition: color .15s, background .15s;
+    text-decoration: none;
+  }
+  .nav-links a:hover { color: var(--gray-900); background: var(--gray-100); }
+  .nav-links a.active { color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+
+  /* ════════════════════════════════════════
+     레이아웃
+  ════════════════════════════════════════ */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+  .section { padding: 72px 0; }
+  .section:nth-child(even) { background: var(--gray-50); }
+
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 3px 12px;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -.025em;
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+
+  .section-lead {
+    font-size: 1.05rem;
+    color: var(--gray-500);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 600px;
+  }
+
+  /* ════════════════════════════════════════
+     히어로
+  ════════════════════════════════════════ */
+  .hero {
+    padding: calc(var(--nav-h) + 56px) 0 64px;
+    background: linear-gradient(160deg, var(--accent-soft) 0%, #fff 60%);
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.9rem, 4vw, 2.75rem);
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -.03em;
+    line-height: 1.2;
+    margin-bottom: 18px;
+  }
+  .hero h1 em { color: var(--accent); font-style: normal; }
+
+  .hero-desc {
+    font-size: 1.08rem;
+    color: var(--gray-500);
+    line-height: 1.75;
+    max-width: 540px;
+    margin-bottom: 32px;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: .82rem;
+    color: var(--gray-500);
+  }
+  .hero-meta span { display: flex; align-items: center; gap: 5px; }
+
+  /* ════════════════════════════════════════
+     카드 그리드
+  ════════════════════════════════════════ */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .info-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow .2s, transform .2s;
+  }
+  .info-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .info-card-icon { font-size: 1.6rem; margin-bottom: 10px; }
+  .info-card h4 { font-size: .95rem; font-weight: 700; color: var(--gray-900); margin-bottom: 7px; }
+  .info-card p { font-size: .86rem; color: var(--gray-600); line-height: 1.7; }
+
+  .ic-accent { background: var(--accent-soft); border-color: var(--accent-border); }
+  .ic-green  { background: var(--green-soft);  border-color: #bbf7d0; }
+  .ic-amber  { background: var(--amber-soft);  border-color: #fde68a; }
+  .ic-red    { background: var(--red-soft);    border-color: #fecdd3; }
+  .ic-gray   { background: var(--gray-50);     border-color: var(--gray-200); }
+
+  /* ════════════════════════════════════════
+     콜아웃
+  ════════════════════════════════════════ */
+  .callout {
+    display: flex;
+    gap: 14px;
+    padding: 18px 20px;
+    border-radius: var(--radius);
+    margin: 24px 0;
+    font-size: .93rem;
+    line-height: 1.75;
+    color: var(--gray-700);
+  }
+  .callout-icon { font-size: 1.2rem; flex-shrink: 0; padding-top: 1px; }
+  .callout-body p { margin: 0; }
+  .callout-body p + p { margin-top: 6px; }
+
+  .co-blue  { background: var(--accent-soft);  border: 1px solid var(--accent-border); }
+  .co-green { background: var(--green-soft);   border: 1px solid #bbf7d0; }
+  .co-amber { background: var(--amber-soft);   border: 1px solid #fde68a; }
+
+  /* ════════════════════════════════════════
+     유형 갤러리 카드
+  ════════════════════════════════════════ */
+  .type-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+    margin-top: 32px;
+  }
+
+  .type-card {
+    background: #fff;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: border-color .2s, box-shadow .2s, transform .22s cubic-bezier(.34,1.56,.64,1);
+  }
+  .type-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow);
+    transform: translateY(-3px);
+  }
+
+  .type-preview {
+    height: 140px;
+    background: repeating-conic-gradient(#f3f4f6 0% 25%, #e5e7eb 0% 50%) 0 0 / 16px 16px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  .type-preview-label {
+    position: absolute; top: 8px; left: 10px;
+    font-size: .65rem; color: var(--gray-400);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: .06em;
+  }
+
+  .type-info {
+    padding: 16px 18px;
+    border-top: 1px solid var(--gray-100);
+  }
+  .type-name {
+    font-size: .95rem; font-weight: 700; color: var(--gray-900);
+    margin-bottom: 5px;
+  }
+  .type-desc {
+    font-size: .82rem; color: var(--gray-500); line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .type-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+  .type-tag {
+    font-size: .65rem; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px;
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .type-tag-green { background: var(--green-soft); color: var(--green); }
+
+  /* ── 미니 햄버거 데모들 ── */
+  /* 슬라이드 사이드바 미리보기 */
+  .mini-sidebar-wrap {
+    width: 180px; height: 110px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--gray-200);
+  }
+  .mini-topbar {
+    background: var(--accent);
+    height: 28px;
+    display: flex; align-items: center; padding: 0 10px;
+    gap: 6px;
+  }
+  .mini-hbtn {
+    display: flex; flex-direction: column; gap: 3px;
+    cursor: pointer;
+  }
+  .mini-hline {
+    width: 14px; height: 2px; background: #fff;
+    border-radius: 1px;
+    transition: transform .3s, opacity .3s;
+    transform-origin: center;
+  }
+  .mini-page-title {
+    font-size: .55rem; color: rgba(255,255,255,.8);
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+  }
+  .mini-sidebar {
+    position: absolute;
+    top: 0; left: -100px; bottom: 0;
+    width: 100px;
+    background: #fff;
+    border-right: 1px solid var(--gray-200);
+    box-shadow: 4px 0 12px rgba(0,0,0,.12);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    padding: 8px 0;
+    z-index: 10;
+  }
+  .mini-sidebar.open { transform: translateX(100px); }
+  .mini-sidebar-item {
+    padding: 4px 10px;
+    font-size: .5rem;
+    color: var(--gray-600);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .mini-sidebar-item:first-child { color: var(--accent); font-weight: 700; }
+  .mini-sidebar-dot {
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--gray-300);
+    flex-shrink: 0;
+  }
+  .mini-sidebar-dot-active { background: var(--accent); }
+  .mini-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,.35);
+    opacity: 0;
+    transition: opacity .3s;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .mini-overlay.show { opacity: 1; pointer-events: all; cursor: pointer; }
+  .mini-content {
+    padding: 6px 8px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .mini-content-line {
+    height: 5px; background: var(--gray-200); border-radius: 3px;
+  }
+  .mini-content-line:nth-child(1) { width: 80%; }
+  .mini-content-line:nth-child(2) { width: 65%; }
+  .mini-content-line:nth-child(3) { width: 75%; }
+
+  /* 드롭다운 미니 미리보기 */
+  .mini-dropdown-wrap {
+    width: 180px; height: 110px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--gray-200);
+  }
+  .mini-dropdown-menu {
+    position: absolute;
+    top: 28px; left: 0; right: 0;
+    background: rgba(79, 70, 229, 0.97);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+    padding: 4px 0;
+    z-index: 10;
+  }
+  .mini-dropdown-menu.open { transform: scaleY(1); }
+  .mini-dropdown-item {
+    padding: 4px 12px;
+    font-size: .5rem; color: rgba(255,255,255,.85);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .mini-dropdown-item:hover { background: rgba(255,255,255,.1); }
+
+  /* X자 애니메이션 미니 미리보기 */
+  .mini-x-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .demo-hbtn {
+    width: 40px; height: 40px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 5px;
+    cursor: pointer;
+    transition: background .2s;
+    border: none;
+    padding: 0;
+  }
+  .demo-hbtn:hover { background: #4338ca; }
+  .demo-hline {
+    width: 18px; height: 2px;
+    background: #fff; border-radius: 1px;
+    transition: transform .35s cubic-bezier(.4,0,.2,1), opacity .35s;
+    transform-origin: center;
+  }
+  .demo-hbtn.is-open .demo-hline:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .demo-hbtn.is-open .demo-hline:nth-child(2) {
+    opacity: 0; transform: scaleX(0);
+  }
+  .demo-hbtn.is-open .demo-hline:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+  .mini-x-label {
+    font-size: .6rem; color: var(--gray-500);
+    font-family: 'JetBrains Mono', monospace;
+    text-align: center;
+  }
+
+  /* ════════════════════════════════════════
+     코드 블록 공통
+  ════════════════════════════════════════ */
+  .code-block {
+    background: var(--code-bg);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 24px;
+    border: 1px solid #2d2d3f;
+    box-shadow: var(--shadow);
+  }
+  .cb-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: #13131f;
+    border-bottom: 1px solid #2d2d3f;
+  }
+  .cb-dots { display: flex; gap: 6px; }
+  .cb-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .cb-dot-r { background: #ff5f57; }
+  .cb-dot-y { background: #febc2e; }
+  .cb-dot-g { background: #28c840; }
+  .cb-file { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: #6272a4; }
+  .cb-copy {
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 5px; color: #94a3b8; padding: 3px 12px;
+    cursor: pointer; transition: background .15s, color .15s;
+  }
+  .cb-copy:hover { background: rgba(255,255,255,.15); color: #fff; }
+  .cb-copy.ok { color: #a6e3a1; border-color: #a6e3a1; }
+
+  .cb-body { padding: 20px; overflow-x: auto; }
+  .cb-body pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem; line-height: 1.75; color: #cdd6f4;
+    white-space: pre;
+  }
+  .tk { color: #89b4fa; }
+  .ta { color: #a6e3a1; }
+  .tv { color: #f9e2af; }
+  .tc { color: #6272a4; font-style: italic; }
+  .tp { color: #f38ba8; }
+  .ts { color: #cba6f7; }
+
+  /* 코드 탭 */
+  .code-tabs {
+    display: flex; gap: 0;
+    border-bottom: 1px solid #2d2d3f;
+    background: #13131f;
+    padding: 0 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .code-tabs::-webkit-scrollbar { display: none; }
+  .code-tab {
+    padding: 8px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem; color: #6272a4;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color .15s, border-color .15s;
+    white-space: nowrap;
+    background: none; border-top: none; border-left: none; border-right: none;
+  }
+  .code-tab:hover { color: #cdd6f4; }
+  .code-tab.active { color: #cdd6f4; border-bottom-color: var(--accent); }
+
+  .code-panel { display: none; }
+  .code-panel.active { display: block; }
+
+  /* ════════════════════════════════════════
+     코드 해설 카드
+  ════════════════════════════════════════ */
+  .explain-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .exp-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .exp-header {
+    padding: 12px 16px;
+    background: var(--code-bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem; color: #a6e3a1;
+    line-height: 1.5; word-break: break-all;
+  }
+
+  .exp-body { padding: 16px; }
+  .exp-title { font-size: .92rem; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
+  .exp-desc { font-size: .85rem; color: var(--gray-600); line-height: 1.75; }
+
+  .exp-example {
+    margin-top: 12px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .74rem; line-height: 1.65; color: var(--gray-700);
+  }
+  .ek { color: #7c3aed; }
+  .ev { color: var(--green); }
+  .ec { color: var(--gray-400); font-style: italic; }
+
+  /* ════════════════════════════════════════
+     ④ 인터랙티브 데모
+  ════════════════════════════════════════ */
+  .demo-shell {
+    background: var(--code-bg);
+    border: 1px solid #2d2d3f;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .demo-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: #13131f;
+    border-bottom: 1px solid #2d2d3f;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .demo-toolbar-left { display: flex; align-items: center; gap: 12px; }
+  .demo-toolbar-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem; color: #6272a4;
+  }
+  .demo-size-btns { display: flex; gap: 6px; }
+  .demo-size-btn {
+    font-family: 'JetBrains Mono', monospace; font-size: .7rem;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 5px; color: #94a3b8; padding: 4px 10px;
+    cursor: pointer; transition: background .15s, color .15s;
+  }
+  .demo-size-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
+  .demo-size-btn.active {
+    background: rgba(79,70,229,.25); color: #a5b4fc;
+    border-color: rgba(79,70,229,.5);
+  }
+
+  .demo-viewport {
+    display: flex; justify-content: center;
+    padding: 20px;
+    background: #1a1a2e;
+    min-height: 340px;
+    align-items: flex-start;
+  }
+
+  .demo-frame {
+    background: #f9fafb;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.1), 0 8px 32px rgba(0,0,0,.4);
+    transition: width .4s cubic-bezier(.4,0,.2,1);
+    width: 100%;
+    max-width: 100%;
+  }
+  .demo-frame.mobile-mode { max-width: 375px; }
+
+  /* 데모 내 네비게이션 */
+  .demo-nav {
+    background: var(--accent);
+    padding: 0 16px;
+    height: 48px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .demo-nav-logo {
+    font-size: .85rem; font-weight: 700; color: #fff;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .demo-nav-logo-icon {
+    width: 22px; height: 22px; background: rgba(255,255,255,.2);
+    border-radius: 5px; display: flex; align-items: center; justify-content: center;
+    font-size: .6rem; font-weight: 700;
+  }
+
+  /* 데스크탑 메뉴 */
+  .demo-desktop-menu {
+    display: flex; gap: 2px;
+    list-style: none;
+  }
+  .demo-frame.mobile-mode .demo-desktop-menu { display: none; }
+
+  .demo-desktop-menu a {
+    color: rgba(255,255,255,.8);
+    font-size: .78rem; padding: 5px 10px;
+    border-radius: 5px;
+    transition: background .15s, color .15s;
+    text-decoration: none;
+  }
+  .demo-desktop-menu a:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+  /* 햄버거 버튼 */
+  .demo-hamburger {
+    display: none;
+    flex-direction: column; gap: 5px;
+    cursor: pointer; padding: 5px;
+    background: none; border: none;
+  }
+  .demo-frame.mobile-mode .demo-hamburger { display: flex; }
+
+  .demo-hamburger-line {
+    width: 20px; height: 2px;
+    background: #fff; border-radius: 1px;
+    transition: transform .3s, opacity .3s;
+    transform-origin: center;
+  }
+  .demo-hamburger.open .demo-hamburger-line:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .demo-hamburger.open .demo-hamburger-line:nth-child(2) {
+    opacity: 0; transform: scaleX(0);
+  }
+  .demo-hamburger.open .demo-hamburger-line:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* 드롭다운 패널 */
+  .demo-mobile-menu {
+    background: var(--accent);
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height .35s cubic-bezier(.4,0,.2,1), padding .35s;
+  }
+  .demo-mobile-menu.open {
+    max-height: 300px;
+    padding-bottom: 8px;
+  }
+  .demo-mobile-menu a {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 20px;
+    color: rgba(255,255,255,.85); font-size: .88rem;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    transition: background .15s, color .15s;
+  }
+  .demo-mobile-menu a:last-child { border-bottom: none; }
+  .demo-mobile-menu a:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+  .demo-content {
+    padding: 20px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .demo-content-block {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .demo-content-title {
+    font-size: .82rem; font-weight: 700; color: var(--gray-900);
+    margin-bottom: 6px;
+  }
+  .demo-content-lines { display: flex; flex-direction: column; gap: 5px; }
+  .demo-content-line {
+    height: 7px; background: var(--gray-200); border-radius: 4px;
+  }
+  .demo-content-line:nth-child(1) { width: 100%; }
+  .demo-content-line:nth-child(2) { width: 80%; }
+  .demo-content-line:nth-child(3) { width: 90%; }
+
+  /* ════════════════════════════════════════
+     바이브코더 TIP 박스
+  ════════════════════════════════════════ */
+  .vibe-tip {
+    background: linear-gradient(135deg, #faf5ff 0%, #eff6ff 100%);
+    border: 1px solid #e9d5ff;
+    border-left: 4px solid #8b5cf6;
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin: 32px 0;
+  }
+  .vibe-tip-label {
+    font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: #7c3aed;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+  }
+  .vibe-tip p { font-size: .92rem; color: var(--gray-700); margin-bottom: 10px; line-height: 1.75; }
+  .vibe-tip p:last-child { margin-bottom: 0; }
+  .vibe-tip code { background: #ede9fe; border-color: #ddd6fe; color: #7c3aed; }
+
+  .prompt-box {
+    background: #1e1e2e;
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-top: 14px;
+  }
+  .prompt-box pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem; line-height: 1.65; color: #cdd6f4;
+    white-space: pre-wrap; word-break: break-word;
+  }
+
+  /* ════════════════════════════════════════
+     FAQ 아코디언
+  ════════════════════════════════════════ */
+  .faq-list { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
+
+  .faq-item {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .faq-item summary {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    cursor: pointer; list-style: none;
+    font-weight: 600; font-size: .95rem; color: var(--gray-900);
+    transition: background .15s;
+    user-select: none;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after {
+    content: '+';
+    font-size: 1.2rem; color: var(--gray-400);
+    transition: transform .2s;
+    flex-shrink: 0; margin-left: 12px;
+  }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
+  .faq-item summary:hover { background: var(--gray-50); }
+
+  .faq-body {
+    padding: 16px 20px 18px;
+    font-size: .92rem; color: var(--gray-600);
+    line-height: 1.8; border-top: 1px solid var(--gray-100);
+  }
+  .faq-body p + p { margin-top: 10px; }
+
+  /* ════════════════════════════════════════
+     푸터
+  ════════════════════════════════════════ */
+  .site-footer {
+    background: var(--gray-900);
+    color: #9ca3af;
+    padding: 48px 24px 36px;
+    text-align: center;
+  }
+  .footer-logo {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-weight: 700; font-size: 1rem; color: #fff; margin-bottom: 16px;
+  }
+  .footer-desc { font-size: .85rem; line-height: 1.7; margin-bottom: 20px; }
+  .footer-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 28px; }
+  .footer-links a { font-size: .82rem; color: #9ca3af; }
+  .footer-links a:hover { color: #fff; }
+  .footer-copy { font-size: .78rem; color: #6b7280; }
+
+  /* ════════════════════════════════════════
+     반응형
+  ════════════════════════════════════════ */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 1.7rem; }
+    .section-title { font-size: 1.4rem; }
+    .card-grid, .explain-grid, .type-grid { grid-template-columns: 1fr; }
+    .container { padding: 0 16px; }
+    .nav-logo span { display: none; }
+    .demo-toolbar { flex-direction: column; align-items: flex-start; }
+  }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     고정 네비게이션
+══════════════════════════════════════════ -->
+<nav class="site-nav">
+  <a href="#hero" class="nav-logo">
+    <div class="logo-mark">VT</div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#concept">① 개념</a></li>
+    <li><a href="#types">② 유형</a></li>
+    <li><a href="#code">③ 코드 해설</a></li>
+    <li><a href="#demo">④ 데모</a></li>
+    <li><a href="#prompt">⑤ AI 프롬프트</a></li>
+    <li><a href="#faq">⑥ FAQ</a></li>
+  </ul>
+</nav>
+
+
+<!-- ══════════════════════════════════════════
+     히어로
+══════════════════════════════════════════ -->
+<section id="hero" class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">☰ CSS · JavaScript · 반응형 패턴</div>
+    <h1>햄버거 메뉴 <em>(Hamburger Menu)</em><br>완전 정복 가이드</h1>
+    <p class="hero-desc">
+      모바일 화면에서 ☰ 아이콘 한 번에 열리는 그 네비게이션.<br>
+      원리부터 슬라이드·드롭다운·X자 애니메이션까지 — 복붙 한 번에 내 사이트에 바로 적용해요.
+    </p>
+    <div class="hero-meta">
+      <span>⏱️ 약 10분</span>
+      <span>📅 2026년 4월</span>
+      <span>🏷️ CSS · JS · 반응형</span>
+      <span>👶 입문 난이도</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ① 개념
+══════════════════════════════════════════ -->
+<section id="concept" class="section">
+  <div class="container">
+
+    <div class="section-badge">① 개념</div>
+    <h2 class="section-title">햄버거 메뉴란 무엇인가요?</h2>
+    <p class="section-lead">세 줄짜리 아이콘(☰) 뒤에 숨겨진 네비게이션 — 모바일 UI의 핵심 패턴</p>
+
+    <p>
+      모바일 앱이나 웹사이트 상단 구석에 줄 세 개짜리 아이콘(☰)을 눌렀을 때 메뉴가 쫙 펼쳐진 경험, 다들 있으시죠?
+      그게 바로 <strong>햄버거 메뉴(Hamburger Menu)</strong>예요.
+      세 개의 가로선이 마치 햄버거를 옆에서 본 모습처럼 생겼다고 해서 붙은 이름이에요.
+      위 빵 → 패티 → 아래 빵, 딱 3줄이죠.
+    </p>
+
+    <p style="margin-top:16px">
+      데스크탑 화면에서는 링크들을 가로로 쭉 나열해도 충분한 공간이 있지만,
+      모바일 화면은 너비가 좁아서 메뉴 항목들이 다 들어가지 않아요.
+      그래서 <strong>768px 이하</strong> 같은 특정 너비 기준으로 메뉴를 숨기고, ☰ 버튼 하나만 보여두는 거예요.
+      버튼을 누르면 메뉴가 다시 나타나고, 다시 누르거나 바깥을 클릭하면 닫히죠.
+    </p>
+
+    <p style="margin-top:16px">
+      구현 원리는 간단해요. CSS <code>@media</code> 쿼리로 작은 화면에서 일반 메뉴를 <code>display: none</code>으로 숨기고,
+      ☰ 버튼을 <code>display: flex</code>로 보여줘요.
+      그 버튼을 클릭하면 JavaScript가 메뉴 요소에 <code>open</code> 클래스를 추가하거나 제거하고,
+      CSS <code>transition</code>이 부드러운 애니메이션을 담당해요.
+    </p>
+
+    <div class="card-grid" style="margin-top:32px">
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">📱</div>
+        <h4>모바일 공간 절약</h4>
+        <p>좁은 모바일 화면에서 네비게이션 항목들을 하나의 아이콘 뒤에 깔끔하게 숨겨요. UX의 핵심 패턴이에요.</p>
+      </div>
+      <div class="info-card ic-green">
+        <div class="info-card-icon">🎯</div>
+        <h4>반응형 디자인 필수</h4>
+        <p>모바일과 데스크탑을 동시에 지원하는 반응형 웹사이트라면 햄버거 메뉴는 거의 필수 구성 요소예요.</p>
+      </div>
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">⚡</div>
+        <h4>HTML + CSS + JS</h4>
+        <p>별도 라이브러리 없이 순수 코드로 만들 수 있어요. 미디어 쿼리, 클래스 토글, 트랜지션만 알면 완성!</p>
+      </div>
+      <div class="info-card ic-gray">
+        <div class="info-card-icon">✨</div>
+        <h4>다양한 애니메이션</h4>
+        <p>슬라이드, 드롭다운, 페이드인 등 열리는 방식에 따라 사이트의 분위기가 달라져요. 골라 쓰세요.</p>
+      </div>
+    </div>
+
+    <div class="callout co-blue" style="margin-top:32px">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <p><strong>언제 햄버거 메뉴를 쓰나요?</strong> 보통 <strong>768px 이하</strong> (태블릿·모바일) 화면에서 사용해요. 데스크탑에서는 가로 네비게이션을 그대로 보여주고, 모바일에서만 햄버거 메뉴로 전환하는 게 일반적인 패턴이에요. CSS <code>@media (max-width: 768px)</code>를 기준으로 스타일을 나눠요.</p>
+      </div>
+    </div>
+
+    <div class="callout co-amber" style="margin-top:16px">
+      <span class="callout-icon">☰</span>
+      <div class="callout-body">
+        <p><strong>☰ 기호의 유니코드</strong>는 <code>U+2630</code>이에요. HTML에서는 <code>&amp;#9776;</code> 또는 그냥 ☰을 직접 입력해도 되고, 실제 프로젝트에서는 CSS로 만든 세 개의 <code>&lt;span&gt;</code> 또는 SVG 아이콘을 주로 사용해요. 코드로 만들면 열릴 때 X자(✕)로 바뀌는 애니메이션을 쉽게 추가할 수 있거든요.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ② 유형 갤러리
+══════════════════════════════════════════ -->
+<section id="types" class="section">
+  <div class="container">
+
+    <div class="section-badge">② 유형 갤러리</div>
+    <h2 class="section-title">3가지 대표 햄버거 메뉴 패턴</h2>
+    <p class="section-lead">어떤 스타일이 내 사이트에 어울릴까요? 직접 클릭해서 동작을 확인해보세요.</p>
+
+    <div class="type-grid">
+
+      <!-- 슬라이드 사이드바 -->
+      <div class="type-card">
+        <div class="type-preview">
+          <span class="type-preview-label">PREVIEW · CLICK</span>
+          <div class="mini-sidebar-wrap" id="sidebarWrap">
+            <div class="mini-topbar">
+              <div class="mini-hbtn" id="sidebarToggle" onclick="toggleSidebar()">
+                <div class="mini-hline"></div>
+                <div class="mini-hline"></div>
+                <div class="mini-hline"></div>
+              </div>
+              <span class="mini-page-title">MY SITE</span>
+            </div>
+            <div class="mini-content">
+              <div class="mini-content-line"></div>
+              <div class="mini-content-line"></div>
+              <div class="mini-content-line"></div>
+            </div>
+            <!-- 사이드바 -->
+            <div class="mini-sidebar" id="miniSidebar">
+              <div class="mini-sidebar-item">
+                <div class="mini-sidebar-dot mini-sidebar-dot-active"></div> 홈
+              </div>
+              <div class="mini-sidebar-item">
+                <div class="mini-sidebar-dot"></div> 소개
+              </div>
+              <div class="mini-sidebar-item">
+                <div class="mini-sidebar-dot"></div> 서비스
+              </div>
+              <div class="mini-sidebar-item">
+                <div class="mini-sidebar-dot"></div> 문의
+              </div>
+            </div>
+            <!-- 오버레이 -->
+            <div class="mini-overlay" id="miniOverlay" onclick="toggleSidebar()"></div>
+          </div>
+        </div>
+        <div class="type-info">
+          <div class="type-name">슬라이드 사이드바</div>
+          <div class="type-desc">왼쪽에서 패널이 밀려나오는 방식. 깊은 메뉴 계층에 적합하고, 고급스러운 느낌을 줘요.</div>
+          <div class="type-tags">
+            <span class="type-tag">transform</span>
+            <span class="type-tag">translateX</span>
+            <span class="type-tag type-tag-green">추천</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 드롭다운 메뉴 -->
+      <div class="type-card">
+        <div class="type-preview">
+          <span class="type-preview-label">PREVIEW · CLICK</span>
+          <div class="mini-dropdown-wrap" id="dropdownWrap">
+            <div class="mini-topbar">
+              <div class="mini-hbtn" id="dropdownToggle" onclick="toggleDropdown()">
+                <div class="mini-hline"></div>
+                <div class="mini-hline"></div>
+                <div class="mini-hline"></div>
+              </div>
+              <span class="mini-page-title">MY SITE</span>
+            </div>
+            <!-- 드롭다운 메뉴 -->
+            <div class="mini-dropdown-menu" id="miniDropdown">
+              <div class="mini-dropdown-item">🏠 홈</div>
+              <div class="mini-dropdown-item">👋 소개</div>
+              <div class="mini-dropdown-item">💼 서비스</div>
+              <div class="mini-dropdown-item">✉️ 문의</div>
+            </div>
+          </div>
+        </div>
+        <div class="type-info">
+          <div class="type-name">드롭다운 메뉴</div>
+          <div class="type-desc">네비게이션 바 아래로 메뉴가 펼쳐지는 방식. 구현이 간단하고 직관적이에요.</div>
+          <div class="type-tags">
+            <span class="type-tag">scaleY</span>
+            <span class="type-tag">max-height</span>
+            <span class="type-tag type-tag-green">가장 많이 사용</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- X자 애니메이션 -->
+      <div class="type-card">
+        <div class="type-preview">
+          <span class="type-preview-label">PREVIEW · CLICK</span>
+          <div class="mini-x-wrap">
+            <button class="demo-hbtn" id="xBtn" onclick="toggleX()" aria-label="메뉴 토글">
+              <div class="demo-hline"></div>
+              <div class="demo-hline"></div>
+              <div class="demo-hline"></div>
+            </button>
+            <div class="mini-x-label" id="xLabel">☰ 클릭하면<br>✕ 로 바뀌어요</div>
+          </div>
+        </div>
+        <div class="type-info">
+          <div class="type-name">X자 애니메이션</div>
+          <div class="type-desc">☰ 아이콘이 ✕로 부드럽게 변환되는 애니메이션. 열림/닫힘 상태를 직관적으로 표현해요.</div>
+          <div class="type-tags">
+            <span class="type-tag">rotate</span>
+            <span class="type-tag">opacity</span>
+            <span class="type-tag">transform-origin</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ③ 코드 해설
+══════════════════════════════════════════ -->
+<section id="code" class="section">
+  <div class="container">
+
+    <div class="section-badge">③ 코드 해설</div>
+    <h2 class="section-title">코드 한 줄 한 줄 뜯어보기</h2>
+    <p class="section-lead">HTML 구조부터 CSS 애니메이션, JS 토글 로직까지 완전한 코드와 설명</p>
+
+    <!-- 핵심 개념 카드 -->
+    <div class="explain-grid">
+      <div class="exp-card">
+        <div class="exp-header">&lt;header&gt; &gt; &lt;nav&gt; 구조</div>
+        <div class="exp-body">
+          <div class="exp-title">HTML 시맨틱 구조</div>
+          <div class="exp-desc">접근성을 위해 <code>&lt;nav&gt;</code> 태그를 사용해요. 안에 로고, 데스크탑 메뉴, 햄버거 버튼을 나란히 배치해요.</div>
+          <div class="exp-example"><span class="ek">header</span> &gt; <span class="ek">nav</span>
+  ├── .logo
+  ├── .nav-menu   <span class="ec">/* 데스크탑 메뉴 */</span>
+  └── .hamburger  <span class="ec">/* ☰ 버튼 */</span></div>
+        </div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-header">@media (max-width: 768px)</div>
+        <div class="exp-body">
+          <div class="exp-title">미디어 쿼리 분기</div>
+          <div class="exp-desc">768px보다 작은 화면에서 데스크탑 메뉴를 숨기고 햄버거 버튼을 보여줘요. 반응형의 핵심이에요.</div>
+          <div class="exp-example"><span class="ek">.nav-menu</span>  { <span class="ev">display</span>: flex; }
+<span class="ek">.hamburger</span> { <span class="ev">display</span>: none; }
+
+<span class="ec">/* 모바일 */</span>
+<span class="ek">@media</span> (max-width: 768px) {
+  <span class="ek">.nav-menu</span>  { <span class="ev">display</span>: none; }
+  <span class="ek">.hamburger</span> { <span class="ev">display</span>: flex; }
+}</div>
+        </div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-header">classList.toggle('open')</div>
+        <div class="exp-body">
+          <div class="exp-title">JS 클래스 토글</div>
+          <div class="exp-desc">버튼을 클릭할 때마다 <code>open</code> 클래스를 추가/제거해요. CSS는 이 클래스의 유무로 애니메이션을 제어해요.</div>
+          <div class="exp-example"><span class="ek">btn</span>.addEventListener(<span class="ev">'click'</span>, () =&gt; {
+  <span class="ek">menu</span>.classList.<span class="ev">toggle</span>(<span class="ev">'open'</span>);
+  <span class="ek">btn</span>.classList.<span class="ev">toggle</span>(<span class="ev">'open'</span>);
+});</div>
+        </div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-header">max-height: 0 → 300px</div>
+        <div class="exp-body">
+          <div class="exp-title">슬라이드 애니메이션 비법</div>
+          <div class="exp-desc"><code>height</code>는 <code>auto</code>에서 transition이 안 돼요. 대신 <code>max-height</code>를 0에서 충분히 큰 값으로 변경하면 부드럽게 펼쳐져요.</div>
+          <div class="exp-example"><span class="ek">.nav-menu</span> {
+  <span class="ev">max-height</span>: 0;
+  <span class="ev">overflow</span>: hidden;
+  <span class="ev">transition</span>: max-height .35s;
+}
+<span class="ek">.nav-menu.open</span> {
+  <span class="ev">max-height</span>: 300px;
+}</div>
+        </div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-header">document.addEventListener('click')</div>
+        <div class="exp-body">
+          <div class="exp-title">바깥 클릭 시 닫기</div>
+          <div class="exp-desc">문서 전체에 클릭 이벤트를 달고, 클릭 대상이 nav 안에 없으면 메뉴를 닫아요. UX 필수 기능이에요.</div>
+          <div class="exp-example"><span class="ek">document</span>.addEventListener(<span class="ev">'click'</span>, (e) =&gt; {
+  <span class="ek">if</span> (!nav.<span class="ev">contains</span>(e.target)) {
+    close();
+  }
+});</div>
+        </div>
+      </div>
+      <div class="exp-card">
+        <div class="exp-header">transform: rotate(45deg)</div>
+        <div class="exp-body">
+          <div class="exp-title">X자 변환 트릭</div>
+          <div class="exp-desc">3개의 선을 CSS로 만들고, 위·아래 선은 회전, 가운데 선은 투명하게 만들면 ☰ → ✕ 변환 효과가 완성돼요.</div>
+          <div class="exp-example"><span class="ek">.open</span> :nth-child(1) {
+  <span class="ev">transform</span>: <span class="ev">translateY</span>(7px) <span class="ev">rotate</span>(45deg);
+}
+<span class="ek">.open</span> :nth-child(2) {
+  <span class="ev">opacity</span>: 0;
+}
+<span class="ek">.open</span> :nth-child(3) {
+  <span class="ev">transform</span>: <span class="ev">translateY</span>(-7px) <span class="ev">rotate</span>(-45deg);
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 완전한 코드 블록 (탭 전환) -->
+    <div class="code-block" style="margin-top:40px">
+      <div class="cb-header">
+        <div class="cb-dots">
+          <div class="cb-dot cb-dot-r"></div>
+          <div class="cb-dot cb-dot-y"></div>
+          <div class="cb-dot cb-dot-g"></div>
+        </div>
+        <div class="code-tabs" style="border-bottom:none; padding:0; background:transparent; flex:1; margin: 0 16px;">
+          <button class="code-tab active" onclick="switchTab('html')">index.html</button>
+          <button class="code-tab" onclick="switchTab('css')">style.css</button>
+          <button class="code-tab" onclick="switchTab('js')">script.js</button>
+        </div>
+        <button class="cb-copy" id="mainCopyBtn" onclick="copyCode('mainCode', 'mainCopyBtn')">복사</button>
+      </div>
+
+      <!-- HTML 탭 -->
+      <div id="tab-html" class="code-panel active">
+        <div class="cb-body">
+          <pre id="mainCode"><span class="tc">&lt;!-- HTML 구조 --&gt;</span>
+<span class="tk">&lt;header</span> <span class="ta">class</span>=<span class="tv">"site-header"</span><span class="tk">&gt;</span>
+  <span class="tk">&lt;nav</span> <span class="ta">class</span>=<span class="tv">"navbar"</span><span class="tk">&gt;</span>
+
+    <span class="tc">&lt;!-- 로고 --&gt;</span>
+    <span class="tk">&lt;a</span> <span class="ta">href</span>=<span class="tv">"/"</span> <span class="ta">class</span>=<span class="tv">"nav-logo"</span><span class="tk">&gt;</span>MySite<span class="tk">&lt;/a&gt;</span>
+
+    <span class="tc">&lt;!-- 데스크탑 + 모바일 메뉴 --&gt;</span>
+    <span class="tk">&lt;ul</span> <span class="ta">class</span>=<span class="tv">"nav-menu"</span> <span class="ta">id</span>=<span class="tv">"navMenu"</span><span class="tk">&gt;</span>
+      <span class="tk">&lt;li&gt;&lt;a</span> <span class="ta">href</span>=<span class="tv">"#"</span><span class="tk">&gt;</span>홈<span class="tk">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tk">&lt;li&gt;&lt;a</span> <span class="ta">href</span>=<span class="tv">"#"</span><span class="tk">&gt;</span>소개<span class="tk">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tk">&lt;li&gt;&lt;a</span> <span class="ta">href</span>=<span class="tv">"#"</span><span class="tk">&gt;</span>서비스<span class="tk">&lt;/a&gt;&lt;/li&gt;</span>
+      <span class="tk">&lt;li&gt;&lt;a</span> <span class="ta">href</span>=<span class="tv">"#"</span><span class="tk">&gt;</span>문의하기<span class="tk">&lt;/a&gt;&lt;/li&gt;</span>
+    <span class="tk">&lt;/ul&gt;</span>
+
+    <span class="tc">&lt;!-- 햄버거 버튼 --&gt;</span>
+    <span class="tk">&lt;button</span>
+      <span class="ta">class</span>=<span class="tv">"hamburger"</span>
+      <span class="ta">id</span>=<span class="tv">"hamburgerBtn"</span>
+      <span class="ta">aria-label</span>=<span class="tv">"메뉴 열기"</span>
+      <span class="ta">aria-expanded</span>=<span class="tv">"false"</span>
+    <span class="tk">&gt;</span>
+      <span class="tk">&lt;span</span> <span class="ta">class</span>=<span class="tv">"hline"</span><span class="tk">&gt;&lt;/span&gt;</span>
+      <span class="tk">&lt;span</span> <span class="ta">class</span>=<span class="tv">"hline"</span><span class="tk">&gt;&lt;/span&gt;</span>
+      <span class="tk">&lt;span</span> <span class="ta">class</span>=<span class="tv">"hline"</span><span class="tk">&gt;&lt;/span&gt;</span>
+    <span class="tk">&lt;/button&gt;</span>
+
+  <span class="tk">&lt;/nav&gt;</span>
+<span class="tk">&lt;/header&gt;</span></pre>
+        </div>
+      </div>
+
+      <!-- CSS 탭 -->
+      <div id="tab-css" class="code-panel">
+        <div class="cb-body">
+          <pre id="cssCode"><span class="tc">/* ── 기본 네비게이션 ── */</span>
+<span class="tk">.site-header</span> {
+  <span class="ta">position</span>: <span class="tv">fixed</span>;
+  <span class="ta">top</span>: <span class="tv">0</span>; <span class="ta">left</span>: <span class="tv">0</span>; <span class="ta">right</span>: <span class="tv">0</span>;
+  <span class="ta">background</span>: <span class="tv">#fff</span>;
+  <span class="ta">box-shadow</span>: <span class="tv">0 1px 8px rgba(0,0,0,.08)</span>;
+  <span class="ta">z-index</span>: <span class="tv">100</span>;
+}
+
+<span class="tk">.navbar</span> {
+  <span class="ta">display</span>: <span class="tv">flex</span>;
+  <span class="ta">align-items</span>: <span class="tv">center</span>;
+  <span class="ta">justify-content</span>: <span class="tv">space-between</span>;
+  <span class="ta">padding</span>: <span class="tv">0 24px</span>;
+  <span class="ta">height</span>: <span class="tv">60px</span>;
+}
+
+<span class="tc">/* ── 데스크탑 메뉴 ── */</span>
+<span class="tk">.nav-menu</span> {
+  <span class="ta">display</span>: <span class="tv">flex</span>;
+  <span class="ta">list-style</span>: <span class="tv">none</span>;
+  <span class="ta">gap</span>: <span class="tv">8px</span>;
+}
+
+<span class="tk">.nav-menu a</span> {
+  <span class="ta">padding</span>: <span class="tv">6px 14px</span>;
+  <span class="ta">border-radius</span>: <span class="tv">6px</span>;
+  <span class="ta">color</span>: <span class="tv">#374151</span>;
+  <span class="ta">font-weight</span>: <span class="tv">500</span>;
+  <span class="ta">text-decoration</span>: <span class="tv">none</span>;
+  <span class="ta">transition</span>: <span class="tv">background .15s</span>;
+}
+<span class="tk">.nav-menu a:hover</span> { <span class="ta">background</span>: <span class="tv">#f3f4f6</span>; }
+
+<span class="tc">/* ── 햄버거 버튼 ── */</span>
+<span class="tk">.hamburger</span> {
+  <span class="ta">display</span>: <span class="tv">none</span>; <span class="tc">/* 기본은 숨김 */</span>
+  <span class="ta">flex-direction</span>: <span class="tv">column</span>;
+  <span class="ta">gap</span>: <span class="tv">5px</span>;
+  <span class="ta">padding</span>: <span class="tv">8px</span>;
+  <span class="ta">background</span>: <span class="tv">none</span>;
+  <span class="ta">border</span>: <span class="tv">none</span>;
+  <span class="ta">cursor</span>: <span class="tv">pointer</span>;
+}
+
+<span class="tk">.hline</span> {
+  <span class="ta">width</span>: <span class="tv">22px</span>; <span class="ta">height</span>: <span class="tv">2px</span>;
+  <span class="ta">background</span>: <span class="tv">#111827</span>;
+  <span class="ta">border-radius</span>: <span class="tv">2px</span>;
+  <span class="ta">transition</span>: <span class="tv">transform .3s, opacity .3s</span>;
+  <span class="ta">transform-origin</span>: <span class="tv">center</span>;
+}
+
+<span class="tc">/* ☰ → ✕ 애니메이션 */</span>
+<span class="tk">.hamburger.open .hline:nth-child(1)</span> {
+  <span class="ta">transform</span>: <span class="tv">translateY(7px) rotate(45deg)</span>;
+}
+<span class="tk">.hamburger.open .hline:nth-child(2)</span> {
+  <span class="ta">opacity</span>: <span class="tv">0</span>;
+  <span class="ta">transform</span>: <span class="tv">scaleX(0)</span>;
+}
+<span class="tk">.hamburger.open .hline:nth-child(3)</span> {
+  <span class="ta">transform</span>: <span class="tv">translateY(-7px) rotate(-45deg)</span>;
+}
+
+<span class="tc">/* ── 모바일 반응형 ── */</span>
+<span class="tk">@media (max-width: 768px)</span> {
+  <span class="ta">.hamburger</span> { <span class="tv">display</span>: flex; }
+
+  <span class="tk">.nav-menu</span> {
+    <span class="ta">position</span>: <span class="tv">absolute</span>;
+    <span class="ta">top</span>: <span class="tv">60px</span>; <span class="ta">left</span>: <span class="tv">0</span>; <span class="ta">right</span>: <span class="tv">0</span>;
+    <span class="ta">flex-direction</span>: <span class="tv">column</span>;
+    <span class="ta">background</span>: <span class="tv">#fff</span>;
+    <span class="ta">box-shadow</span>: <span class="tv">0 8px 24px rgba(0,0,0,.10)</span>;
+    <span class="ta">max-height</span>: <span class="tv">0</span>;
+    <span class="ta">overflow</span>: <span class="tv">hidden</span>;
+    <span class="ta">transition</span>: <span class="tv">max-height .35s cubic-bezier(.4,0,.2,1)</span>;
+    <span class="ta">padding</span>: <span class="tv">0</span>;
+    <span class="ta">gap</span>: <span class="tv">0</span>;
+  }
+
+  <span class="tk">.nav-menu.open</span> {
+    <span class="ta">max-height</span>: <span class="tv">400px</span>;
+    <span class="ta">padding</span>: <span class="tv">8px 0</span>;
+  }
+
+  <span class="tk">.nav-menu li a</span> {
+    <span class="ta">display</span>: <span class="tv">block</span>;
+    <span class="ta">padding</span>: <span class="tv">12px 24px</span>;
+    <span class="ta">border-radius</span>: <span class="tv">0</span>;
+    <span class="ta">border-bottom</span>: <span class="tv">1px solid #f3f4f6</span>;
+  }
+}</pre>
+        </div>
+      </div>
+
+      <!-- JS 탭 -->
+      <div id="tab-js" class="code-panel">
+        <div class="cb-body">
+          <pre id="jsCode"><span class="tc">// 요소 참조</span>
+<span class="ts">const</span> btn  = document.getElementById(<span class="tv">'hamburgerBtn'</span>);
+<span class="ts">const</span> menu = document.getElementById(<span class="tv">'navMenu'</span>);
+<span class="ts">const</span> nav  = document.querySelector(<span class="tv">'.navbar'</span>);
+
+<span class="tc">// 메뉴 열기 / 닫기 함수</span>
+<span class="ts">function</span> <span class="tk">openMenu</span>() {
+  menu.classList.add(<span class="tv">'open'</span>);
+  btn.classList.add(<span class="tv">'open'</span>);
+  btn.setAttribute(<span class="tv">'aria-expanded'</span>, <span class="tv">'true'</span>);
+  btn.setAttribute(<span class="tv">'aria-label'</span>, <span class="tv">'메뉴 닫기'</span>);
+  document.body.style.overflow = <span class="tv">'hidden'</span>; <span class="tc">// 스크롤 방지</span>
+}
+
+<span class="ts">function</span> <span class="tk">closeMenu</span>() {
+  menu.classList.remove(<span class="tv">'open'</span>);
+  btn.classList.remove(<span class="tv">'open'</span>);
+  btn.setAttribute(<span class="tv">'aria-expanded'</span>, <span class="tv">'false'</span>);
+  btn.setAttribute(<span class="tv">'aria-label'</span>, <span class="tv">'메뉴 열기'</span>);
+  document.body.style.overflow = <span class="tv">''</span>;
+}
+
+<span class="tc">// 버튼 클릭 시 토글</span>
+btn.addEventListener(<span class="tv">'click'</span>, () =&gt; {
+  <span class="ts">if</span> (menu.classList.contains(<span class="tv">'open'</span>)) {
+    closeMenu();
+  } <span class="ts">else</span> {
+    openMenu();
+  }
+});
+
+<span class="tc">// 바깥 클릭 시 닫기</span>
+document.addEventListener(<span class="tv">'click'</span>, (e) =&gt; {
+  <span class="ts">if</span> (!nav.contains(e.target)) {
+    closeMenu();
+  }
+});
+
+<span class="tc">// 메뉴 항목 클릭 시 닫기</span>
+menu.querySelectorAll(<span class="tv">'a'</span>).forEach(link =&gt; {
+  link.addEventListener(<span class="tv">'click'</span>, () =&gt; {
+    closeMenu();
+  });
+});
+
+<span class="tc">// ESC 키로 닫기</span>
+document.addEventListener(<span class="tv">'keydown'</span>, (e) =&gt; {
+  <span class="ts">if</span> (e.key === <span class="tv">'Escape'</span>) closeMenu();
+});</pre>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ④ 인터랙티브 데모
+══════════════════════════════════════════ -->
+<section id="demo" class="section">
+  <div class="container">
+
+    <div class="section-badge">④ 인터랙티브 데모</div>
+    <h2 class="section-title">직접 조작해보는 햄버거 메뉴</h2>
+    <p class="section-lead">데스크탑 / 모바일 모드를 전환하면서 실제 동작을 확인해보세요.</p>
+
+    <div class="demo-shell">
+      <div class="demo-toolbar">
+        <div class="demo-toolbar-left">
+          <div class="cb-dots">
+            <div class="cb-dot cb-dot-r"></div>
+            <div class="cb-dot cb-dot-y"></div>
+            <div class="cb-dot cb-dot-g"></div>
+          </div>
+          <div class="demo-toolbar-title">live-demo.html</div>
+        </div>
+        <div class="demo-size-btns">
+          <button class="demo-size-btn active" onclick="setDemoMode('desktop', this)">🖥 데스크탑</button>
+          <button class="demo-size-btn" onclick="setDemoMode('mobile', this)">📱 모바일</button>
+        </div>
+      </div>
+
+      <div class="demo-viewport">
+        <div class="demo-frame" id="demoFrame">
+
+          <!-- 데모 네비게이션 -->
+          <div class="demo-nav">
+            <div class="demo-nav-logo">
+              <div class="demo-nav-logo-icon">M</div>
+              MySite
+            </div>
+
+            <!-- 데스크탑 메뉴 -->
+            <ul class="demo-desktop-menu">
+              <li><a href="#" onclick="return false">홈</a></li>
+              <li><a href="#" onclick="return false">소개</a></li>
+              <li><a href="#" onclick="return false">서비스</a></li>
+              <li><a href="#" onclick="return false">문의하기</a></li>
+            </ul>
+
+            <!-- 햄버거 버튼 -->
+            <button class="demo-hamburger" id="demoHamburger" onclick="toggleDemoMenu()" aria-label="메뉴 토글">
+              <div class="demo-hamburger-line"></div>
+              <div class="demo-hamburger-line"></div>
+              <div class="demo-hamburger-line"></div>
+            </button>
+          </div>
+
+          <!-- 모바일 드롭다운 메뉴 -->
+          <div class="demo-mobile-menu" id="demoMobileMenu">
+            <a href="#" onclick="closeDemoMenu(); return false;">🏠 홈</a>
+            <a href="#" onclick="closeDemoMenu(); return false;">👋 소개</a>
+            <a href="#" onclick="closeDemoMenu(); return false;">💼 서비스</a>
+            <a href="#" onclick="closeDemoMenu(); return false;">✉️ 문의하기</a>
+          </div>
+
+          <!-- 더미 콘텐츠 -->
+          <div class="demo-content">
+            <div class="demo-content-block">
+              <div class="demo-content-title">페이지 콘텐츠 영역</div>
+              <div class="demo-content-lines">
+                <div class="demo-content-line"></div>
+                <div class="demo-content-line"></div>
+                <div class="demo-content-line"></div>
+              </div>
+            </div>
+            <div class="demo-content-block">
+              <div class="demo-content-title">모바일 모드에서 ☰ 버튼을 눌러보세요</div>
+              <div class="demo-content-lines">
+                <div class="demo-content-line" style="width:70%"></div>
+                <div class="demo-content-line" style="width:55%"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ⑤ AI 프롬프트 팁
+══════════════════════════════════════════ -->
+<section id="prompt" class="section">
+  <div class="container">
+
+    <div class="section-badge">⑤ AI 프롬프트 팁</div>
+    <h2 class="section-title">AI에게 정확하게 요청하는 법</h2>
+    <p class="section-lead">바이브 코딩으로 햄버거 메뉴를 만들 때 이 프롬프트를 그대로 복붙하세요.</p>
+
+    <div class="vibe-tip">
+      <div class="vibe-tip-label">✦ 바이브코더 추천 프롬프트</div>
+      <p>아래 프롬프트를 Claude, ChatGPT, Cursor 등 AI 코딩 도구에 붙여넣으면 바로 작동하는 코드를 받을 수 있어요. 필요에 따라 메뉴 항목이나 색상을 바꿔서 사용하세요.</p>
+      <div class="prompt-box">
+        <pre>내 사이트 상단 네비게이션을 모바일에서 햄버거 메뉴로 바꿔줘.
+
+요구사항:
+- 768px 이하에서 기존 메뉴를 숨기고 ☰ 버튼을 보여줘
+- 버튼 클릭 시 메뉴가 아래로 슬라이드되어 나타나게 해줘 (max-height 트릭 사용)
+- ☰ 버튼이 클릭되면 ✕ 로 바뀌는 CSS 애니메이션 추가해줘
+- 메뉴 항목: 홈, 소개, 서비스, 문의하기
+- 메뉴 항목 클릭 시 메뉴가 닫히게 해줘
+- 바깥 영역 클릭 시 메뉴가 닫히게 해줘
+- ESC 키로도 닫히게 해줘
+- aria-expanded 접근성 속성도 올바르게 처리해줘</pre>
+      </div>
+    </div>
+
+    <div class="callout co-green" style="margin-top: 8px;">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <p><strong>더 구체적으로 요청하면 더 좋은 코드가 나와요!</strong> "슬라이드 사이드바 방식으로 만들어줘" 또는 "왼쪽에서 밀려나오는 오버레이 패널 방식으로" 처럼 원하는 동작을 명확히 설명하면 AI가 정확히 맞춰줘요.</p>
+        <p>기존 코드가 있다면 "아래 코드에서 nav 부분을 햄버거 메뉴로 바꿔줘:"라고 시작하고 코드를 붙여넣으세요. 훨씬 정확한 결과를 받을 수 있어요.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ⑥ FAQ
+══════════════════════════════════════════ -->
+<section id="faq" class="section">
+  <div class="container">
+
+    <div class="section-badge">⑥ FAQ</div>
+    <h2 class="section-title">자주 묻는 질문</h2>
+    <p class="section-lead">햄버거 메뉴를 처음 만들 때 자주 마주치는 문제들을 정리했어요.</p>
+
+    <div class="faq-list">
+
+      <details class="faq-item">
+        <summary>데스크탑에서도 햄버거 버튼이 보여요. 어떻게 숨기나요?</summary>
+        <div class="faq-body">
+          <p>미디어 쿼리 밖에서 <code>.hamburger { display: none; }</code>으로 기본 숨김 처리를 먼저 해주세요. 그다음 <code>@media (max-width: 768px)</code> 안에서 <code>.hamburger { display: flex; }</code>로 모바일에서만 보이게 하면 돼요.</p>
+          <p>반대로 데스크탑 메뉴는 기본적으로 <code>display: flex</code>이고, 미디어 쿼리 안에서 <code>display: none</code>으로 숨겨야 해요. 이 두 가지를 쌍으로 처리해야 해요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>메뉴가 열릴 때 화면이 밀려요 (스크롤이 생겨요).</summary>
+        <div class="faq-body">
+          <p>메뉴가 열릴 때 배경 스크롤을 막지 않아서 생기는 현상이에요. JavaScript에서 메뉴를 열 때 <code>document.body.style.overflow = 'hidden'</code>을 추가하고, 닫을 때 <code>document.body.style.overflow = ''</code>으로 되돌리면 해결돼요.</p>
+          <p>특히 풀스크린 드롭다운이나 사이드바 방식에서는 이 처리가 꼭 필요해요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>다른 페이지로 이동하면 메뉴가 닫히지 않아요.</summary>
+        <div class="faq-body">
+          <p>각 메뉴 항목(<code>&lt;a&gt;</code> 태그)에 클릭 이벤트를 달아서 <code>closeMenu()</code>를 호출해야 해요.</p>
+          <p><code>menu.querySelectorAll('a').forEach(link =&gt; link.addEventListener('click', closeMenu))</code>처럼 모든 링크에 한 번에 처리하면 편해요. SPA(싱글 페이지 앱)에서는 라우터 변경 이벤트에서도 닫아줘야 해요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>height: auto에서 슬라이드 애니메이션이 작동하지 않아요.</summary>
+        <div class="faq-body">
+          <p>CSS <code>transition</code>은 <code>height: auto</code>를 지원하지 않아요. 이때 사용하는 꼼수가 <strong>max-height 트릭</strong>이에요. 닫혔을 때 <code>max-height: 0; overflow: hidden;</code>으로 설정하고, 열렸을 때 <code>max-height: 400px;</code>처럼 충분히 큰 값으로 바꾸면 부드럽게 펼쳐져요.</p>
+          <p>단, <code>max-height</code> 값이 실제 내용보다 훨씬 크면 닫힐 때 먼저 줄어들고 나중에 사라지는 느낌이 날 수 있으니, 내용 높이와 너무 차이나지 않게 설정하세요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>스크롤해도 메뉴가 고정되지 않아요.</summary>
+        <div class="faq-body">
+          <p>헤더에 <code>position: fixed; top: 0; left: 0; right: 0;</code>를 적용해야 해요. 그리고 <code>&lt;body&gt;</code>에 <code>padding-top: 60px;</code>(헤더 높이만큼)을 추가해야 헤더 뒤에 콘텐츠가 가려지지 않아요.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>접근성(키보드, 스크린 리더)을 고려해야 할까요?</summary>
+        <div class="faq-body">
+          <p>네, 꼭 챙겨야 해요. 햄버거 버튼에 <code>aria-label="메뉴 열기"</code>와 <code>aria-expanded="false"</code>를 추가하고, 메뉴가 열리면 <code>aria-expanded="true"</code>로 업데이트해요. 또한 ESC 키로 닫히도록 처리하면 키보드 사용자도 불편 없이 이용할 수 있어요.</p>
+          <p>버튼에 <code>&lt;button&gt;</code> 태그를 사용하면 키보드 포커스가 자동으로 처리되니, <code>&lt;div&gt;</code>나 <code>&lt;span&gt;</code>이 아닌 <code>&lt;button&gt;</code>을 쓰는 것을 권장해요.</p>
+        </div>
+      </details>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     푸터
+══════════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-logo"><div class="logo-mark">VT</div>바이브툴킷</div>
+  <p class="footer-desc">바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 도구 모음</p>
+  <div class="footer-links">
+    <a href="index.html">홈</a><a href="about.html">소개</a>
+    <a href="contact.html">문의</a><a href="sitemap.html">사이트맵</a>
+  </div>
+  <div class="footer-copy">© 2026 바이브툴킷. 콘텐츠는 자유롭게 참고하세요.</div>
+</footer>
+
+
+<script>
+/* ════════════════════════════════════════
+   ② 유형 갤러리 데모
+════════════════════════════════════════ */
+
+// 슬라이드 사이드바
+function toggleSidebar() {
+  const sidebar = document.getElementById('miniSidebar');
+  const overlay = document.getElementById('miniOverlay');
+  const isOpen = sidebar.classList.contains('open');
+  if (isOpen) {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+  } else {
+    sidebar.classList.add('open');
+    overlay.classList.add('show');
+  }
+}
+
+// 드롭다운 메뉴
+let dropdownOpen = false;
+function toggleDropdown() {
+  const menu = document.getElementById('miniDropdown');
+  dropdownOpen = !dropdownOpen;
+  if (dropdownOpen) {
+    menu.classList.add('open');
+  } else {
+    menu.classList.remove('open');
+  }
+}
+
+// X자 애니메이션
+let xOpen = false;
+function toggleX() {
+  const btn = document.getElementById('xBtn');
+  const label = document.getElementById('xLabel');
+  xOpen = !xOpen;
+  if (xOpen) {
+    btn.classList.add('is-open');
+    label.textContent = '다시 클릭하면 ☰ 로 돌아와요';
+  } else {
+    btn.classList.remove('is-open');
+    label.innerHTML = '☰ 클릭하면<br>✕ 로 바뀌어요';
+  }
+}
+
+/* ════════════════════════════════════════
+   ③ 코드 탭 전환
+════════════════════════════════════════ */
+function switchTab(lang) {
+  // 패널 전환
+  document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + lang).classList.add('active');
+
+  // 탭 버튼 활성화
+  document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  // 복사 버튼 타겟 업데이트
+  const ids = { html: 'mainCode', css: 'cssCode', js: 'jsCode' };
+  document.getElementById('mainCopyBtn').onclick = () => copyCode(ids[lang], 'mainCopyBtn');
+}
+
+/* ════════════════════════════════════════
+   복사 버튼
+════════════════════════════════════════ */
+function copyCode(preId, btnId) {
+  const pre = document.getElementById(preId);
+  if (!pre) return;
+  const text = pre.innerText || pre.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.textContent = '복사됨 ✓';
+    btn.classList.add('ok');
+    setTimeout(() => {
+      btn.textContent = '복사';
+      btn.classList.remove('ok');
+    }, 2000);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+}
+
+/* ════════════════════════════════════════
+   ④ 인터랙티브 데모
+════════════════════════════════════════ */
+function setDemoMode(mode, btn) {
+  const frame = document.getElementById('demoFrame');
+  // 버튼 상태
+  document.querySelectorAll('.demo-size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  if (mode === 'mobile') {
+    frame.classList.add('mobile-mode');
+  } else {
+    frame.classList.remove('mobile-mode');
+    // 데스크탑으로 전환 시 메뉴 닫기
+    closeDemoMenu();
+  }
+}
+
+function toggleDemoMenu() {
+  const hamburger = document.getElementById('demoHamburger');
+  const menu = document.getElementById('demoMobileMenu');
+  const isOpen = menu.classList.contains('open');
+  if (isOpen) {
+    closeDemoMenu();
+  } else {
+    hamburger.classList.add('open');
+    menu.classList.add('open');
+  }
+}
+
+function closeDemoMenu() {
+  const hamburger = document.getElementById('demoHamburger');
+  const menu = document.getElementById('demoMobileMenu');
+  hamburger.classList.remove('open');
+  menu.classList.remove('open');
+}
+
+/* ════════════════════════════════════════
+   iframe 감지 스크립트
+════════════════════════════════════════ */
+(function() {
+  if (self === top) return;
+  const nav = document.querySelector('.site-nav');
+  if (nav) nav.style.display = 'none';
+  const hero = document.querySelector('.hero');
+  if (hero) hero.style.paddingTop = '40px';
+  document.querySelectorAll('a[href$=".html"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      if (window.parent && window.parent.loadTool) {
+        e.preventDefault();
+        window.parent.loadTool(this.getAttribute('href'));
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
