@@ -1,5 +1,5 @@
 # 바이브툴킷 (Vibe Toolkit) robots.txt
-# https://aun-jy.github.io/vibe-toolkit/
+# https://vibetoolkit.kr/
 
 User-agent: *
 Allow: /
@@ -8,4 +8,4 @@ Allow: /
 Disallow: /node_modules/
 
 # Sitemap 위치 (실제 배포 URL로 변경하세요)
-Sitemap: https://aun-jy.github.io/vibe-toolkit/sitemap.xml
+Sitemap: https://vibetoolkit.kr/sitemap.xml

@@ -3,7 +3,7 @@
 
   <!-- 메인 페이지 -->
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/</loc>
+    <loc>https://vibetoolkit.kr/</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -11,28 +11,28 @@
 
   <!-- 도구 페이지 -->
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/favicon-sample.html</loc>
+    <loc>https://vibetoolkit.kr/favicon-sample.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/floating-button.html</loc>
+    <loc>https://vibetoolkit.kr/floating-button.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/meta-tag.html</loc>
+    <loc>https://vibetoolkit.kr/meta-tag.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/open-graph.html</loc>
+    <loc>https://vibetoolkit.kr/open-graph.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -40,21 +40,21 @@
 
   <!-- CSS 기초 페이지 -->
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/css-variables.html</loc>
+    <loc>https://vibetoolkit.kr/css-variables.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/flexbox.html</loc>
+    <loc>https://vibetoolkit.kr/flexbox.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/dark-mode.html</loc>
+    <loc>https://vibetoolkit.kr/dark-mode.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -62,28 +62,28 @@
 
   <!-- SEO / 수익화 페이지 -->
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/sitemap-guide.html</loc>
+    <loc>https://vibetoolkit.kr/sitemap-guide.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/google-analytics.html</loc>
+    <loc>https://vibetoolkit.kr/google-analytics.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/adsense-guide.html</loc>
+    <loc>https://vibetoolkit.kr/adsense-guide.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/cookie-banner.html</loc>
+    <loc>https://vibetoolkit.kr/cookie-banner.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -91,14 +91,14 @@
 
   <!-- JavaScript 기초 페이지 -->
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/click-event.html</loc>
+    <loc>https://vibetoolkit.kr/click-event.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/local-storage.html</loc>
+    <loc>https://vibetoolkit.kr/local-storage.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -106,21 +106,21 @@
 
   <!-- HTML UI 페이지 -->
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/modal-popup.html</loc>
+    <loc>https://vibetoolkit.kr/modal-popup.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/hamburger-menu.html</loc>
+    <loc>https://vibetoolkit.kr/hamburger-menu.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/css-grid.html</loc>
+    <loc>https://vibetoolkit.kr/css-grid.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -128,35 +128,35 @@
 
   <!-- 사이트 정보 페이지 -->
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/about.html</loc>
+    <loc>https://vibetoolkit.kr/about.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/contact.html</loc>
+    <loc>https://vibetoolkit.kr/contact.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/privacy.html</loc>
+    <loc>https://vibetoolkit.kr/privacy.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/terms.html</loc>
+    <loc>https://vibetoolkit.kr/terms.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/sitemap.html</loc>
+    <loc>https://vibetoolkit.kr/sitemap.html</loc>
     <lastmod>2026-04-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -164,21 +164,21 @@
 
   <!-- 2순위 추가 페이지 -->
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/form-validation.html</loc>
+    <loc>https://vibetoolkit.kr/form-validation.html</loc>
     <lastmod>2026-04-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/responsive-design.html</loc>
+    <loc>https://vibetoolkit.kr/responsive-design.html</loc>
     <lastmod>2026-04-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/scroll-event.html</loc>
+    <loc>https://vibetoolkit.kr/scroll-event.html</loc>
     <lastmod>2026-04-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -186,21 +186,21 @@
 
   <!-- 3순위 추가 페이지 -->
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/css-animation.html</loc>
+    <loc>https://vibetoolkit.kr/css-animation.html</loc>
     <lastmod>2026-04-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/fetch-api.html</loc>
+    <loc>https://vibetoolkit.kr/fetch-api.html</loc>
     <lastmod>2026-04-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://aun-jy.github.io/vibe-toolkit/tab-ui.html</loc>
+    <loc>https://vibetoolkit.kr/tab-ui.html</loc>
     <lastmod>2026-04-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
