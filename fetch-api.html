@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>fetch API & 비동기 완전 정복 | 바이브툴킷</title>
+  <meta name="description" content="fetch, async/await, 에러처리, 로딩 상태까지. 외부 API 데이터를 가져오는 방법을 인터랙티브 데모로 배워봐요.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://aun-jy.github.io/vibe-toolkit/fetch-api.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+  :root {
+    --accent:#4f46e5; --accent-soft:#eef2ff; --accent-border:#c7d2fe;
+    --green:#16a34a; --green-soft:#f0fdf4;
+    --amber:#d97706; --amber-soft:#fffbeb;
+    --red:#e11d48; --red-soft:#fff1f2;
+    --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+    --gray-300:#d1d5db; --gray-400:#9ca3af; --gray-500:#6b7280;
+    --gray-600:#4b5563; --gray-700:#374151; --gray-900:#111827;
+    --code-bg:#1e1e2e; --radius:12px; --radius-sm:8px;
+    --shadow-sm:0 1px 3px rgba(0,0,0,.08); --shadow:0 4px 12px rgba(0,0,0,.08);
+    --nav-h:56px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h)+24px)}
+  body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:#fff;color:var(--gray-700);line-height:1.75;font-size:16px}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  strong{color:var(--gray-900);font-weight:600}
+  code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:var(--gray-100);color:var(--accent);padding:.1em .4em;border-radius:4px;border:1px solid var(--gray-200)}
+
+  /* 네비게이션 */
+  .site-nav{position:fixed;top:0;left:0;right:0;z-index:500;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);height:var(--nav-h);display:flex;align-items:center;padding:0 24px}
+  .nav-logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.95rem;color:var(--gray-900);margin-right:32px;flex-shrink:0;text-decoration:none}
+  .nav-logo:hover{text-decoration:none}
+  .logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;color:#fff}
+  .nav-links{display:flex;align-items:center;gap:2px;list-style:none;overflow-x:auto;scrollbar-width:none}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{display:block;padding:6px 14px;font-size:.85rem;font-weight:500;color:var(--gray-500);border-radius:var(--radius-sm);white-space:nowrap;transition:color .15s,background .15s;text-decoration:none}
+  .nav-links a:hover{color:var(--gray-900);background:var(--gray-100)}
+  .nav-links a.active{color:var(--accent);background:var(--accent-soft);font-weight:600}
+
+  /* 레이아웃 */
+  .container{max-width:860px;margin:0 auto;padding:0 24px}
+  .section{padding:72px 0}
+  .section:nth-child(even){background:var(--gray-50)}
+  .section-badge{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:20px;padding:3px 12px;margin-bottom:14px}
+  .section-title{font-size:1.75rem;font-weight:700;color:var(--gray-900);letter-spacing:-.025em;line-height:1.25;margin-bottom:10px}
+  .section-lead{font-size:1.05rem;color:var(--gray-500);line-height:1.7;margin-bottom:40px;max-width:600px}
+
+  /* 히어로 */
+  .hero{padding:calc(var(--nav-h)+56px) 0 64px;background:linear-gradient(160deg,var(--accent-soft) 0%,#fff 60%);border-bottom:1px solid var(--gray-200)}
+  .hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:20px;padding:4px 14px;margin-bottom:20px}
+  .hero h1{font-size:clamp(1.9rem,4vw,2.75rem);font-weight:700;color:var(--gray-900);letter-spacing:-.03em;line-height:1.2;margin-bottom:18px}
+  .hero h1 em{color:var(--accent);font-style:normal}
+  .hero-desc{font-size:1.08rem;color:var(--gray-500);line-height:1.75;max-width:540px;margin-bottom:32px}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:16px;font-size:.82rem;color:var(--gray-500)}
+  .hero-meta span{display:flex;align-items:center;gap:5px}
+
+  /* 카드 그리드 */
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:28px}
+  .info-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:22px 20px;box-shadow:var(--shadow-sm);transition:box-shadow .2s,transform .2s}
+  .info-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+  .info-card-icon{font-size:1.6rem;margin-bottom:10px}
+  .info-card h4{font-size:.95rem;font-weight:700;color:var(--gray-900);margin-bottom:7px}
+  .info-card p{font-size:.86rem;color:var(--gray-600);line-height:1.7}
+  .ic-accent{background:var(--accent-soft);border-color:var(--accent-border)}
+  .ic-green{background:var(--green-soft);border-color:#bbf7d0}
+  .ic-amber{background:var(--amber-soft);border-color:#fde68a}
+  .ic-red{background:var(--red-soft);border-color:#fecdd3}
+
+  /* 콜아웃 */
+  .callout{display:flex;gap:14px;padding:18px 20px;border-radius:var(--radius);margin:24px 0;font-size:.93rem;line-height:1.75;color:var(--gray-700)}
+  .callout-icon{font-size:1.2rem;flex-shrink:0;padding-top:1px}
+  .callout-body p{margin:0} .callout-body p+p{margin-top:6px}
+  .co-blue{background:var(--accent-soft);border:1px solid var(--accent-border)}
+  .co-green{background:var(--green-soft);border:1px solid #bbf7d0}
+  .co-amber{background:var(--amber-soft);border:1px solid #fde68a}
+  .co-red{background:var(--red-soft);border:1px solid #fecdd3}
+
+  /* 비교 테이블 */
+  .cmp-table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:24px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+  .cmp-table th{background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:11px 16px;text-align:left;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-600)}
+  .cmp-table td{padding:13px 16px;border-bottom:1px solid var(--gray-100);vertical-align:top;color:var(--gray-700)}
+  .cmp-table tr:last-child td{border-bottom:none}
+  .badge{display:inline-block;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px}
+  .bg{background:var(--green-soft);color:var(--green)} .bb{background:var(--gray-100);color:var(--gray-600)} .ba{background:var(--amber-soft);color:var(--amber)}
+
+  /* 바이브코더 TIP */
+  .vibe-tip{background:linear-gradient(135deg,#faf5ff 0%,#eff6ff 100%);border:1px solid #e9d5ff;border-left:4px solid #8b5cf6;border-radius:var(--radius);padding:20px 22px;margin:32px 0}
+  .vibe-tip-label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7c3aed;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .vibe-tip p{font-size:.92rem;color:var(--gray-700);margin-bottom:10px;line-height:1.75}
+  .vibe-tip p:last-child{margin-bottom:0}
+  .vibe-tip code{background:#ede9fe;border-color:#ddd6fe;color:#7c3aed}
+  .prompt-box{background:#1e1e2e;border-radius:var(--radius-sm);padding:14px 16px;margin-top:14px}
+  .prompt-box pre{font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.65;color:#cdd6f4;white-space:pre-wrap;word-break:break-word}
+
+  /* 코드 블록 */
+  .code-block{background:var(--code-bg);border-radius:var(--radius);overflow:hidden;margin-top:24px;border:1px solid #2d2d3f;box-shadow:var(--shadow)}
+  .cb-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#13131f;border-bottom:1px solid #2d2d3f}
+  .cb-dots{display:flex;gap:6px}
+  .cb-dot{width:10px;height:10px;border-radius:50%}
+  .cb-dot-r{background:#ff5f57} .cb-dot-y{background:#febc2e} .cb-dot-g{background:#28c840}
+  .cb-file{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#6272a4}
+  .cb-copy{font-family:'JetBrains Mono',monospace;font-size:.72rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:5px;color:#94a3b8;padding:3px 12px;cursor:pointer;transition:background .15s,color .15s}
+  .cb-copy:hover{background:rgba(255,255,255,.15);color:#fff}
+  .cb-copy.ok{color:#a6e3a1;border-color:#a6e3a1}
+  .cb-body{padding:20px;overflow-x:auto}
+  .cb-body pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.75;color:#cdd6f4;white-space:pre}
+  .tk{color:#89b4fa} .ta{color:#a6e3a1} .tv{color:#f9e2af} .tc{color:#6272a4;font-style:italic} .tp{color:#cba6f7}
+
+  /* ── 인터랙티브 데모 ── */
+  .demo-shell{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);box-shadow:0 8px 28px rgba(0,0,0,.10);overflow:hidden;margin-top:32px}
+  .demo-shell-head{background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:12px 18px;display:flex;align-items:center;gap:10px}
+  .demo-dots{display:flex;gap:6px}
+  .demo-dot{width:10px;height:10px;border-radius:50%}
+  .demo-dot-r{background:#ff5f57} .demo-dot-y{background:#febc2e} .demo-dot-g{background:#28c840}
+  .demo-shell-title{font-size:.78rem;color:var(--gray-500);font-family:'JetBrains Mono',monospace}
+  .demo-body{padding:24px}
+
+  .demo-controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;align-items:center}
+  .demo-input{flex:1;min-width:200px;padding:9px 14px;border:1.5px solid var(--gray-300);border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:.88rem;color:var(--gray-900);outline:none;transition:border-color .2s}
+  .demo-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .demo-fetch-btn{padding:9px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:background .2s,transform .15s;display:flex;align-items:center;gap:8px}
+  .demo-fetch-btn:hover{background:#4338ca;transform:translateY(-1px)}
+  .demo-fetch-btn:disabled{background:var(--gray-300);cursor:not-allowed;transform:none}
+
+  .demo-status{font-size:.82rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:6px;min-height:22px}
+  .status-loading{color:var(--amber)}
+  .status-ok{color:var(--green)}
+  .status-err{color:var(--red)}
+
+  .demo-result{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:16px;min-height:80px;max-height:320px;overflow-y:auto;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.7;color:var(--gray-700);white-space:pre-wrap;word-break:break-all}
+  .demo-result::-webkit-scrollbar{width:5px}
+  .demo-result::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:3px}
+
+  .spinner-inline{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* FAQ */
+  .faq-list{margin-top:28px}
+  .faq-item{border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm)}
+  .faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:none;border:none;font-family:'Noto Sans KR',sans-serif;font-size:.93rem;font-weight:600;color:var(--gray-900);cursor:pointer;text-align:left;gap:12px;transition:background .15s}
+  .faq-q:hover{background:var(--gray-50)}
+  .faq-q-icon{width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;transition:transform .25s}
+  .faq-item.open .faq-q-icon{transform:rotate(45deg)}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;font-size:.9rem;color:var(--gray-600);line-height:1.75;padding:0 20px}
+  .faq-item.open .faq-a{max-height:300px;padding:0 20px 18px}
+
+  /* 푸터 */
+  .site-footer{background:var(--gray-900);color:var(--gray-400);padding:48px 24px 36px;text-align:center}
+  .footer-logo{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:1rem;color:#fff;margin-bottom:10px}
+  .footer-logo .logo-mark{background:var(--accent)}
+  .footer-desc{font-size:.85rem;line-height:1.7;margin-bottom:20px}
+  .footer-links{display:flex;justify-content:center;gap:20px;margin-bottom:20px;flex-wrap:wrap}
+  .footer-links a{font-size:.83rem;color:var(--gray-400);transition:color .15s;text-decoration:none}
+  .footer-links a:hover{color:#fff}
+  .footer-copy{font-size:.78rem;color:var(--gray-500)}
+
+  @media(max-width:600px){
+    .hero{padding:calc(var(--nav-h)+36px) 0 48px}
+    .section{padding:52px 0}
+    .card-grid{grid-template-columns:1fr}
+    .demo-controls{flex-direction:column;align-items:stretch}
+    .demo-fetch-btn{width:100%;justify-content:center}
+  }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark">VT</div>
+    바이브툴킷
+  </a>
+  <ul class="nav-links">
+    <li><a href="#concept">① 개념</a></li>
+    <li><a href="#types">② 패턴</a></li>
+    <li><a href="#code">③ 코드</a></li>
+    <li><a href="#demo">④ 데모</a></li>
+    <li><a href="#prompt">⑤ 프롬프트</a></li>
+    <li><a href="#faq">⑥ FAQ</a></li>
+  </ul>
+</nav>
+
+<!-- 히어로 -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">🌐 fetch API & 비동기 JavaScript</div>
+    <h1>fetch API<br><em>완전 정복</em></h1>
+    <p class="hero-desc">날씨, 뉴스, 가격 정보를 외부에서 가져오고 싶다면 <code>fetch</code>가 필요해요. <code>async/await</code>, 에러 처리, 로딩 상태까지 — 실제 공개 API로 바로 체험해봐요.</p>
+    <div class="hero-meta">
+      <span>🌐 fetch + async/await</span>
+      <span>⚡ 실제 API 호출 데모</span>
+      <span>🔐 에러 처리 포함</span>
+      <span>📋 복사 가능한 코드</span>
+    </div>
+  </div>
+</section>
+
+<!-- ① 개념 -->
+<section class="section" id="concept">
+  <div class="container">
+    <div class="section-badge">① Concept</div>
+    <h2 class="section-title">동기 vs 비동기 — 왜 async/await인가?</h2>
+    <p class="section-lead">JavaScript는 기본적으로 한 줄씩 순서대로 실행돼요(동기). 그런데 서버에서 데이터를 가져오는 건 시간이 걸리기 때문에 기다리는 동안 다른 작업을 할 수 있어야 해요(비동기). <code>async/await</code>는 비동기 코드를 동기 코드처럼 읽기 쉽게 써주는 문법이에요.</p>
+
+    <div class="callout co-blue">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <p><strong>fetch 흐름:</strong> 브라우저 → API 서버에 요청 → 서버가 JSON 응답 → <code>response.json()</code>으로 파싱 → 데이터 사용. 이 모든 단계가 비동기이기 때문에 <code>await</code>으로 기다려야 해요.</p>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">📡</div>
+        <h4>fetch(url)</h4>
+        <p>URL에 HTTP 요청을 보내요. <code>Promise</code>를 반환하므로 <code>await</code>으로 결과를 기다려야 해요. 기본값은 GET 요청이고, 두 번째 인자로 옵션을 넣으면 POST 등 다른 메서드도 사용할 수 있어요.</p>
+      </div>
+      <div class="info-card ic-green">
+        <div class="info-card-icon">📦</div>
+        <h4>response.json()</h4>
+        <p>서버 응답 본문을 JSON으로 파싱해요. 이것도 비동기라 <code>await</code>이 필요해요. <code>response.text()</code>는 텍스트, <code>response.blob()</code>은 이미지/파일을 받을 때 사용해요.</p>
+      </div>
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">⚡</div>
+        <h4>async / await</h4>
+        <p>함수 앞에 <code>async</code>를 붙이면 그 함수 안에서 <code>await</code>을 쓸 수 있어요. <code>await</code>은 Promise가 완료될 때까지 코드 실행을 잠시 멈춰요. 동기 코드처럼 읽히지만 실제론 비동기예요.</p>
+      </div>
+      <div class="info-card ic-red">
+        <div class="info-card-icon">🚨</div>
+        <h4>try / catch</h4>
+        <p>네트워크 에러, 타임아웃, API 서버 오류 등 예외를 잡아요. <code>response.ok</code>가 false면 HTTP 4xx/5xx 에러예요. fetch 자체는 에러를 던지지 않기 때문에 <code>if (!response.ok)</code> 체크가 꼭 필요해요.</p>
+      </div>
+    </div>
+
+    <table class="cmp-table" style="margin-top:36px">
+      <thead>
+        <tr><th>방식</th><th>읽기 난이도</th><th>에러 처리</th><th>권장도</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>콜백 (구식)</td>
+          <td><span class="badge ba">콜백 지옥</span></td>
+          <td><span class="badge ba">번거로움</span></td>
+          <td><span class="badge bb">지양</span></td>
+        </tr>
+        <tr>
+          <td>.then().catch() (Promise)</td>
+          <td><span class="badge bb">중간</span></td>
+          <td><span class="badge bg">가능</span></td>
+          <td><span class="badge bb">보통</span></td>
+        </tr>
+        <tr>
+          <td>async / await (현재 표준)</td>
+          <td><span class="badge bg">동기 코드처럼</span></td>
+          <td><span class="badge bg">try/catch</span></td>
+          <td><span class="badge bg">✅ 권장</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ② 패턴 -->
+<section class="section" id="types">
+  <div class="container">
+    <div class="section-badge">② Patterns</div>
+    <h2 class="section-title">실무에서 쓰는 4가지 패턴</h2>
+    <p class="section-lead">이 패턴들을 조합하면 대부분의 API 연동 시나리오를 처리할 수 있어요.</p>
+    <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">⬇️</div>
+        <h4>GET — 데이터 가져오기</h4>
+        <p>날씨, 게시글 목록, 환율 등 서버에서 데이터를 읽을 때 사용해요. 기본 fetch는 자동으로 GET 요청이에요. URL에 쿼리스트링(<code>?key=value</code>)으로 파라미터를 전달해요.</p>
+      </div>
+      <div class="info-card ic-green">
+        <div class="info-card-icon">⬆️</div>
+        <h4>POST — 데이터 보내기</h4>
+        <p>회원가입, 댓글 작성, 주문처럼 서버에 새 데이터를 생성할 때 사용해요. <code>method: 'POST'</code>, <code>headers</code>, <code>body</code>를 옵션으로 넣어요. body는 <code>JSON.stringify()</code>로 직렬화해야 해요.</p>
+      </div>
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">⏳</div>
+        <h4>로딩 상태 표시</h4>
+        <p>요청 중에는 스피너나 "로딩 중..." 메시지를 보여주고, 완료되면 숨겨요. 버튼을 비활성화해서 중복 요청을 막는 것도 중요해요. UX에서 가장 많이 놓치는 부분이에요.</p>
+      </div>
+      <div class="info-card ic-red">
+        <div class="info-card-icon">🚨</div>
+        <h4>에러 처리</h4>
+        <p>네트워크 단절, API 키 오류(401), 찾을 수 없음(404), 서버 오류(500) 등을 각각 처리해요. 사용자에게 친절한 메시지를 보여주는 게 중요해요. 에러를 그냥 콘솔에만 출력하면 사용자는 왜 안 되는지 모릅니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ③ 코드 -->
+<section class="section" id="code">
+  <div class="container">
+    <div class="section-badge">③ Code</div>
+    <h2 class="section-title">복사해서 바로 쓰는 코드</h2>
+    <p class="section-lead">가장 많이 쓰이는 패턴을 템플릿으로 정리했어요. 복사해서 AI에게 "우리 프로젝트에 맞게 수정해줘"라고 하면 돼요.</p>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin-bottom:4px">1 — 기본 GET 요청 (async/await)</h3>
+    <p style="font-size:.9rem;color:var(--gray-500);margin:4px 0 0">가장 많이 쓰이는 표준 패턴이에요. 이 구조를 외워두세요.</p>
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots"><div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div></div>
+        <span class="cb-file">script.js</span>
+        <button class="cb-copy" onclick="copyBlock(this,'c1')">copy</button>
+      </div>
+      <div class="cb-body"><pre id="c1"><span class="tc">// async 함수 안에서만 await 사용 가능</span>
+<span class="tp">async function</span> <span class="ta">getData</span>(url) {
+  <span class="tp">try</span> {
+    <span class="tc">// 1. 요청 보내기</span>
+    <span class="tp">const</span> response = <span class="tp">await</span> fetch(url);
+
+    <span class="tc">// 2. HTTP 에러 체크 (fetch는 4xx/5xx에서 에러 안 던짐!)</span>
+    <span class="tp">if</span> (!response.ok) {
+      <span class="tp">throw new</span> Error(<span class="tv">`HTTP 에러: ${response.status}`</span>);
+    }
+
+    <span class="tc">// 3. JSON 파싱</span>
+    <span class="tp">const</span> data = <span class="tp">await</span> response.json();
+
+    <span class="tc">// 4. 데이터 활용</span>
+    console.log(data);
+    <span class="tp">return</span> data;
+
+  } <span class="tp">catch</span> (err) {
+    <span class="tc">// 5. 에러 처리</span>
+    console.error(<span class="tv">'데이터 로드 실패:'</span>, err.message);
+    <span class="tp">throw</span> err; <span class="tc">// 호출한 곳으로 에러 전달</span>
+  }
+}
+
+<span class="tc">// 호출</span>
+getData(<span class="tv">'https://api.example.com/posts'</span>);</pre></div>
+    </div>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin:40px 0 4px">2 — 로딩 상태와 함께 UI 업데이트</h3>
+    <p style="font-size:.9rem;color:var(--gray-500);margin:4px 0 0">실제 서비스에서 꼭 필요한 로딩·성공·에러 세 가지 상태 처리 패턴이에요.</p>
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots"><div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div></div>
+        <span class="cb-file">script.js</span>
+        <button class="cb-copy" onclick="copyBlock(this,'c2')">copy</button>
+      </div>
+      <div class="cb-body"><pre id="c2"><span class="tp">async function</span> <span class="ta">loadPosts</span>() {
+  <span class="tp">const</span> btn     = document.getElementById(<span class="tv">'load-btn'</span>);
+  <span class="tp">const</span> result  = document.getElementById(<span class="tv">'result'</span>);
+  <span class="tp">const</span> status  = document.getElementById(<span class="tv">'status'</span>);
+
+  <span class="tc">// 로딩 시작</span>
+  btn.disabled   = <span class="tp">true</span>;
+  status.textContent = <span class="tv">'⏳ 로딩 중...'</span>;
+  result.innerHTML   = <span class="tv">''</span>;
+
+  <span class="tp">try</span> {
+    <span class="tp">const</span> res  = <span class="tp">await</span> fetch(<span class="tv">'https://jsonplaceholder.typicode.com/posts?_limit=5'</span>);
+    <span class="tp">if</span> (!res.ok) <span class="tp">throw new</span> Error(<span class="tv">`${res.status} ${res.statusText}`</span>);
+    <span class="tp">const</span> data = <span class="tp">await</span> res.json();
+
+    <span class="tc">// 성공: 카드 렌더링</span>
+    status.textContent = <span class="tv">`✅ 게시글 ${data.length}개 로드 완료`</span>;
+    result.innerHTML = data.map(post => <span class="tv">`
+      &lt;div class="post-card"&gt;
+        &lt;strong&gt;${post.title}&lt;/strong&gt;
+        &lt;p&gt;${post.body.substring(0, 80)}...&lt;/p&gt;
+      &lt;/div&gt;
+    `</span>).join(<span class="tv">''</span>);
+
+  } <span class="tp">catch</span> (err) {
+    <span class="tc">// 에러: 사용자에게 표시</span>
+    status.textContent = <span class="tv">`❌ 오류: ${err.message}`</span>;
+  } <span class="tp">finally</span> {
+    btn.disabled = <span class="tp">false</span>; <span class="tc">// 항상 버튼 복구</span>
+  }
+}</pre></div>
+    </div>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin:40px 0 4px">3 — POST 요청 (데이터 보내기)</h3>
+    <p style="font-size:.9rem;color:var(--gray-500);margin:4px 0 0">폼 제출, 댓글 저장, 로그인 등 서버로 데이터를 전송할 때 쓰는 패턴이에요.</p>
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots"><div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div></div>
+        <span class="cb-file">script.js</span>
+        <button class="cb-copy" onclick="copyBlock(this,'c3')">copy</button>
+      </div>
+      <div class="cb-body"><pre id="c3"><span class="tp">async function</span> <span class="ta">postData</span>(url, body) {
+  <span class="tp">const</span> response = <span class="tp">await</span> fetch(url, {
+    method: <span class="tv">'POST'</span>,
+    headers: {
+      <span class="tv">'Content-Type'</span>: <span class="tv">'application/json'</span>,
+    },
+    body: JSON.stringify(body), <span class="tc">// 객체 → JSON 문자열 변환</span>
+  });
+
+  <span class="tp">if</span> (!response.ok) <span class="tp">throw new</span> Error(<span class="tv">`HTTP ${response.status}`</span>);
+  <span class="tp">return</span> response.json();
+}
+
+<span class="tc">// 사용 예시</span>
+postData(<span class="tv">'https://jsonplaceholder.typicode.com/posts'</span>, {
+  title: <span class="tv">'새 게시글'</span>,
+  body: <span class="tv">'내용입니다.'</span>,
+  userId: <span class="tv">1</span>,
+}).then(data => {
+  console.log(<span class="tv">'저장 완료:'</span>, data);
+});</pre></div>
+    </div>
+
+    <div class="callout co-amber" style="margin-top:32px">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <p><strong>CORS 에러가 나요!</strong> 다른 도메인의 API를 브라우저에서 직접 호출하면 CORS(Cross-Origin Resource Sharing) 에러가 발생할 수 있어요. 서버 측에서 <code>Access-Control-Allow-Origin</code> 헤더를 허용해야 해요. 공개 API를 테스트할 때는 CORS를 허용한 API를 찾거나, Netlify Functions / Vercel Edge Functions 같은 중간 서버를 거쳐야 해요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ④ 데모 -->
+<section class="section" id="demo">
+  <div class="container">
+    <div class="section-badge">④ Demo</div>
+    <h2 class="section-title">실제 API를 호출해보세요</h2>
+    <p class="section-lead">아래 데모는 실제 공개 API(<a href="https://jsonplaceholder.typicode.com" target="_blank" rel="noopener">JSONPlaceholder</a>)를 호출해요. 버튼을 눌러 데이터가 불러와지는 걸 직접 확인해보세요.</p>
+
+    <div class="demo-shell">
+      <div class="demo-shell-head">
+        <div class="demo-dots">
+          <div class="demo-dot demo-dot-r"></div>
+          <div class="demo-dot demo-dot-y"></div>
+          <div class="demo-dot demo-dot-g"></div>
+        </div>
+        <span class="demo-shell-title">fetch-demo.js — 라이브 데모</span>
+      </div>
+      <div class="demo-body">
+
+        <div class="demo-controls">
+          <select class="demo-input" id="demo-endpoint" style="max-width:280px">
+            <option value="https://jsonplaceholder.typicode.com/posts?_limit=3">📄 게시글 3개 (GET)</option>
+            <option value="https://jsonplaceholder.typicode.com/users?_limit=3">👤 사용자 3명 (GET)</option>
+            <option value="https://jsonplaceholder.typicode.com/todos?_limit=3">✅ 할 일 3개 (GET)</option>
+            <option value="https://jsonplaceholder.typicode.com/photos?_limit=2">🖼️ 사진 2개 (GET)</option>
+            <option value="https://jsonplaceholder.typicode.com/NOT_FOUND">❌ 404 에러 테스트</option>
+          </select>
+          <button class="demo-fetch-btn" id="demo-btn" onclick="runFetch()">
+            🚀 fetch 실행
+          </button>
+        </div>
+
+        <div class="demo-status" id="demo-status"></div>
+        <div class="demo-result" id="demo-result">← 위에서 엔드포인트를 선택하고 실행 버튼을 눌러보세요.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤ 프롬프트 -->
+<section class="section" id="prompt">
+  <div class="container">
+    <div class="section-badge">⑤ Prompt Tip</div>
+    <h2 class="section-title">AI 프롬프트 팁</h2>
+    <p class="section-lead">API 연동을 AI에게 맡길 때 구체적으로 요청할수록 완성도 높은 코드를 받을 수 있어요.</p>
+    <div class="vibe-tip">
+      <div class="vibe-tip-label">✦ 바이브코더 프롬프트</div>
+      <p>아래 프롬프트를 Claude, ChatGPT, Cursor에 복사해서 바로 사용해보세요.</p>
+      <div class="prompt-box">
+        <pre>내 HTML 페이지에서 외부 API 데이터를 가져와서 카드로 표시하는 기능을 만들어줘.
+
+API 정보:
+- URL: https://api.example.com/products
+- 메서드: GET
+- 응답 형태: JSON 배열, 각 항목에 name, price, image 필드 있음
+
+요구사항:
+- async/await 패턴 사용
+- 로딩 중 스피너 표시, 완료 후 숨기기
+- HTTP 에러(4xx, 5xx)와 네트워크 에러 모두 처리
+- 에러 시 사용자에게 친절한 메시지 표시
+- 각 제품을 카드 형태로 렌더링 (이름, 가격, 이미지)
+- 버튼 클릭 시 중복 요청 방지
+
+순수 HTML + Vanilla JS로 구현해줘.</pre>
+      </div>
+    </div>
+    <div class="callout co-green" style="margin-top:0">
+      <div class="callout-icon">💬</div>
+      <div class="callout-body">
+        <p><strong>팁:</strong> 사용할 API의 실제 응답 JSON을 복사해서 "응답 예시는 이렇게 생겼어:"라고 함께 붙여주면 AI가 정확한 필드명으로 코드를 작성해줘요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑥ FAQ -->
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-badge">⑥ FAQ</div>
+    <h2 class="section-title">자주 묻는 질문</h2>
+    <p class="section-lead">fetch와 비동기를 처음 배울 때 맞닥뜨리는 질문들이에요.</p>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          fetch가 에러를 안 던진다는 게 무슨 말인가요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          404나 500 같은 HTTP 에러가 와도 fetch는 에러를 던지지 않아요. 네트워크 자체가 끊기거나 요청이 완전히 실패할 때만 에러를 던져요. 그래서 <code>response.ok</code> (status 200~299이면 true)를 직접 체크하고 수동으로 에러를 throw해야 해요.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          await를 빼먹으면 어떻게 되나요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          <code>const data = fetch(url)</code>처럼 await 없이 쓰면 <code>data</code>는 실제 데이터가 아니라 Promise 객체예요. <code>data.title</code>을 출력하면 <code>undefined</code>가 나오는 게 흔한 실수예요. 비동기 작업이 있는 곳마다 <code>await</code>을 붙여야 해요.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          API 키를 코드에 그냥 넣어도 되나요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          절대 안 돼요! GitHub에 올리면 누구나 볼 수 있어요. 프론트엔드 코드에 있는 API 키는 개발자 도구로 바로 확인할 수 있어요. 민감한 API 키는 반드시 서버(Node.js, Vercel Functions, Netlify Functions 등) 환경변수에 넣고 프록시 역할을 해야 해요.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          여러 API를 동시에 호출하려면요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          <code>Promise.all([fetch(url1), fetch(url2)])</code>을 사용하면 두 요청을 동시에 보내고 둘 다 완료될 때까지 기다려요. 순서대로 기다리는 것보다 훨씬 빠릅니다. 하나라도 실패하면 전체가 reject되므로 주의하세요. 개별 에러 처리가 필요하면 <code>Promise.allSettled</code>를 사용해요.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          axios와 fetch 중 어떤 걸 써야 하나요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          바이브 코딩 초반엔 외부 라이브러리 없이 쓸 수 있는 fetch를 추천해요. axios는 에러 처리가 더 직관적이고(HTTP 에러에서 자동 throw), 요청/응답 인터셉터, 자동 JSON 변환 등 편의 기능이 있어요. 프로젝트가 커지면 axios나 React Query 같은 라이브러리를 도입하는 게 좋습니다.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-logo"><div class="logo-mark">VT</div>바이브툴킷</div>
+  <p class="footer-desc">바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 도구 모음</p>
+  <div class="footer-links">
+    <a href="index.html">홈</a><a href="about.html">소개</a>
+    <a href="contact.html">문의</a><a href="sitemap.html">사이트맵</a>
+  </div>
+  <div class="footer-copy">© 2026 바이브툴킷. 콘텐츠는 자유롭게 참고하세요.</div>
+</footer>
+
+<script>
+/* 데모 fetch 실행 */
+async function runFetch() {
+  const btn    = document.getElementById('demo-btn');
+  const status = document.getElementById('demo-status');
+  const result = document.getElementById('demo-result');
+  const url    = document.getElementById('demo-endpoint').value;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-inline"></span> 요청 중...';
+  status.className = 'demo-status status-loading';
+  status.textContent = '⏳ 서버에 요청을 보내는 중...';
+  result.textContent = '';
+
+  try {
+    const t0 = Date.now();
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} — ${response.statusText || '요청 실패'}`);
+    }
+
+    const data = await response.json();
+    const elapsed = Date.now() - t0;
+
+    status.className = 'demo-status status-ok';
+    status.textContent = `✅ 성공! ${elapsed}ms 소요 — 항목 ${Array.isArray(data) ? data.length : 1}개`;
+    result.textContent = JSON.stringify(data, null, 2);
+
+  } catch (err) {
+    status.className = 'demo-status status-err';
+    status.textContent = `❌ 오류: ${err.message}`;
+    result.textContent = `에러가 발생했습니다.\n\n${err.message}\n\n실제 서비스라면 사용자에게 친절한 메시지를 보여주고,\n재시도 버튼을 제공하는 것이 좋아요.`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🚀 fetch 실행';
+  }
+}
+
+/* 코드 복사 */
+function copyBlock(btn, id) {
+  const pre = document.getElementById(id);
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'copied!'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+/* FAQ 토글 */
+function toggleFaq(btn) { btn.closest('.faq-item').classList.toggle('open'); }
+
+/* iframe 감지 */
+(function(){
+  if(self===top)return;
+  var nav=document.querySelector('.site-nav'); if(nav)nav.style.display='none';
+  var hero=document.querySelector('.hero'); if(hero)hero.style.paddingTop='40px';
+  document.querySelectorAll('a[href$=".html"]').forEach(function(a){
+    a.addEventListener('click',function(e){
+      if(window.parent&&window.parent.loadTool){e.preventDefault();window.parent.loadTool(this.getAttribute('href'));}
+    });
+  });
+})();
+</script>
+</body>
+</html>

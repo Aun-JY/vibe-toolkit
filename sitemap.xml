@@ -184,4 +184,26 @@
     <priority>0.9</priority>
   </url>
 
+  <!-- 3순위 추가 페이지 -->
+  <url>
+    <loc>https://aun-jy.github.io/vibe-toolkit/css-animation.html</loc>
+    <lastmod>2026-04-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://aun-jy.github.io/vibe-toolkit/fetch-api.html</loc>
+    <lastmod>2026-04-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://aun-jy.github.io/vibe-toolkit/tab-ui.html</loc>
+    <lastmod>2026-04-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
 </urlset>
