@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-
-# 사이트맵 (Astro 빌드 후 자동 생성되거나 수동 추가)
-# Sitemap: https://yourdomain.com/sitemap-index.xml
