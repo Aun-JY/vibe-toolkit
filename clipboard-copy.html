@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>클립보드 복사 버튼 완전 정복 | 바이브툴킷</title>
+  <meta name="description" content="navigator.clipboard API로 복사 버튼 만들기. 복사 완료 피드백 애니메이션, iOS Safari 대응, URL 복사까지 실전 예제로 배워요.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://vibetoolkit.kr/clipboard-copy.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+  :root {
+    --accent:#4f46e5; --accent-soft:#eef2ff; --accent-border:#c7d2fe;
+    --green:#16a34a; --green-soft:#f0fdf4;
+    --amber:#d97706; --amber-soft:#fffbeb;
+    --red:#e11d48; --red-soft:#fff1f2;
+    --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+    --gray-300:#d1d5db; --gray-400:#9ca3af; --gray-500:#6b7280;
+    --gray-600:#4b5563; --gray-700:#374151; --gray-900:#111827;
+    --code-bg:#1e1e2e; --radius:12px; --radius-sm:8px;
+    --shadow-sm:0 1px 3px rgba(0,0,0,.08); --shadow:0 4px 12px rgba(0,0,0,.08);
+    --nav-h:56px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h)+24px)}
+  body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:#fff;color:var(--gray-700);line-height:1.75;font-size:16px}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  strong{color:var(--gray-900);font-weight:600}
+  code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:var(--gray-100);color:var(--accent);padding:.1em .4em;border-radius:4px;border:1px solid var(--gray-200)}
+
+  .site-nav{position:fixed;top:0;left:0;right:0;z-index:500;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);height:var(--nav-h);display:flex;align-items:center;padding:0 24px}
+  .nav-logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.95rem;color:var(--gray-900);margin-right:32px;flex-shrink:0;text-decoration:none}
+  .nav-logo:hover{text-decoration:none}
+  .logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;color:#fff}
+  .nav-links{display:flex;align-items:center;gap:2px;list-style:none;overflow-x:auto;scrollbar-width:none}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{display:block;padding:6px 14px;font-size:.85rem;font-weight:500;color:var(--gray-500);border-radius:var(--radius-sm);white-space:nowrap;transition:color .15s,background .15s;text-decoration:none}
+  .nav-links a:hover{color:var(--gray-900);background:var(--gray-100)}
+  .nav-links a.active{color:var(--accent);background:var(--accent-soft);font-weight:600}
+
+  .container{max-width:860px;margin:0 auto;padding:0 24px}
+  .section{padding:72px 0}
+  .section:nth-child(even){background:var(--gray-50)}
+  .section-badge{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:20px;padding:3px 12px;margin-bottom:14px}
+  .section-title{font-size:1.75rem;font-weight:700;color:var(--gray-900);letter-spacing:-.025em;line-height:1.25;margin-bottom:10px}
+  .section-lead{font-size:1.05rem;color:var(--gray-500);line-height:1.7;margin-bottom:40px;max-width:600px}
+
+  .hero{padding:calc(var(--nav-h)+56px) 0 64px;background:linear-gradient(160deg,var(--accent-soft) 0%,#fff 60%);border-bottom:1px solid var(--gray-200)}
+  .hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:20px;padding:4px 14px;margin-bottom:20px}
+  .hero h1{font-size:clamp(1.9rem,4vw,2.75rem);font-weight:700;color:var(--gray-900);letter-spacing:-.03em;line-height:1.2;margin-bottom:18px}
+  .hero h1 em{color:var(--accent);font-style:normal}
+  .hero-desc{font-size:1.08rem;color:var(--gray-500);line-height:1.75;max-width:540px;margin-bottom:32px}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:16px;font-size:.82rem;color:var(--gray-500)}
+  .hero-meta span{display:flex;align-items:center;gap:5px}
+
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:28px}
+  .info-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:22px 20px;box-shadow:var(--shadow-sm);transition:box-shadow .2s,transform .2s}
+  .info-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+  .info-card-icon{font-size:1.6rem;margin-bottom:10px}
+  .info-card h4{font-size:.95rem;font-weight:700;color:var(--gray-900);margin-bottom:7px}
+  .info-card p{font-size:.86rem;color:var(--gray-600);line-height:1.7}
+  .ic-accent{background:var(--accent-soft);border-color:var(--accent-border)}
+  .ic-green{background:var(--green-soft);border-color:#bbf7d0}
+  .ic-amber{background:var(--amber-soft);border-color:#fde68a}
+  .ic-red{background:var(--red-soft);border-color:#fecdd3}
+
+  .callout{display:flex;gap:14px;padding:18px 20px;border-radius:var(--radius);margin:24px 0;font-size:.93rem;line-height:1.75;color:var(--gray-700)}
+  .callout-icon{font-size:1.2rem;flex-shrink:0;padding-top:1px}
+  .callout-body p{margin:0} .callout-body p+p{margin-top:6px}
+  .co-blue{background:var(--accent-soft);border:1px solid var(--accent-border)}
+  .co-green{background:var(--green-soft);border:1px solid #bbf7d0}
+  .co-amber{background:var(--amber-soft);border:1px solid #fde68a}
+  .co-red{background:var(--red-soft);border:1px solid #fecdd3}
+
+  .vibe-tip{background:linear-gradient(135deg,#faf5ff 0%,#eff6ff 100%);border:1px solid #e9d5ff;border-left:4px solid #8b5cf6;border-radius:var(--radius);padding:20px 22px;margin:32px 0}
+  .vibe-tip-label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7c3aed;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .vibe-tip p{font-size:.92rem;color:var(--gray-700);margin-bottom:10px;line-height:1.75}
+  .vibe-tip p:last-child{margin-bottom:0}
+  .vibe-tip code{background:#ede9fe;border-color:#ddd6fe;color:#7c3aed}
+  .prompt-box{background:#1e1e2e;border-radius:var(--radius-sm);padding:14px 16px;margin-top:14px}
+  .prompt-box pre{font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.65;color:#cdd6f4;white-space:pre-wrap;word-break:break-word}
+
+  .code-block{background:var(--code-bg);border-radius:var(--radius);overflow:hidden;margin-top:24px;border:1px solid #2d2d3f;box-shadow:var(--shadow)}
+  .cb-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#13131f;border-bottom:1px solid #2d2d3f}
+  .cb-dots{display:flex;gap:6px}
+  .cb-dot{width:10px;height:10px;border-radius:50%}
+  .cb-dot-r{background:#ff5f57} .cb-dot-y{background:#febc2e} .cb-dot-g{background:#28c840}
+  .cb-file{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#6272a4}
+  .cb-copy{font-family:'JetBrains Mono',monospace;font-size:.72rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:5px;color:#94a3b8;padding:3px 12px;cursor:pointer;transition:background .15s,color .15s}
+  .cb-copy:hover{background:rgba(255,255,255,.15);color:#fff}
+  .cb-copy.ok{color:#a6e3a1;border-color:#a6e3a1}
+  .cb-body{padding:20px;overflow-x:auto}
+  .cb-body pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.75;color:#cdd6f4;white-space:pre}
+  .tk{color:#89b4fa} .ta{color:#a6e3a1} .tv{color:#f9e2af} .tc{color:#6272a4;font-style:italic} .tp{color:#cba6f7}
+
+  /* 데모 영역 */
+  .demo-wrap{margin-top:28px;display:flex;flex-direction:column;gap:32px}
+  .demo-label{font-size:.82rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+  .demo-box{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow-sm)}
+
+  /* 기본 복사 버튼 데모 */
+  .copy-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .copy-input{flex:1;min-width:180px;padding:10px 14px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-family:'Noto Sans KR',sans-serif;font-size:.9rem;color:var(--gray-700);background:var(--gray-50);outline:none;transition:border-color .2s}
+  .copy-input:focus{border-color:var(--accent);background:#fff}
+  .copy-btn{padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-family:'Noto Sans KR',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:background .2s,transform .1s;white-space:nowrap}
+  .copy-btn:hover{background:#4338ca}
+  .copy-btn:active{transform:scale(.97)}
+  .copy-btn.copied{background:var(--green)}
+
+  /* 코드 복사 데모 */
+  .demo-code-area{position:relative}
+  .demo-code-pre{background:var(--code-bg);border-radius:var(--radius-sm);padding:18px 16px;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.7;color:#cdd6f4;overflow-x:auto;white-space:pre}
+  .demo-code-copy{position:absolute;top:10px;right:10px;padding:5px 14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#94a3b8;cursor:pointer;transition:background .2s,color .2s}
+  .demo-code-copy:hover{background:rgba(255,255,255,.2);color:#fff}
+  .demo-code-copy.copied{color:#a6e3a1;border-color:#a6e3a1}
+
+  /* URL 복사 데모 */
+  .url-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .url-display{flex:1;min-width:180px;padding:10px 14px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--gray-600);background:var(--gray-50);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .url-copy-btn{padding:10px 20px;background:var(--gray-900);color:#fff;border:none;border-radius:var(--radius-sm);font-family:'Noto Sans KR',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:background .2s;white-space:nowrap}
+  .url-copy-btn:hover{background:var(--gray-700)}
+  .url-copy-btn.copied{background:var(--green)}
+  .copy-toast{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:.82rem;color:var(--green);font-weight:600;opacity:0;transition:opacity .3s}
+  .copy-toast.show{opacity:1}
+
+  /* FAQ */
+  .faq-list{margin-top:28px}
+  .faq-item{border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm)}
+  .faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:none;border:none;font-family:'Noto Sans KR',sans-serif;font-size:.93rem;font-weight:600;color:var(--gray-900);cursor:pointer;text-align:left;gap:12px;transition:background .15s}
+  .faq-q:hover{background:var(--gray-50)}
+  .faq-q-icon{width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;transition:transform .25s}
+  .faq-item.open .faq-q-icon{transform:rotate(45deg)}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;font-size:.9rem;color:var(--gray-600);line-height:1.75;padding:0 20px}
+  .faq-item.open .faq-a{max-height:300px;padding:0 20px 18px}
+
+  /* 비교 테이블 */
+  .compare-table{width:100%;border-collapse:collapse;margin-top:24px;font-size:.88rem}
+  .compare-table th{background:var(--accent-soft);color:var(--accent);font-weight:700;padding:10px 14px;text-align:left;border:1px solid var(--accent-border)}
+  .compare-table td{padding:10px 14px;border:1px solid var(--gray-200);color:var(--gray-700);vertical-align:top;line-height:1.65}
+  .compare-table tr:nth-child(even) td{background:var(--gray-50)}
+  .badge-old{display:inline-block;font-size:.7rem;font-weight:700;color:var(--amber);background:var(--amber-soft);border:1px solid #fde68a;border-radius:10px;padding:1px 8px}
+  .badge-new{display:inline-block;font-size:.7rem;font-weight:700;color:var(--green);background:var(--green-soft);border:1px solid #bbf7d0;border-radius:10px;padding:1px 8px}
+
+  .site-footer{background:var(--gray-900);color:var(--gray-400);padding:48px 24px 36px;text-align:center}
+  .footer-logo{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:1rem;color:#fff;margin-bottom:10px}
+  .footer-logo .logo-mark{background:var(--accent)}
+  .footer-desc{font-size:.85rem;line-height:1.7;margin-bottom:20px}
+  .footer-links{display:flex;justify-content:center;gap:20px;margin-bottom:20px;flex-wrap:wrap}
+  .footer-links a{font-size:.83rem;color:var(--gray-400);transition:color .15s;text-decoration:none}
+  .footer-links a:hover{color:#fff}
+  .footer-copy{font-size:.78rem;color:var(--gray-500)}
+
+  @media(max-width:600px){
+    .hero{padding:calc(var(--nav-h)+36px) 0 48px}
+    .section{padding:52px 0}
+    .card-grid{grid-template-columns:1fr}
+    .copy-row,.url-row{flex-direction:column;align-items:stretch}
+    .copy-btn,.url-copy-btn{width:100%}
+  }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark">VT</div>
+    바이브툴킷
+  </a>
+  <ul class="nav-links">
+    <li><a href="#concept">① 개념</a></li>
+    <li><a href="#demo">② 데모</a></li>
+    <li><a href="#code">③ 코드</a></li>
+    <li><a href="#advanced">④ 응용</a></li>
+    <li><a href="#prompt">⑤ 프롬프트</a></li>
+    <li><a href="#faq">⑥ FAQ</a></li>
+  </ul>
+</nav>
+
+<!-- 히어로 -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">📋 JavaScript 실전 패턴</div>
+    <h1>클립보드 복사<br><em>(Clipboard Copy)</em></h1>
+    <p class="hero-desc">"복사" 버튼 하나로 코드·링크·텍스트를 바로 클립보드에 저장. navigator.clipboard API로 깔끔하게 구현하고 복사 완료 피드백까지 완성해봐요.</p>
+    <div class="hero-meta">
+      <span>📋 Clipboard API</span>
+      <span>⚡ 3줄이면 완성</span>
+      <span>🎨 피드백 애니메이션</span>
+      <span>📱 모바일 지원</span>
+    </div>
+  </div>
+</section>
+
+<!-- ① 개념 -->
+<section class="section" id="concept">
+  <div class="container">
+    <div class="section-badge">① Concept</div>
+    <h2 class="section-title">Clipboard API란?</h2>
+    <p class="section-lead">브라우저가 제공하는 클립보드 접근 API예요. 버튼 하나로 텍스트를 복사할 수 있어 사용자 경험을 크게 향상시켜요.</p>
+
+    <div class="callout co-blue">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <p><strong>핵심 3줄:</strong> <code>await navigator.clipboard.writeText(text)</code> — 이게 전부예요. async/await로 감싸고, 완료 후 버튼 텍스트를 바꿔주면 끝이에요.</p>
+      </div>
+    </div>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>방법</th>
+          <th>지원 범위</th>
+          <th>특징</th>
+          <th>추천도</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>document.execCommand('copy')</code></td>
+          <td>모든 브라우저 (구형 포함)</td>
+          <td>텍스트 선택 후 복사. 동기식. 이미 deprecated 됨</td>
+          <td><span class="badge-old">구식</span></td>
+        </tr>
+        <tr>
+          <td><code>navigator.clipboard.writeText()</code></td>
+          <td>Chrome 66+, Firefox 63+, Safari 13.1+</td>
+          <td>Promise 기반 비동기. HTTPS 또는 localhost 필요</td>
+          <td><span class="badge-new">권장</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="card-grid" style="margin-top:32px">
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">🔒</div>
+        <h4>HTTPS 필요</h4>
+        <p><code>navigator.clipboard</code>는 보안 컨텍스트(HTTPS 또는 localhost)에서만 동작해요. HTTP 사이트에서는 <code>document.execCommand</code> 폴백이 필요해요.</p>
+      </div>
+      <div class="info-card ic-green">
+        <div class="info-card-icon">⏱️</div>
+        <h4>사용자 행동 내 호출</h4>
+        <p>클립보드 API는 버튼 클릭 같은 사용자 제스처 안에서만 호출할 수 있어요. 페이지 로드 시 자동으로 복사하려 하면 차단돼요.</p>
+      </div>
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">📱</div>
+        <h4>iOS Safari 주의</h4>
+        <p>iOS Safari 13.4 미만에서는 <code>navigator.clipboard</code>가 없을 수 있어요. <code>try/catch</code>로 에러를 잡고 <code>execCommand</code>로 폴백 처리하세요.</p>
+      </div>
+      <div class="info-card ic-red">
+        <div class="info-card-icon">🎨</div>
+        <h4>피드백이 핵심</h4>
+        <p>복사가 됐는지 사용자가 알 수 없으면 불안해요. 버튼 텍스트 변경, 색상 변화, 토스트 알림 등으로 복사 완료를 명확하게 알려주세요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ② 데모 -->
+<section class="section" id="demo">
+  <div class="container">
+    <div class="section-badge">② Demo</div>
+    <h2 class="section-title">직접 클릭해보세요</h2>
+    <p class="section-lead">3가지 복사 패턴을 직접 체험해보세요. 버튼을 클릭하면 클립보드에 복사돼요.</p>
+
+    <div class="demo-wrap">
+
+      <!-- [1] 기본 복사 버튼 -->
+      <div>
+        <p class="demo-label">① 기본 복사 버튼</p>
+        <div class="demo-box">
+          <p style="font-size:.88rem;color:var(--gray-600);margin-bottom:16px">텍스트를 수정하고 복사 버튼을 눌러보세요. 2초 후 버튼이 원래대로 돌아와요.</p>
+          <div class="copy-row">
+            <input class="copy-input" id="copyText1" type="text" value="바이브툴킷에서 클립보드 복사를 배웠어요! 🎉">
+            <button class="copy-btn" id="copyBtn1" onclick="handleBasicCopy()">📋 복사</button>
+          </div>
+          <div class="copy-toast" id="toast1">✓ 클립보드에 복사됐어요!</div>
+        </div>
+      </div>
+
+      <!-- [2] 코드 블록 복사 -->
+      <div>
+        <p class="demo-label">② 코드 블록 복사</p>
+        <div class="demo-box">
+          <p style="font-size:.88rem;color:var(--gray-600);margin-bottom:16px">코드 영역 오른쪽 상단의 copy 버튼을 눌러보세요.</p>
+          <div class="demo-code-area">
+            <pre class="demo-code-pre" id="codeDemo">const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    console.log('복사 완료!');
+  } catch (err) {
+    console.error('복사 실패:', err);
+  }
+};</pre>
+            <button class="demo-code-copy" id="codeCopyBtn" onclick="handleCodeCopy()">copy</button>
+          </div>
+          <div class="copy-toast" id="toast2" style="margin-top:12px">✓ 코드가 복사됐어요!</div>
+        </div>
+      </div>
+
+      <!-- [3] URL 복사 버튼 -->
+      <div>
+        <p class="demo-label">③ 현재 페이지 URL 복사</p>
+        <div class="demo-box">
+          <p style="font-size:.88rem;color:var(--gray-600);margin-bottom:16px">현재 페이지의 URL을 클립보드에 복사해요. 블로그나 공유 버튼에 유용해요.</p>
+          <div class="url-row">
+            <div class="url-display" id="urlDisplay"></div>
+            <button class="url-copy-btn" id="urlCopyBtn" onclick="handleUrlCopy()">🔗 URL 복사</button>
+          </div>
+          <div class="copy-toast" id="toast3">✓ URL이 복사됐어요! 어디서든 붙여넣기 하세요.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ③ 코드 -->
+<section class="section" id="code">
+  <div class="container">
+    <div class="section-badge">③ Code</div>
+    <h2 class="section-title">코드 해설</h2>
+    <p class="section-lead">기본 복사 버튼부터 심화 패턴까지 단계별로 살펴봐요.</p>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin-bottom:4px">1 — 기본 복사 버튼 (3줄 핵심)</h3>
+    <p style="font-size:.9rem;color:var(--gray-500);margin:4px 0 0">이것만 알면 80% 완성이에요. async/await로 복사하고 버튼 텍스트를 바꿔요.</p>
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots"><div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div></div>
+        <span class="cb-file">script.js</span>
+        <button class="cb-copy" onclick="copyBlock(this,'c1')">copy</button>
+      </div>
+      <div class="cb-body"><pre id="c1"><span class="tp">const</span> btn  = document.querySelector(<span class="tv">'#copyBtn'</span>);
+<span class="tp">const</span> text = <span class="tv">'복사할 텍스트를 여기에'</span>;
+
+btn.addEventListener(<span class="tv">'click'</span>, <span class="tp">async</span> () => {
+  <span class="tp">await</span> navigator.clipboard.writeText(text);
+
+  <span class="tc">// 복사 완료 피드백</span>
+  btn.textContent = <span class="tv">'복사됨! ✓'</span>;
+  btn.style.background = <span class="tv">'#16a34a'</span>;   <span class="tc">// 초록색으로 변경</span>
+
+  <span class="tc">// 2초 후 원래대로</span>
+  setTimeout(() => {
+    btn.textContent = <span class="tv">'📋 복사'</span>;
+    btn.style.background = <span class="tv">''</span>;
+  }, <span class="tv">2000</span>);
+});</pre></div>
+    </div>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin:40px 0 4px">2 — 입력 필드 내용 복사</h3>
+    <p style="font-size:.9rem;color:var(--gray-500);margin:4px 0 0">input 또는 textarea 값을 복사할 때는 <code>.value</code>를 읽어서 writeText에 넘겨요.</p>
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots"><div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div></div>
+        <span class="cb-file">script.js</span>
+        <button class="cb-copy" onclick="copyBlock(this,'c2')">copy</button>
+      </div>
+      <div class="cb-body"><pre id="c2"><span class="tp">const</span> input = document.querySelector(<span class="tv">'#myInput'</span>);
+<span class="tp">const</span> btn   = document.querySelector(<span class="tv">'#copyBtn'</span>);
+
+btn.addEventListener(<span class="tv">'click'</span>, <span class="tp">async</span> () => {
+  <span class="tp">const</span> text = input.value.trim();
+
+  <span class="tp">if</span> (!text) {
+    alert(<span class="tv">'복사할 내용이 없어요!'</span>);
+    <span class="tp">return</span>;
+  }
+
+  <span class="tp">try</span> {
+    <span class="tp">await</span> navigator.clipboard.writeText(text);
+    showFeedback(btn, <span class="tv">'복사됨! ✓'</span>);
+  } <span class="tp">catch</span> (err) {
+    console.error(<span class="tv">'복사 실패:'</span>, err);
+    fallbackCopy(text);   <span class="tc">// execCommand 폴백</span>
+  }
+});
+
+<span class="tp">function</span> showFeedback(btn, msg) {
+  <span class="tp">const</span> original = btn.textContent;
+  btn.textContent = msg;
+  btn.disabled = <span class="tp">true</span>;
+  setTimeout(() => {
+    btn.textContent = original;
+    btn.disabled = <span class="tp">false</span>;
+  }, <span class="tv">2000</span>);
+}</pre></div>
+    </div>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin:40px 0 4px">3 — 코드 블록 복사 버튼 (HTML 포함)</h3>
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots"><div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div></div>
+        <span class="cb-file">index.html + script.js</span>
+        <button class="cb-copy" onclick="copyBlock(this,'c3')">copy</button>
+      </div>
+      <div class="cb-body"><pre id="c3"><span class="tc">&lt;!-- HTML --&gt;</span>
+<span class="tk">&lt;div</span> <span class="ta">class</span>=<span class="tv">"code-area"</span> <span class="ta">style</span>=<span class="tv">"position:relative"</span><span class="tk">&gt;</span>
+  <span class="tk">&lt;pre</span> <span class="ta">id</span>=<span class="tv">"myCode"</span><span class="tk">&gt;</span>const x = 42;<span class="tk">&lt;/pre&gt;</span>
+  <span class="tk">&lt;button</span> <span class="ta">class</span>=<span class="tv">"copy-code-btn"</span>
+          <span class="ta">style</span>=<span class="tv">"position:absolute;top:10px;right:10px"</span>
+          <span class="ta">onclick</span>=<span class="tv">"copyCode(this,'myCode')"</span><span class="tk">&gt;</span>copy<span class="tk">&lt;/button&gt;</span>
+<span class="tk">&lt;/div&gt;</span>
+
+<span class="tc">// JavaScript</span>
+<span class="tp">async function</span> copyCode(btn, preId) {
+  <span class="tp">const</span> code = document.getElementById(preId).innerText;
+  <span class="tp">await</span> navigator.clipboard.writeText(code);
+  btn.textContent = <span class="tv">'copied! ✓'</span>;
+  btn.style.color = <span class="tv">'#a6e3a1'</span>;
+  setTimeout(() => {
+    btn.textContent = <span class="tv">'copy'</span>;
+    btn.style.color = <span class="tv">''</span>;
+  }, <span class="tv">2000</span>);
+}</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ④ 응용 -->
+<section class="section" id="advanced">
+  <div class="container">
+    <div class="section-badge">④ Advanced</div>
+    <h2 class="section-title">응용 & 예외 처리</h2>
+    <p class="section-lead">실서비스에서 자주 맞닥뜨리는 예외 상황과 UX 향상 팁이에요.</p>
+
+    <div class="callout co-amber">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <p><strong>iOS Safari 구버전 대응:</strong> iOS 13.4 미만에서는 <code>navigator.clipboard</code>가 없을 수 있어요. <code>try/catch</code> 안에서 <code>navigator.clipboard</code> 존재 여부를 확인하고 없으면 <code>document.execCommand('copy')</code> 폴백을 사용하세요.</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin:32px 0 4px">완전한 폴백 처리 코드</h3>
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots"><div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div></div>
+        <span class="cb-file">clipboard-utils.js</span>
+        <button class="cb-copy" onclick="copyBlock(this,'c4')">copy</button>
+      </div>
+      <div class="cb-body"><pre id="c4"><span class="tc">/**
+ * 텍스트를 클립보드에 복사 (폴백 포함)
+ * @param {string} text - 복사할 텍스트
+ * @returns {Promise&lt;boolean&gt;} 성공 여부
+ */</span>
+<span class="tp">async function</span> copyToClipboard(text) {
+  <span class="tc">// 최신 브라우저: navigator.clipboard API</span>
+  <span class="tp">if</span> (navigator.clipboard && window.isSecureContext) {
+    <span class="tp">try</span> {
+      <span class="tp">await</span> navigator.clipboard.writeText(text);
+      <span class="tp">return true</span>;
+    } <span class="tp">catch</span> (err) {
+      console.warn(<span class="tv">'Clipboard API 실패, 폴백 시도:'</span>, err);
+    }
+  }
+
+  <span class="tc">// 폴백: execCommand (구형 브라우저 / HTTP)</span>
+  <span class="tp">const</span> textarea = document.createElement(<span class="tv">'textarea'</span>);
+  textarea.value = text;
+  textarea.style.cssText = <span class="tv">'position:fixed;opacity:0;top:-9999px'</span>;
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+
+  <span class="tp">try</span> {
+    document.execCommand(<span class="tv">'copy'</span>);
+    <span class="tp">return true</span>;
+  } <span class="tp">catch</span> (err) {
+    console.error(<span class="tv">'복사 실패:'</span>, err);
+    <span class="tp">return false</span>;
+  } <span class="tp">finally</span> {
+    document.body.removeChild(textarea);
+  }
+}
+
+<span class="tc">// 사용 예시</span>
+btn.addEventListener(<span class="tv">'click'</span>, <span class="tp">async</span> () => {
+  <span class="tp">const</span> ok = <span class="tp">await</span> copyToClipboard(<span class="tv">'복사할 텍스트'</span>);
+  <span class="tp">if</span> (ok) {
+    showSuccess(<span class="tv">'복사됐어요! ✓'</span>);
+  } <span class="tp">else</span> {
+    showError(<span class="tv">'복사에 실패했어요. 직접 선택 후 Ctrl+C를 눌러주세요.'</span>);
+  }
+});</pre></div>
+    </div>
+
+    <div class="card-grid" style="margin-top:32px">
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">🎨</div>
+        <h4>버튼 색상 피드백</h4>
+        <p>복사 완료 시 초록색으로, 실패 시 빨간색으로 버튼 색상을 바꿔 직관적으로 상태를 알려요. 2초 후 원래 색상으로 돌아오게 <code>setTimeout</code>을 사용해요.</p>
+      </div>
+      <div class="info-card ic-green">
+        <div class="info-card-icon">🍞</div>
+        <h4>토스트 알림</h4>
+        <p>화면 하단이나 상단에 "복사됐어요!" 토스트를 띄우는 방식도 인기 있어요. 여러 곳의 복사 버튼이 있을 때 중앙 피드백으로 일관성을 줄 수 있어요.</p>
+      </div>
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">♿</div>
+        <h4>접근성 고려</h4>
+        <p>버튼에 <code>aria-label="코드 복사"</code>를 추가하고, 복사 완료 시 <code>aria-live="polite"</code> 영역에 "복사됐습니다"를 넣으면 스크린 리더 사용자도 피드백을 받을 수 있어요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤ 프롬프트 -->
+<section class="section" id="prompt">
+  <div class="container">
+    <div class="section-badge">⑤ Prompt Tip</div>
+    <h2 class="section-title">AI 프롬프트 팁</h2>
+    <p class="section-lead">복사 버튼 기능을 AI에게 요청할 때 이 프롬프트를 참고해보세요.</p>
+    <div class="vibe-tip">
+      <div class="vibe-tip-label">✦ 바이브코더 프롬프트</div>
+      <p>아래 프롬프트를 복사해서 AI에 붙여넣어 보세요.</p>
+      <div class="prompt-box">
+        <pre>내 블로그 코드 블록에 복사 버튼을 추가해줘.
+
+요구사항:
+- 코드 블록(pre 태그) 오른쪽 상단에 "copy" 버튼 표시
+- 클릭하면 해당 코드 내용을 클립보드에 복사
+- 복사 성공 시 버튼이 "copied! ✓"로 바뀌고 초록색이 됨
+- 2초 후 원래 "copy" 버튼으로 되돌아옴
+- navigator.clipboard API 사용 (iOS Safari 폴백 포함)
+- 페이지에 코드 블록이 여러 개 있어도 각각 독립적으로 동작
+- 순수 Vanilla JS (라이브러리 없이)
+
+현재 내 코드 블록 HTML 구조:
+&lt;pre class="code-block"&gt;&lt;code&gt;코드 내용&lt;/code&gt;&lt;/pre&gt;</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑥ FAQ -->
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-badge">⑥ FAQ</div>
+    <h2 class="section-title">자주 묻는 질문</h2>
+    <p class="section-lead">클립보드 복사 구현 시 자주 맞닥뜨리는 질문들이에요.</p>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          localhost에서는 되는데 배포하면 안 돼요.
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          <code>navigator.clipboard</code>는 보안 컨텍스트(HTTPS)에서만 동작해요. HTTP로 배포된 사이트에서는 사용할 수 없어요. 해결책은 ① HTTPS로 배포하거나, ② <code>document.execCommand('copy')</code> 폴백을 함께 구현하는 것이에요. 대부분의 호스팅 서비스(Netlify, Vercel, GitHub Pages)는 기본으로 HTTPS를 제공해요.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          복사 완료 후 붙여넣기 하면 다른 내용이 나와요.
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          <code>pre.innerText</code>와 <code>pre.textContent</code>의 차이 때문일 수 있어요. <code>innerText</code>는 화면에 렌더링된 텍스트를, <code>textContent</code>는 HTML 태그를 포함한 원본을 반환해요. 코드 하이라이팅을 위해 span 태그를 사용했다면 <code>textContent</code>에는 태그가 포함돼요. <code>innerText</code>를 사용하면 화면에 보이는 텍스트만 복사돼요.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          여러 복사 버튼이 있을 때 각각 독립적으로 작동하게 하려면요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          <code>data-copy-target</code> 같은 데이터 속성으로 버튼과 복사 대상을 연결하면 돼요. 예시: <code>&lt;button data-copy-target="code1"&gt;복사&lt;/button&gt;</code> → <code>document.querySelectorAll('[data-copy-target]').forEach(btn =&gt; btn.addEventListener('click', ...))</code>. 이벤트 위임 패턴으로 하나의 이벤트 리스너로 모든 버튼을 처리할 수 있어요.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-logo"><div class="logo-mark">VT</div>바이브툴킷</div>
+  <p class="footer-desc">바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 도구 모음</p>
+  <div class="footer-links">
+    <a href="index.html">홈</a><a href="about.html">소개</a>
+    <a href="contact.html">문의</a><a href="sitemap.html">사이트맵</a>
+  </div>
+  <div class="footer-copy">© 2026 바이브툴킷. 콘텐츠는 자유롭게 참고하세요.</div>
+</footer>
+
+<script>
+/* URL 표시 */
+document.addEventListener('DOMContentLoaded', function() {
+  var urlDisplay = document.getElementById('urlDisplay');
+  if (urlDisplay) urlDisplay.textContent = window.location.href;
+});
+
+/* 기본 복사 버튼 */
+async function handleBasicCopy() {
+  var input = document.getElementById('copyText1');
+  var btn = document.getElementById('copyBtn1');
+  var toast = document.getElementById('toast1');
+  var text = input.value.trim();
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch(e) {
+    fallbackCopy(text);
+  }
+  btn.textContent = '복사됨! ✓';
+  btn.classList.add('copied');
+  toast.classList.add('show');
+  setTimeout(function() {
+    btn.textContent = '📋 복사';
+    btn.classList.remove('copied');
+    toast.classList.remove('show');
+  }, 2000);
+}
+
+/* 코드 복사 */
+async function handleCodeCopy() {
+  var pre = document.getElementById('codeDemo');
+  var btn = document.getElementById('codeCopyBtn');
+  var toast = document.getElementById('toast2');
+  try {
+    await navigator.clipboard.writeText(pre.innerText);
+  } catch(e) {
+    fallbackCopy(pre.innerText);
+  }
+  btn.textContent = 'copied! ✓';
+  btn.classList.add('copied');
+  toast.classList.add('show');
+  setTimeout(function() {
+    btn.textContent = 'copy';
+    btn.classList.remove('copied');
+    toast.classList.remove('show');
+  }, 2000);
+}
+
+/* URL 복사 */
+async function handleUrlCopy() {
+  var url = window.location.href;
+  var btn = document.getElementById('urlCopyBtn');
+  var toast = document.getElementById('toast3');
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch(e) {
+    fallbackCopy(url);
+  }
+  btn.textContent = '✓ 복사됨!';
+  btn.classList.add('copied');
+  toast.classList.add('show');
+  setTimeout(function() {
+    btn.textContent = '🔗 URL 복사';
+    btn.classList.remove('copied');
+    toast.classList.remove('show');
+  }, 2000);
+}
+
+/* execCommand 폴백 */
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;top:-9999px';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+/* 코드 블록 복사 */
+function copyBlock(btn, id) {
+  var pre = document.getElementById(id);
+  var text = pre.innerText;
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = 'copied!'; btn.classList.add('ok');
+      setTimeout(function() { btn.textContent = 'copy'; btn.classList.remove('ok'); }, 2000);
+    });
+  } else {
+    fallbackCopy(text);
+    btn.textContent = 'copied!'; btn.classList.add('ok');
+    setTimeout(function() { btn.textContent = 'copy'; btn.classList.remove('ok'); }, 2000);
+  }
+}
+
+/* FAQ 토글 */
+function toggleFaq(btn) { btn.closest('.faq-item').classList.toggle('open'); }
+
+/* 네비 활성화 */
+(function() {
+  var sections = document.querySelectorAll('.section[id]');
+  var links = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', function() {
+    var pos = window.scrollY + 80;
+    sections.forEach(function(s) {
+      if (s.offsetTop <= pos && s.offsetTop + s.offsetHeight > pos) {
+        links.forEach(function(l) { l.classList.remove('active'); });
+        var link = document.querySelector('.nav-links a[href="#' + s.id + '"]');
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { passive: true });
+})();
+
+/* iframe 감지 */
+(function() {
+  if (self === top) return;
+  var nav = document.querySelector('.site-nav'); if (nav) nav.style.display = 'none';
+  var hero = document.querySelector('.hero'); if (hero) hero.style.paddingTop = '40px';
+  document.querySelectorAll('a[href$=".html"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      if (window.parent && window.parent.loadTool) { e.preventDefault(); window.parent.loadTool(this.getAttribute('href')); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS 로딩 스피너 완전 정복 | 바이브툴킷</title>
+  <meta name="description" content="JS 없이 CSS만으로 만드는 6가지 로딩 스피너. 원형·점·펄스·스켈레톤·이중링·바운스 패턴을 코드와 함께 정복하는 바이브 코딩 가이드.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://vibetoolkit.kr/loading-spinner.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+  :root {
+    --accent:#4f46e5; --accent-soft:#eef2ff; --accent-border:#c7d2fe;
+    --green:#16a34a; --green-soft:#f0fdf4;
+    --amber:#d97706; --amber-soft:#fffbeb;
+    --red:#e11d48; --red-soft:#fff1f2;
+    --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+    --gray-300:#d1d5db; --gray-400:#9ca3af; --gray-500:#6b7280;
+    --gray-600:#4b5563; --gray-700:#374151; --gray-900:#111827;
+    --code-bg:#1e1e2e; --radius:12px; --radius-sm:8px;
+    --shadow-sm:0 1px 3px rgba(0,0,0,.08); --shadow:0 4px 12px rgba(0,0,0,.08);
+    --shadow-lg:0 8px 28px rgba(0,0,0,.10); --nav-h:56px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h)+24px)}
+  body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:#fff;color:var(--gray-700);line-height:1.75;font-size:16px}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  strong{color:var(--gray-900);font-weight:600}
+  code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:var(--gray-100);color:var(--accent);padding:.1em .4em;border-radius:4px;border:1px solid var(--gray-200)}
+
+  .site-nav{position:fixed;top:0;left:0;right:0;z-index:500;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);height:var(--nav-h);display:flex;align-items:center;padding:0 24px}
+  .nav-logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.95rem;color:var(--gray-900);margin-right:32px;flex-shrink:0;text-decoration:none}
+  .nav-logo:hover{text-decoration:none}
+  .logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;color:#fff}
+  .nav-links{display:flex;align-items:center;gap:2px;list-style:none;overflow-x:auto;scrollbar-width:none}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{display:block;padding:6px 14px;font-size:.85rem;font-weight:500;color:var(--gray-500);border-radius:var(--radius-sm);white-space:nowrap;transition:color .15s,background .15s;text-decoration:none}
+  .nav-links a:hover{color:var(--gray-900);background:var(--gray-100)}
+  .nav-links a.active{color:var(--accent);background:var(--accent-soft);font-weight:600}
+
+  .container{max-width:860px;margin:0 auto;padding:0 24px}
+  .section{padding:72px 0}
+  .section:nth-child(even){background:var(--gray-50)}
+
+  .section-badge{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:20px;padding:3px 12px;margin-bottom:14px}
+  .section-title{font-size:1.75rem;font-weight:700;color:var(--gray-900);letter-spacing:-.025em;line-height:1.25;margin-bottom:10px}
+  .section-lead{font-size:1.05rem;color:var(--gray-500);line-height:1.7;margin-bottom:40px;max-width:600px}
+
+  .hero{padding:calc(var(--nav-h)+56px) 0 64px;background:linear-gradient(160deg,var(--accent-soft) 0%,#fff 60%);border-bottom:1px solid var(--gray-200)}
+  .hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:20px;padding:4px 14px;margin-bottom:20px}
+  .hero h1{font-size:clamp(1.9rem,4vw,2.75rem);font-weight:700;color:var(--gray-900);letter-spacing:-.03em;line-height:1.2;margin-bottom:18px}
+  .hero h1 em{color:var(--accent);font-style:normal}
+  .hero-desc{font-size:1.08rem;color:var(--gray-500);line-height:1.75;max-width:540px;margin-bottom:32px}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:16px;font-size:.82rem;color:var(--gray-500)}
+  .hero-meta span{display:flex;align-items:center;gap:5px}
+
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:28px}
+  .info-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:22px 20px;box-shadow:var(--shadow-sm);transition:box-shadow .2s,transform .2s}
+  .info-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+  .info-card-icon{font-size:1.6rem;margin-bottom:10px}
+  .info-card h4{font-size:.95rem;font-weight:700;color:var(--gray-900);margin-bottom:7px}
+  .info-card p{font-size:.86rem;color:var(--gray-600);line-height:1.7}
+  .ic-accent{background:var(--accent-soft);border-color:var(--accent-border)}
+  .ic-green{background:var(--green-soft);border-color:#bbf7d0}
+  .ic-amber{background:var(--amber-soft);border-color:#fde68a}
+  .ic-red{background:var(--red-soft);border-color:#fecdd3}
+
+  .callout{display:flex;gap:14px;padding:18px 20px;border-radius:var(--radius);margin:24px 0;font-size:.93rem;line-height:1.75;color:var(--gray-700)}
+  .callout-icon{font-size:1.2rem;flex-shrink:0;padding-top:1px}
+  .callout-body p{margin:0}
+  .callout-body p+p{margin-top:6px}
+  .co-blue{background:var(--accent-soft);border:1px solid var(--accent-border)}
+  .co-green{background:var(--green-soft);border:1px solid #bbf7d0}
+  .co-amber{background:var(--amber-soft);border:1px solid #fde68a}
+
+  .vibe-tip{background:linear-gradient(135deg,#faf5ff 0%,#eff6ff 100%);border:1px solid #e9d5ff;border-left:4px solid #8b5cf6;border-radius:var(--radius);padding:20px 22px;margin:32px 0}
+  .vibe-tip-label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7c3aed;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .vibe-tip p{font-size:.92rem;color:var(--gray-700);margin-bottom:10px;line-height:1.75}
+  .vibe-tip p:last-child{margin-bottom:0}
+  .vibe-tip code{background:#ede9fe;border-color:#ddd6fe;color:#7c3aed}
+  .prompt-box{background:#1e1e2e;border-radius:var(--radius-sm);padding:14px 16px;margin-top:14px}
+  .prompt-box pre{font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.65;color:#cdd6f4;white-space:pre-wrap;word-break:break-word}
+
+  .code-block{background:var(--code-bg);border-radius:var(--radius);overflow:hidden;margin-top:24px;border:1px solid #2d2d3f;box-shadow:var(--shadow)}
+  .cb-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#13131f;border-bottom:1px solid #2d2d3f}
+  .cb-dots{display:flex;gap:6px}
+  .cb-dot{width:10px;height:10px;border-radius:50%}
+  .cb-dot-r{background:#ff5f57} .cb-dot-y{background:#febc2e} .cb-dot-g{background:#28c840}
+  .cb-file{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#6272a4}
+  .cb-copy{font-family:'JetBrains Mono',monospace;font-size:.72rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:5px;color:#94a3b8;padding:3px 12px;cursor:pointer;transition:background .15s,color .15s}
+  .cb-copy:hover{background:rgba(255,255,255,.15);color:#fff}
+  .cb-copy.ok{color:#a6e3a1;border-color:#a6e3a1}
+  .cb-body{padding:20px;overflow-x:auto}
+  .cb-body pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.75;color:#cdd6f4;white-space:pre}
+  .tk{color:#89b4fa} .ta{color:#a6e3a1} .tv{color:#f9e2af} .tc{color:#6272a4;font-style:italic} .tp{color:#cba6f7}
+
+  .faq-list{margin-top:28px}
+  .faq-item{border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm)}
+  .faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:none;border:none;font-family:'Noto Sans KR',sans-serif;font-size:.93rem;font-weight:600;color:var(--gray-900);cursor:pointer;text-align:left;gap:12px;transition:background .15s}
+  .faq-q:hover{background:var(--gray-50)}
+  .faq-q-icon{width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;transition:transform .25s}
+  .faq-item.open .faq-q-icon{transform:rotate(45deg)}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;font-size:.9rem;color:var(--gray-600);line-height:1.75;padding:0 20px}
+  .faq-item.open .faq-a{max-height:300px;padding:0 20px 18px}
+
+  .site-footer{background:var(--gray-900);color:var(--gray-400);padding:48px 24px 36px;text-align:center}
+  .footer-logo{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:1rem;color:#fff;margin-bottom:10px}
+  .footer-logo .logo-mark{background:var(--accent)}
+  .footer-desc{font-size:.85rem;line-height:1.7;margin-bottom:20px}
+  .footer-links{display:flex;justify-content:center;gap:20px;margin-bottom:20px;flex-wrap:wrap}
+  .footer-links a{font-size:.83rem;color:var(--gray-400);transition:color .15s;text-decoration:none}
+  .footer-links a:hover{color:#fff}
+  .footer-copy{font-size:.78rem;color:var(--gray-500)}
+
+  /* ── 스피너 갤러리 ── */
+  .spinner-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;margin-top:28px}
+  .spinner-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:28px 20px 20px;text-align:center;box-shadow:var(--shadow-sm);transition:box-shadow .2s,border-color .2s}
+  .spinner-card:hover{box-shadow:var(--shadow);border-color:var(--accent-border)}
+  .spinner-stage{height:72px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+  .spinner-card h4{font-size:.9rem;font-weight:700;color:var(--gray-900);margin-bottom:4px}
+  .spinner-card p{font-size:.78rem;color:var(--gray-500);line-height:1.5;margin-bottom:12px}
+  .code-toggle-btn{font-size:.73rem;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:6px;padding:4px 12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:background .15s}
+  .code-toggle-btn:hover{background:var(--accent);color:#fff}
+  .spinner-code{display:none;margin-top:10px;background:var(--code-bg);border-radius:8px;padding:12px;text-align:left;overflow-x:auto}
+  .spinner-code pre{font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.6;color:#cdd6f4;white-space:pre}
+  .spinner-code.open{display:block}
+
+  /* ── 스피너 애니메이션 정의 ── */
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes dotPulse{0%,80%,100%{transform:scale(0);opacity:.3}40%{transform:scale(1);opacity:1}}
+  @keyframes scalePulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
+  @keyframes skeletonShimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+  @keyframes dualSpin{to{transform:rotate(360deg)}}
+  @keyframes dualSpinR{to{transform:rotate(-360deg)}}
+  @keyframes bounceAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+
+  /* 1. 원형 스피너 */
+  .sp-circle{width:44px;height:44px;border:4px solid var(--gray-200);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+
+  /* 2. 점 3개 */
+  .sp-dots{display:flex;gap:8px;align-items:center}
+  .sp-dot{width:12px;height:12px;background:var(--accent);border-radius:50%;animation:dotPulse 1.4s ease-in-out infinite}
+  .sp-dot:nth-child(1){animation-delay:0s}
+  .sp-dot:nth-child(2){animation-delay:.2s}
+  .sp-dot:nth-child(3){animation-delay:.4s}
+
+  /* 3. 펄스 */
+  .sp-pulse{width:48px;height:48px;background:var(--accent);border-radius:50%;animation:scalePulse 1.2s ease-in-out infinite}
+
+  /* 4. 스켈레톤 바 */
+  .sp-skeleton{width:180px;display:flex;flex-direction:column;gap:8px}
+  .sk-line{height:10px;border-radius:5px;background:linear-gradient(90deg,var(--gray-200) 25%,var(--gray-100) 50%,var(--gray-200) 75%);background-size:600px 100%;animation:skeletonShimmer 1.4s infinite linear}
+  .sk-line:nth-child(1){width:100%}
+  .sk-line:nth-child(2){width:75%}
+  .sk-line:nth-child(3){width:88%}
+
+  /* 5. 이중 링 */
+  .sp-dual{width:48px;height:48px;position:relative}
+  .sp-dual-outer{position:absolute;inset:0;border:4px solid transparent;border-top-color:var(--accent);border-radius:50%;animation:dualSpin .9s linear infinite}
+  .sp-dual-inner{position:absolute;inset:8px;border:3px solid transparent;border-top-color:#a5b4fc;border-radius:50%;animation:dualSpinR .7s linear infinite}
+
+  /* 6. 바운스 */
+  .sp-bounce{display:flex;gap:7px;align-items:flex-end}
+  .sp-b{width:11px;height:11px;background:var(--accent);border-radius:50%;animation:bounceAnim .8s ease-in-out infinite}
+  .sp-b:nth-child(1){animation-delay:0s}
+  .sp-b:nth-child(2){animation-delay:.15s}
+  .sp-b:nth-child(3){animation-delay:.3s}
+
+  /* 실전 활용 데모 */
+  .usage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;margin-top:28px}
+  .usage-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm)}
+  .usage-card h4{font-size:.92rem;font-weight:700;color:var(--gray-900);margin-bottom:14px}
+
+  /* 버튼 로딩 데모 */
+  .demo-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity .15s}
+  .demo-btn:disabled{opacity:.7;cursor:not-allowed}
+  .btn-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none}
+  .demo-btn.loading .btn-spinner{display:block}
+  .demo-btn.loading .btn-label{display:none}
+  .demo-btn.loading .btn-loading-label{display:inline}
+  .btn-loading-label{display:none}
+
+  /* 오버레이 데모 */
+  .overlay-demo{position:relative;height:100px;background:var(--gray-50);border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid var(--gray-200);overflow:hidden}
+  .overlay-layer{position:absolute;inset:0;background:rgba(255,255,255,.85);display:none;align-items:center;justify-content:center;flex-direction:column;gap:8px;font-size:.82rem;color:var(--gray-500)}
+  .overlay-layer.visible{display:flex}
+  .toggle-overlay-btn{margin-top:10px;padding:6px 14px;font-size:.8rem;font-weight:600;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);border-radius:6px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:background .15s}
+  .toggle-overlay-btn:hover{background:var(--accent);color:#fff}
+
+  @media(max-width:600px){
+    .hero{padding:calc(var(--nav-h)+36px) 0 48px}
+    .section{padding:52px 0}
+    .card-grid,.spinner-grid,.usage-grid{grid-template-columns:1fr 1fr}
+    .sp-skeleton{width:120px}
+  }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark">VT</div>
+    바이브툴킷
+  </a>
+  <ul class="nav-links">
+    <li><a href="#concept">① 개념</a></li>
+    <li><a href="#types">② 유형</a></li>
+    <li><a href="#code">③ 코드</a></li>
+    <li><a href="#usage">④ 실전</a></li>
+    <li><a href="#prompt">⑤ 프롬프트</a></li>
+    <li><a href="#faq">⑥ FAQ</a></li>
+  </ul>
+</nav>
+
+<!-- 히어로 -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">⏳ CSS 애니메이션 패턴</div>
+    <h1>로딩 스피너<br><em>(Loading Spinner)</em></h1>
+    <p class="hero-desc">데이터를 불러오는 동안 사용자를 기다리게 만드는 스피너. JS 없이 CSS만으로 만드는 6가지 스피너 유형을 코드와 함께 정복해봐요.</p>
+    <div class="hero-meta">
+      <span>⏳ Pure CSS</span>
+      <span>⚡ JS 불필요</span>
+      <span>🎨 6가지 디자인</span>
+      <span>📋 복사 가능한 코드</span>
+    </div>
+  </div>
+</section>
+
+<!-- ① 개념 -->
+<section class="section" id="concept">
+  <div class="container">
+    <div class="section-badge">① Concept</div>
+    <h2 class="section-title">로딩 스피너가 필요한 이유</h2>
+    <p class="section-lead">사용자는 아무 반응이 없는 화면을 가장 답답해합니다. "지금 처리 중이에요"라는 시각적 피드백만 있어도 이탈률이 크게 줄어요.</p>
+
+    <div class="callout co-blue">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <p><strong>UX 연구 결과:</strong> 100ms 이내 응답은 즉각적으로 느껴지지만, 1초가 넘어가면 사용자는 "뭔가 문제가 있나?" 하고 의심하기 시작해요. 3초 이상이면 약 40%가 페이지를 떠납니다. 로딩 스피너는 "지금 열심히 하고 있어요"라는 신뢰 신호입니다.</p>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">🔄</div>
+        <h4>인지적 안심</h4>
+        <p>스피너가 돌아가는 것을 보면 사용자는 "앱이 살아있구나"라고 인식해요. 빈 화면보다 같은 대기 시간이 훨씬 짧게 느껴집니다.</p>
+      </div>
+      <div class="info-card ic-green">
+        <div class="info-card-icon">📊</div>
+        <h4>진행 피드백</h4>
+        <p>가능하다면 <strong>확정 스피너</strong>(진행 %) vs <strong>불확정 스피너</strong>(무한 회전) 중 적합한 것을 골라요. 진행률을 알 수 있으면 확정이 훨씬 좋습니다.</p>
+      </div>
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">⚡</div>
+        <h4>CSS만으로 충분</h4>
+        <p>복잡한 라이브러리 없이 <code>border</code>와 <code>@keyframes</code> 몇 줄이면 충분히 매끄러운 스피너를 만들 수 있어요. 번들 크기가 늘지 않아요.</p>
+      </div>
+      <div class="info-card ic-red">
+        <div class="info-card-icon">🎯</div>
+        <h4>상황에 맞게 선택</h4>
+        <p>버튼 안 → 아주 작은 인라인 스피너. 페이지 전체 → 오버레이 스피너. 콘텐츠 영역 → 스켈레톤 로딩이 가장 좋은 UX예요.</p>
+      </div>
+    </div>
+
+    <div class="callout co-green" style="margin-top:8px">
+      <div class="callout-icon">✅</div>
+      <div class="callout-body">
+        <p><strong>스켈레톤 vs 스피너:</strong> 콘텐츠의 레이아웃을 미리 보여주는 스켈레톤 로딩은 사용자가 로드될 내용을 예측할 수 있어 스피너보다 체감 속도가 더 빠릅니다. 페이스북, YouTube 등 대형 서비스가 모두 이 방식을 사용하는 이유예요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ② 유형 갤러리 -->
+<section class="section" id="types">
+  <div class="container">
+    <div class="section-badge">② Types</div>
+    <h2 class="section-title">6가지 스피너 갤러리</h2>
+    <p class="section-lead">실제로 작동하는 스피너 6가지예요. 각 카드의 "코드 보기" 버튼을 누르면 해당 스피너의 CSS 코드를 바로 확인할 수 있습니다.</p>
+
+    <div class="spinner-grid">
+
+      <!-- 1. 원형 스피너 -->
+      <div class="spinner-card">
+        <div class="spinner-stage">
+          <div class="sp-circle"></div>
+        </div>
+        <h4>① 원형 스피너</h4>
+        <p><code>border</code> 트릭으로 만드는 가장 기본적인 스피너. 어디에나 무난하게 어울려요.</p>
+        <button class="code-toggle-btn" onclick="toggleCode(this)">코드 보기</button>
+        <div class="spinner-code">
+          <pre><span style="color:#a6e3a1">.sp-circle</span> {
+  <span style="color:#cba6f7">width</span>: <span style="color:#f9e2af">44px</span>;
+  <span style="color:#cba6f7">height</span>: <span style="color:#f9e2af">44px</span>;
+  <span style="color:#cba6f7">border</span>: <span style="color:#f9e2af">4px solid #e5e7eb</span>;
+  <span style="color:#cba6f7">border-top-color</span>: <span style="color:#f9e2af">#4f46e5</span>;
+  <span style="color:#cba6f7">border-radius</span>: <span style="color:#f9e2af">50%</span>;
+  <span style="color:#cba6f7">animation</span>: <span style="color:#f9e2af">spin .8s linear infinite</span>;
+}
+<span style="color:#a6e3a1">@keyframes</span> spin {
+  to { <span style="color:#cba6f7">transform</span>: <span style="color:#f9e2af">rotate(360deg)</span>; }
+}</pre>
+        </div>
+      </div>
+
+      <!-- 2. 점 3개 -->
+      <div class="spinner-card">
+        <div class="spinner-stage">
+          <div class="sp-dots">
+            <div class="sp-dot"></div>
+            <div class="sp-dot"></div>
+            <div class="sp-dot"></div>
+          </div>
+        </div>
+        <h4>② 점 세 개</h4>
+        <p>순차적으로 튀어나오는 점 3개. 채팅 앱의 "타이핑 중" 표시에 자주 쓰여요.</p>
+        <button class="code-toggle-btn" onclick="toggleCode(this)">코드 보기</button>
+        <div class="spinner-code">
+          <pre><span style="color:#a6e3a1">.sp-dots</span> { <span style="color:#cba6f7">display</span>: <span style="color:#f9e2af">flex</span>; <span style="color:#cba6f7">gap</span>: <span style="color:#f9e2af">8px</span>; }
+<span style="color:#a6e3a1">.sp-dot</span> {
+  <span style="color:#cba6f7">width</span>: <span style="color:#f9e2af">12px</span>; <span style="color:#cba6f7">height</span>: <span style="color:#f9e2af">12px</span>;
+  <span style="color:#cba6f7">background</span>: <span style="color:#f9e2af">#4f46e5</span>;
+  <span style="color:#cba6f7">border-radius</span>: <span style="color:#f9e2af">50%</span>;
+  <span style="color:#cba6f7">animation</span>: <span style="color:#f9e2af">dotPulse 1.4s ease-in-out infinite</span>;
+}
+<span style="color:#a6e3a1">.sp-dot:nth-child(2)</span> { <span style="color:#cba6f7">animation-delay</span>: <span style="color:#f9e2af">.2s</span>; }
+<span style="color:#a6e3a1">.sp-dot:nth-child(3)</span> { <span style="color:#cba6f7">animation-delay</span>: <span style="color:#f9e2af">.4s</span>; }
+<span style="color:#a6e3a1">@keyframes</span> dotPulse {
+  0%,80%,100% { <span style="color:#cba6f7">transform</span>: <span style="color:#f9e2af">scale(0)</span>; <span style="color:#cba6f7">opacity</span>: <span style="color:#f9e2af">.3</span>; }
+  40%         { <span style="color:#cba6f7">transform</span>: <span style="color:#f9e2af">scale(1)</span>; <span style="color:#cba6f7">opacity</span>: <span style="color:#f9e2af">1</span>; }
+}</pre>
+        </div>
+      </div>
+
+      <!-- 3. 펄스 -->
+      <div class="spinner-card">
+        <div class="spinner-stage">
+          <div class="sp-pulse"></div>
+        </div>
+        <h4>③ 펄스</h4>
+        <p>원이 커졌다 작아지는 효과. 심박수처럼 살아있다는 느낌을 줘요.</p>
+        <button class="code-toggle-btn" onclick="toggleCode(this)">코드 보기</button>
+        <div class="spinner-code">
+          <pre><span style="color:#a6e3a1">.sp-pulse</span> {
+  <span style="color:#cba6f7">width</span>: <span style="color:#f9e2af">48px</span>; <span style="color:#cba6f7">height</span>: <span style="color:#f9e2af">48px</span>;
+  <span style="color:#cba6f7">background</span>: <span style="color:#f9e2af">#4f46e5</span>;
+  <span style="color:#cba6f7">border-radius</span>: <span style="color:#f9e2af">50%</span>;
+  <span style="color:#cba6f7">animation</span>: <span style="color:#f9e2af">scalePulse 1.2s ease-in-out infinite</span>;
+}
+<span style="color:#a6e3a1">@keyframes</span> scalePulse {
+  0%,100% { <span style="color:#cba6f7">transform</span>: <span style="color:#f9e2af">scale(1)</span>; <span style="color:#cba6f7">opacity</span>: <span style="color:#f9e2af">1</span>; }
+  50%     { <span style="color:#cba6f7">transform</span>: <span style="color:#f9e2af">scale(1.5)</span>; <span style="color:#cba6f7">opacity</span>: <span style="color:#f9e2af">.5</span>; }
+}</pre>
+        </div>
+      </div>
+
+      <!-- 4. 스켈레톤 -->
+      <div class="spinner-card">
+        <div class="spinner-stage">
+          <div class="sp-skeleton">
+            <div class="sk-line"></div>
+            <div class="sk-line"></div>
+            <div class="sk-line"></div>
+          </div>
+        </div>
+        <h4>④ 스켈레톤</h4>
+        <p>빛이 흘러가는 플레이스홀더. 텍스트·이미지 로딩 전 레이아웃을 미리 보여줘요.</p>
+        <button class="code-toggle-btn" onclick="toggleCode(this)">코드 보기</button>
+        <div class="spinner-code">
+          <pre><span style="color:#a6e3a1">.sk-line</span> {
+  <span style="color:#cba6f7">height</span>: <span style="color:#f9e2af">10px</span>;
+  <span style="color:#cba6f7">border-radius</span>: <span style="color:#f9e2af">5px</span>;
+  <span style="color:#cba6f7">background</span>: <span style="color:#f9e2af">linear-gradient(
+    90deg,
+    #e5e7eb 25%,
+    #f3f4f6 50%,
+    #e5e7eb 75%
+  )</span>;
+  <span style="color:#cba6f7">background-size</span>: <span style="color:#f9e2af">600px 100%</span>;
+  <span style="color:#cba6f7">animation</span>: <span style="color:#f9e2af">shimmer 1.4s infinite linear</span>;
+}
+<span style="color:#a6e3a1">@keyframes</span> shimmer {
+  0%   { <span style="color:#cba6f7">background-position</span>: <span style="color:#f9e2af">-600px 0</span>; }
+  100% { <span style="color:#cba6f7">background-position</span>: <span style="color:#f9e2af">600px 0</span>; }
+}</pre>
+        </div>
+      </div>
+
+      <!-- 5. 이중 링 -->
+      <div class="spinner-card">
+        <div class="spinner-stage">
+          <div class="sp-dual">
+            <div class="sp-dual-outer"></div>
+            <div class="sp-dual-inner"></div>
+          </div>
+        </div>
+        <h4>⑤ 이중 링</h4>
+        <p>바깥·안쪽 링이 반대로 도는 효과. 정교한 느낌을 줘야 할 때 좋아요.</p>
+        <button class="code-toggle-btn" onclick="toggleCode(this)">코드 보기</button>
+        <div class="spinner-code">
+          <pre><span style="color:#a6e3a1">.sp-dual</span> { <span style="color:#cba6f7">width</span>: <span style="color:#f9e2af">48px</span>; <span style="color:#cba6f7">height</span>: <span style="color:#f9e2af">48px</span>; <span style="color:#cba6f7">position</span>: <span style="color:#f9e2af">relative</span>; }
+<span style="color:#a6e3a1">.sp-dual-outer</span> {
+  <span style="color:#cba6f7">position</span>: <span style="color:#f9e2af">absolute</span>; <span style="color:#cba6f7">inset</span>: <span style="color:#f9e2af">0</span>;
+  <span style="color:#cba6f7">border</span>: <span style="color:#f9e2af">4px solid transparent</span>;
+  <span style="color:#cba6f7">border-top-color</span>: <span style="color:#f9e2af">#4f46e5</span>;
+  <span style="color:#cba6f7">border-radius</span>: <span style="color:#f9e2af">50%</span>;
+  <span style="color:#cba6f7">animation</span>: <span style="color:#f9e2af">spin .9s linear infinite</span>;
+}
+<span style="color:#a6e3a1">.sp-dual-inner</span> {
+  <span style="color:#cba6f7">position</span>: <span style="color:#f9e2af">absolute</span>; <span style="color:#cba6f7">inset</span>: <span style="color:#f9e2af">8px</span>;
+  <span style="color:#cba6f7">border</span>: <span style="color:#f9e2af">3px solid transparent</span>;
+  <span style="color:#cba6f7">border-top-color</span>: <span style="color:#f9e2af">#a5b4fc</span>;
+  <span style="color:#cba6f7">border-radius</span>: <span style="color:#f9e2af">50%</span>;
+  <span style="color:#cba6f7">animation</span>: <span style="color:#f9e2af">spin .7s linear infinite reverse</span>;
+}</pre>
+        </div>
+      </div>
+
+      <!-- 6. 바운스 -->
+      <div class="spinner-card">
+        <div class="spinner-stage">
+          <div class="sp-bounce">
+            <div class="sp-b"></div>
+            <div class="sp-b"></div>
+            <div class="sp-b"></div>
+          </div>
+        </div>
+        <h4>⑥ 바운스</h4>
+        <p>점이 위아래로 통통 튀는 효과. 귀엽고 발랄한 느낌의 서비스에 잘 맞아요.</p>
+        <button class="code-toggle-btn" onclick="toggleCode(this)">코드 보기</button>
+        <div class="spinner-code">
+          <pre><span style="color:#a6e3a1">.sp-bounce</span> { <span style="color:#cba6f7">display</span>: <span style="color:#f9e2af">flex</span>; <span style="color:#cba6f7">gap</span>: <span style="color:#f9e2af">7px</span>; <span style="color:#cba6f7">align-items</span>: <span style="color:#f9e2af">flex-end</span>; }
+<span style="color:#a6e3a1">.sp-b</span> {
+  <span style="color:#cba6f7">width</span>: <span style="color:#f9e2af">11px</span>; <span style="color:#cba6f7">height</span>: <span style="color:#f9e2af">11px</span>;
+  <span style="color:#cba6f7">background</span>: <span style="color:#f9e2af">#4f46e5</span>;
+  <span style="color:#cba6f7">border-radius</span>: <span style="color:#f9e2af">50%</span>;
+  <span style="color:#cba6f7">animation</span>: <span style="color:#f9e2af">bounce .8s ease-in-out infinite</span>;
+}
+<span style="color:#a6e3a1">.sp-b:nth-child(2)</span> { <span style="color:#cba6f7">animation-delay</span>: <span style="color:#f9e2af">.15s</span>; }
+<span style="color:#a6e3a1">.sp-b:nth-child(3)</span> { <span style="color:#cba6f7">animation-delay</span>: <span style="color:#f9e2af">.3s</span>; }
+<span style="color:#a6e3a1">@keyframes</span> bounce {
+  0%,100% { <span style="color:#cba6f7">transform</span>: <span style="color:#f9e2af">translateY(0)</span>; }
+  50%     { <span style="color:#cba6f7">transform</span>: <span style="color:#f9e2af">translateY(-16px)</span>; }
+}</pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ③ 코드 -->
+<section class="section" id="code">
+  <div class="container">
+    <div class="section-badge">③ Code</div>
+    <h2 class="section-title">전체 CSS 한 번에 복사하기</h2>
+    <p class="section-lead">6가지 스피너 CSS를 모두 담은 완성 코드예요. 필요한 것만 골라서 쓰거나 전부 포함해도 용량은 매우 작습니다.</p>
+
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots"><div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div></div>
+        <span class="cb-file">spinners.css — 전체</span>
+        <button class="cb-copy" onclick="copyBlock(this,'c-all')">copy</button>
+      </div>
+      <div class="cb-body"><pre id="c-all"><span class="tc">/* ① 원형 스피너 */</span>
+<span class="ta">@keyframes</span> spin { to { <span class="tp">transform</span>: <span class="tv">rotate(360deg)</span>; } }
+<span class="ta">.sp-circle</span> {
+  <span class="tp">width</span>: <span class="tv">44px</span>; <span class="tp">height</span>: <span class="tv">44px</span>;
+  <span class="tp">border</span>: <span class="tv">4px solid #e5e7eb</span>;
+  <span class="tp">border-top-color</span>: <span class="tv">#4f46e5</span>;
+  <span class="tp">border-radius</span>: <span class="tv">50%</span>;
+  <span class="tp">animation</span>: <span class="tv">spin .8s linear infinite</span>;
+}
+
+<span class="tc">/* ② 점 세 개 */</span>
+<span class="ta">@keyframes</span> dotPulse {
+  0%,80%,100% { <span class="tp">transform</span>: <span class="tv">scale(0)</span>; <span class="tp">opacity</span>: <span class="tv">.3</span>; }
+  40%         { <span class="tp">transform</span>: <span class="tv">scale(1)</span>; <span class="tp">opacity</span>: <span class="tv">1</span>; }
+}
+<span class="ta">.sp-dots</span> { <span class="tp">display</span>: <span class="tv">flex</span>; <span class="tp">gap</span>: <span class="tv">8px</span>; <span class="tp">align-items</span>: <span class="tv">center</span>; }
+<span class="ta">.sp-dot</span> {
+  <span class="tp">width</span>: <span class="tv">12px</span>; <span class="tp">height</span>: <span class="tv">12px</span>;
+  <span class="tp">background</span>: <span class="tv">#4f46e5</span>; <span class="tp">border-radius</span>: <span class="tv">50%</span>;
+  <span class="tp">animation</span>: <span class="tv">dotPulse 1.4s ease-in-out infinite</span>;
+}
+<span class="ta">.sp-dot:nth-child(2)</span> { <span class="tp">animation-delay</span>: <span class="tv">.2s</span>; }
+<span class="ta">.sp-dot:nth-child(3)</span> { <span class="tp">animation-delay</span>: <span class="tv">.4s</span>; }
+
+<span class="tc">/* ③ 펄스 */</span>
+<span class="ta">@keyframes</span> scalePulse {
+  0%,100% { <span class="tp">transform</span>: <span class="tv">scale(1)</span>; <span class="tp">opacity</span>: <span class="tv">1</span>; }
+  50%     { <span class="tp">transform</span>: <span class="tv">scale(1.5)</span>; <span class="tp">opacity</span>: <span class="tv">.5</span>; }
+}
+<span class="ta">.sp-pulse</span> {
+  <span class="tp">width</span>: <span class="tv">48px</span>; <span class="tp">height</span>: <span class="tv">48px</span>;
+  <span class="tp">background</span>: <span class="tv">#4f46e5</span>; <span class="tp">border-radius</span>: <span class="tv">50%</span>;
+  <span class="tp">animation</span>: <span class="tv">scalePulse 1.2s ease-in-out infinite</span>;
+}
+
+<span class="tc">/* ④ 스켈레톤 */</span>
+<span class="ta">@keyframes</span> shimmer {
+  0%   { <span class="tp">background-position</span>: <span class="tv">-600px 0</span>; }
+  100% { <span class="tp">background-position</span>: <span class="tv">600px 0</span>; }
+}
+<span class="ta">.sk-line</span> {
+  <span class="tp">height</span>: <span class="tv">10px</span>; <span class="tp">border-radius</span>: <span class="tv">5px</span>;
+  <span class="tp">background</span>: <span class="tv">linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%)</span>;
+  <span class="tp">background-size</span>: <span class="tv">600px 100%</span>;
+  <span class="tp">animation</span>: <span class="tv">shimmer 1.4s infinite linear</span>;
+}
+
+<span class="tc">/* ⑤ 이중 링 */</span>
+<span class="ta">.sp-dual</span> { <span class="tp">width</span>: <span class="tv">48px</span>; <span class="tp">height</span>: <span class="tv">48px</span>; <span class="tp">position</span>: <span class="tv">relative</span>; }
+<span class="ta">.sp-dual-outer</span>, <span class="ta">.sp-dual-inner</span> {
+  <span class="tp">position</span>: <span class="tv">absolute</span>; <span class="tp">border-radius</span>: <span class="tv">50%</span>;
+  <span class="tp">border</span>: <span class="tv">4px solid transparent</span>;
+  <span class="tp">border-top-color</span>: <span class="tv">#4f46e5</span>;
+  <span class="tp">animation</span>: <span class="tv">spin .9s linear infinite</span>;
+}
+<span class="ta">.sp-dual-outer</span> { <span class="tp">inset</span>: <span class="tv">0</span>; }
+<span class="ta">.sp-dual-inner</span> {
+  <span class="tp">inset</span>: <span class="tv">8px</span>; <span class="tp">border-width</span>: <span class="tv">3px</span>;
+  <span class="tp">border-top-color</span>: <span class="tv">#a5b4fc</span>;
+  <span class="tp">animation-direction</span>: <span class="tv">reverse</span>;
+  <span class="tp">animation-duration</span>: <span class="tv">.7s</span>;
+}
+
+<span class="tc">/* ⑥ 바운스 */</span>
+<span class="ta">@keyframes</span> bounce {
+  0%,100% { <span class="tp">transform</span>: <span class="tv">translateY(0)</span>; }
+  50%     { <span class="tp">transform</span>: <span class="tv">translateY(-16px)</span>; }
+}
+<span class="ta">.sp-bounce</span> { <span class="tp">display</span>: <span class="tv">flex</span>; <span class="tp">gap</span>: <span class="tv">7px</span>; <span class="tp">align-items</span>: <span class="tv">flex-end</span>; }
+<span class="ta">.sp-b</span> {
+  <span class="tp">width</span>: <span class="tv">11px</span>; <span class="tp">height</span>: <span class="tv">11px</span>;
+  <span class="tp">background</span>: <span class="tv">#4f46e5</span>; <span class="tp">border-radius</span>: <span class="tv">50%</span>;
+  <span class="tp">animation</span>: <span class="tv">bounce .8s ease-in-out infinite</span>;
+}
+<span class="ta">.sp-b:nth-child(2)</span> { <span class="tp">animation-delay</span>: <span class="tv">.15s</span>; }
+<span class="ta">.sp-b:nth-child(3)</span> { <span class="tp">animation-delay</span>: <span class="tv">.3s</span>; }</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ④ 실전 활용 -->
+<section class="section" id="usage">
+  <div class="container">
+    <div class="section-badge">④ Usage</div>
+    <h2 class="section-title">실전 활용 패턴</h2>
+    <p class="section-lead">스피너를 어디에 붙이냐에 따라 UX가 달라져요. 버튼 인라인, 전체 오버레이, Fetch API 연동 예시를 준비했습니다.</p>
+
+    <div class="usage-grid">
+      <!-- 버튼 로딩 -->
+      <div class="usage-card">
+        <h4>① 버튼 로딩 상태</h4>
+        <button class="demo-btn" id="load-btn" onclick="simulateLoad(this)">
+          <div class="btn-spinner"></div>
+          <span class="btn-label">데이터 저장</span>
+          <span class="btn-loading-label">저장 중...</span>
+        </button>
+        <p style="font-size:.8rem;color:var(--gray-400);margin-top:10px">버튼을 누르면 2초 후 완료됩니다</p>
+      </div>
+
+      <!-- 오버레이 -->
+      <div class="usage-card">
+        <h4>② 오버레이 로딩</h4>
+        <div class="overlay-demo" id="overlay-demo">
+          <span style="font-size:.85rem;color:var(--gray-400)">콘텐츠 영역</span>
+          <div class="overlay-layer" id="overlay-layer">
+            <div class="sp-circle" style="width:32px;height:32px;border-width:3px"></div>
+            <span>불러오는 중...</span>
+          </div>
+        </div>
+        <button class="toggle-overlay-btn" onclick="toggleOverlay()">오버레이 토글</button>
+      </div>
+
+      <!-- Fetch 연동 -->
+      <div class="usage-card">
+        <h4>③ Fetch API 연동 패턴</h4>
+        <p style="font-size:.83rem;color:var(--gray-500);line-height:1.6">fetch 요청 전에 스피너를 보여주고, 완료 후 숨기는 패턴이에요.</p>
+      </div>
+    </div>
+
+    <!-- Fetch 코드 -->
+    <div class="code-block" style="margin-top:28px">
+      <div class="cb-header">
+        <div class="cb-dots"><div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div></div>
+        <span class="cb-file">script.js — Fetch + 스피너</span>
+        <button class="cb-copy" onclick="copyBlock(this,'c-fetch')">copy</button>
+      </div>
+      <div class="cb-body"><pre id="c-fetch"><span class="tk">async function</span> <span class="ta">loadData</span>() {
+  <span class="tk">const</span> spinner = document.getElementById(<span class="tv">'spinner'</span>);
+  <span class="tk">const</span> content = document.getElementById(<span class="tv">'content'</span>);
+
+  <span class="tc">// 1. 스피너 표시, 콘텐츠 숨김</span>
+  spinner.style.display = <span class="tv">'flex'</span>;
+  content.style.display = <span class="tv">'none'</span>;
+
+  <span class="tk">try</span> {
+    <span class="tk">const</span> res  = <span class="tk">await</span> <span class="ta">fetch</span>(<span class="tv">'/api/data'</span>);
+    <span class="tk">const</span> data = <span class="tk">await</span> res.json();
+
+    <span class="tc">// 2. 콘텐츠 렌더링</span>
+    content.innerHTML = renderData(data);
+    content.style.display = <span class="tv">'block'</span>;
+
+  } <span class="tk">catch</span> (err) {
+    content.innerHTML = <span class="tv">'&lt;p&gt;불러오기 실패. 다시 시도해주세요.&lt;/p&gt;'</span>;
+    content.style.display = <span class="tv">'block'</span>;
+
+  } <span class="tk">finally</span> {
+    <span class="tc">// 3. 스피너 항상 숨김 (성공·실패 무관)</span>
+    spinner.style.display = <span class="tv">'none'</span>;
+  }
+}</pre></div>
+    </div>
+
+    <div class="callout co-blue" style="margin-top:28px">
+      <div class="callout-icon">♿</div>
+      <div class="callout-body">
+        <p><strong>접근성 팁:</strong> 스피너 요소에 <code>role="status"</code>와 <code>aria-label="로딩 중"</code>을 추가하면 스크린 리더가 로딩 상태를 읽어줍니다. 시각적으로만 표현하면 시각장애 사용자는 아무런 피드백을 받지 못해요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤ 프롬프트 -->
+<section class="section" id="prompt">
+  <div class="container">
+    <div class="section-badge">⑤ Prompt Tip</div>
+    <h2 class="section-title">AI 프롬프트 팁</h2>
+    <p class="section-lead">AI에게 스피너를 요청할 때 사용하기 좋은 프롬프트 예시예요. 어떤 유형·색상·크기를 원하는지 구체적으로 쓸수록 정확한 결과가 나와요.</p>
+    <div class="vibe-tip">
+      <div class="vibe-tip-label">✦ 바이브코더 프롬프트</div>
+      <p>아래 프롬프트를 Claude, ChatGPT, Cursor에 붙여넣어 보세요.</p>
+      <div class="prompt-box">
+        <pre>내 웹페이지에 로딩 스피너를 추가해줘.
+
+상황별로 3가지가 필요해:
+
+1. 버튼 안 인라인 스피너
+   - 버튼 클릭 시 텍스트 대신 작은 원형 스피너가 표시됨
+   - 버튼 비활성화(disabled) 처리
+   - 완료 시 원래 텍스트로 복원
+
+2. 카드/섹션 전체 오버레이 스피너
+   - 반투명 흰 배경 위에 원형 스피너 + "로딩 중..." 텍스트
+   - position: absolute로 컨테이너 위에 레이어링
+
+3. 목록 로딩용 스켈레톤 스피너
+   - 3개 줄 shimmer 효과 (회색 → 밝은 회색 → 회색 반복)
+
+조건:
+- CSS만으로 구현 (JS는 show/hide 제어만)
+- 색상은 #4f46e5 (인디고)
+- role="status" aria-label="로딩 중" 접근성 포함
+- 기존 HTML/CSS를 최대한 유지</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑥ FAQ -->
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-badge">⑥ FAQ</div>
+    <h2 class="section-title">자주 묻는 질문</h2>
+    <p class="section-lead">CSS 스피너를 처음 쓸 때 자주 만나는 질문들이에요.</p>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          스피너를 정확히 화면 가운데에 놓으려면 어떻게 하나요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          부모에게 <code>position: relative</code>, 스피너에 <code>position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)</code>를 주면 돼요. 전체 화면 중앙이라면 부모를 <code>position: fixed; inset: 0; display: flex; align-items: center; justify-content: center</code>로 설정하면 가장 간단합니다.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          스피너 색을 브랜드 컬러에 맞게 바꾸려면요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          원형 스피너는 <code>border-top-color</code>만 바꾸면 됩니다. 점·바운스 스피너는 <code>background</code> 속성을 변경하세요. CSS 변수(<code>--brand-color: #your-color</code>)를 선언하고 모든 스피너에서 참조하면 한 곳만 바꿔도 전부 바뀌어서 관리가 편해요.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          스피너를 너무 오래 보여주면 안 되나요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          10초 이상 스피너가 돌고 있으면 사용자는 오류인지 헷갈려요. <strong>타임아웃 처리</strong>를 꼭 추가하세요. 예를 들어 10초가 지나면 "응답이 없습니다. 새로고침해주세요."라는 오류 메시지를 보여주는 것이 좋습니다. <code>setTimeout</code>으로 간단하게 구현할 수 있어요.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-logo"><div class="logo-mark">VT</div>바이브툴킷</div>
+  <p class="footer-desc">바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 도구 모음</p>
+  <div class="footer-links">
+    <a href="index.html">홈</a><a href="about.html">소개</a>
+    <a href="contact.html">문의</a><a href="sitemap.html">사이트맵</a>
+  </div>
+  <div class="footer-copy">© 2026 바이브툴킷. 콘텐츠는 자유롭게 참고하세요.</div>
+</footer>
+
+<script>
+/* 코드 토글 */
+function toggleCode(btn) {
+  var code = btn.nextElementSibling;
+  code.classList.toggle('open');
+  btn.textContent = code.classList.contains('open') ? '코드 닫기' : '코드 보기';
+}
+
+/* 버튼 로딩 시뮬레이션 */
+function simulateLoad(btn) {
+  if (btn.classList.contains('loading')) return;
+  btn.classList.add('loading');
+  btn.disabled = true;
+  setTimeout(function() {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    btn.style.background = '#16a34a';
+    btn.querySelector('.btn-label').textContent = '저장 완료 ✓';
+    setTimeout(function() {
+      btn.style.background = '';
+      btn.querySelector('.btn-label').textContent = '데이터 저장';
+    }, 2000);
+  }, 2000);
+}
+
+/* 오버레이 토글 */
+function toggleOverlay() {
+  var layer = document.getElementById('overlay-layer');
+  layer.classList.toggle('visible');
+}
+
+/* 코드 복사 */
+function copyBlock(btn, id) {
+  var pre = document.getElementById(id);
+  navigator.clipboard.writeText(pre.innerText).then(function() {
+    btn.textContent = 'copied!'; btn.classList.add('ok');
+    setTimeout(function() { btn.textContent = 'copy'; btn.classList.remove('ok'); }, 2000);
+  });
+}
+
+/* FAQ 토글 */
+function toggleFaq(btn) { btn.closest('.faq-item').classList.toggle('open'); }
+
+/* 네비게이션 활성화 */
+(function() {
+  var sections = document.querySelectorAll('section[id]');
+  var links = document.querySelectorAll('.nav-links a');
+  function onScroll() {
+    var scrollY = window.scrollY + 80;
+    sections.forEach(function(s) {
+      if (scrollY >= s.offsetTop && scrollY < s.offsetTop + s.offsetHeight) {
+        links.forEach(function(a) { a.classList.remove('active'); });
+        var active = document.querySelector('.nav-links a[href="#' + s.id + '"]');
+        if (active) active.classList.add('active');
+      }
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+})();
+
+/* iframe 감지 */
+(function() {
+  if (self === top) return;
+  var nav = document.querySelector('.site-nav'); if (nav) nav.style.display = 'none';
+  var hero = document.querySelector('.hero'); if (hero) hero.style.paddingTop = '40px';
+  document.querySelectorAll('a[href$=".html"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      if (window.parent && window.parent.loadTool) { e.preventDefault(); window.parent.loadTool(this.getAttribute('href')); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>아코디언 UI 완전 정복 | 바이브툴킷</title>
+  <meta name="description" content="클릭하면 펼쳐지고 접히는 아코디언 UI. CSS transition과 JS로 FAQ, 메뉴, 설정 패널을 부드럽게 구현하는 방법을 배워요.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://vibetoolkit.kr/accordion-ui.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+  :root {
+    --accent:#4f46e5; --accent-soft:#eef2ff; --accent-border:#c7d2fe;
+    --green:#16a34a; --green-soft:#f0fdf4;
+    --amber:#d97706; --amber-soft:#fffbeb;
+    --red:#e11d48; --red-soft:#fff1f2;
+    --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+    --gray-300:#d1d5db; --gray-400:#9ca3af; --gray-500:#6b7280;
+    --gray-600:#4b5563; --gray-700:#374151; --gray-900:#111827;
+    --code-bg:#1e1e2e; --radius:12px; --radius-sm:8px;
+    --shadow-sm:0 1px 3px rgba(0,0,0,.08); --shadow:0 4px 12px rgba(0,0,0,.08);
+    --nav-h:56px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h)+24px)}
+  body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:#fff;color:var(--gray-700);line-height:1.75;font-size:16px}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  strong{color:var(--gray-900);font-weight:600}
+  code{font-family:'JetBrains Mono',monospace;font-size:.83em;background:var(--gray-100);color:var(--accent);padding:.1em .4em;border-radius:4px;border:1px solid var(--gray-200)}
+
+  .site-nav{position:fixed;top:0;left:0;right:0;z-index:500;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--gray-200);height:var(--nav-h);display:flex;align-items:center;padding:0 24px}
+  .nav-logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.95rem;color:var(--gray-900);margin-right:32px;flex-shrink:0;text-decoration:none}
+  .nav-logo:hover{text-decoration:none}
+  .logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;color:#fff}
+  .nav-links{display:flex;align-items:center;gap:2px;list-style:none;overflow-x:auto;scrollbar-width:none}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{display:block;padding:6px 14px;font-size:.85rem;font-weight:500;color:var(--gray-500);border-radius:var(--radius-sm);white-space:nowrap;transition:color .15s,background .15s;text-decoration:none}
+  .nav-links a:hover{color:var(--gray-900);background:var(--gray-100)}
+  .nav-links a.active{color:var(--accent);background:var(--accent-soft);font-weight:600}
+
+  .container{max-width:860px;margin:0 auto;padding:0 24px}
+  .section{padding:72px 0}
+  .section:nth-child(even){background:var(--gray-50)}
+  .section-badge{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:20px;padding:3px 12px;margin-bottom:14px}
+  .section-title{font-size:1.75rem;font-weight:700;color:var(--gray-900);letter-spacing:-.025em;line-height:1.25;margin-bottom:10px}
+  .section-lead{font-size:1.05rem;color:var(--gray-500);line-height:1.7;margin-bottom:40px;max-width:600px}
+
+  .hero{padding:calc(var(--nav-h)+56px) 0 64px;background:linear-gradient(160deg,var(--accent-soft) 0%,#fff 60%);border-bottom:1px solid var(--gray-200)}
+  .hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-border);border-radius:20px;padding:4px 14px;margin-bottom:20px}
+  .hero h1{font-size:clamp(1.9rem,4vw,2.75rem);font-weight:700;color:var(--gray-900);letter-spacing:-.03em;line-height:1.2;margin-bottom:18px}
+  .hero h1 em{color:var(--accent);font-style:normal}
+  .hero-desc{font-size:1.08rem;color:var(--gray-500);line-height:1.75;max-width:540px;margin-bottom:32px}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:16px;font-size:.82rem;color:var(--gray-500)}
+  .hero-meta span{display:flex;align-items:center;gap:5px}
+
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:28px}
+  .info-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:22px 20px;box-shadow:var(--shadow-sm);transition:box-shadow .2s,transform .2s}
+  .info-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+  .info-card-icon{font-size:1.6rem;margin-bottom:10px}
+  .info-card h4{font-size:.95rem;font-weight:700;color:var(--gray-900);margin-bottom:7px}
+  .info-card p{font-size:.86rem;color:var(--gray-600);line-height:1.7}
+  .ic-accent{background:var(--accent-soft);border-color:var(--accent-border)}
+  .ic-green{background:var(--green-soft);border-color:#bbf7d0}
+  .ic-amber{background:var(--amber-soft);border-color:#fde68a}
+  .ic-red{background:var(--red-soft);border-color:#fecdd3}
+
+  .callout{display:flex;gap:14px;padding:18px 20px;border-radius:var(--radius);margin:24px 0;font-size:.93rem;line-height:1.75;color:var(--gray-700)}
+  .callout-icon{font-size:1.2rem;flex-shrink:0;padding-top:1px}
+  .callout-body p{margin:0} .callout-body p+p{margin-top:6px}
+  .co-blue{background:var(--accent-soft);border:1px solid var(--accent-border)}
+  .co-green{background:var(--green-soft);border:1px solid #bbf7d0}
+  .co-amber{background:var(--amber-soft);border:1px solid #fde68a}
+  .co-red{background:var(--red-soft);border:1px solid #fecdd3}
+
+  .vibe-tip{background:linear-gradient(135deg,#faf5ff 0%,#eff6ff 100%);border:1px solid #e9d5ff;border-left:4px solid #8b5cf6;border-radius:var(--radius);padding:20px 22px;margin:32px 0}
+  .vibe-tip-label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7c3aed;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .vibe-tip p{font-size:.92rem;color:var(--gray-700);margin-bottom:10px;line-height:1.75}
+  .vibe-tip p:last-child{margin-bottom:0}
+  .vibe-tip code{background:#ede9fe;border-color:#ddd6fe;color:#7c3aed}
+  .prompt-box{background:#1e1e2e;border-radius:var(--radius-sm);padding:14px 16px;margin-top:14px}
+  .prompt-box pre{font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.65;color:#cdd6f4;white-space:pre-wrap;word-break:break-word}
+
+  .code-block{background:var(--code-bg);border-radius:var(--radius);overflow:hidden;margin-top:24px;border:1px solid #2d2d3f;box-shadow:var(--shadow)}
+  .cb-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#13131f;border-bottom:1px solid #2d2d3f}
+  .cb-dots{display:flex;gap:6px}
+  .cb-dot{width:10px;height:10px;border-radius:50%}
+  .cb-dot-r{background:#ff5f57} .cb-dot-y{background:#febc2e} .cb-dot-g{background:#28c840}
+  .cb-file{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#6272a4}
+  .cb-copy{font-family:'JetBrains Mono',monospace;font-size:.72rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:5px;color:#94a3b8;padding:3px 12px;cursor:pointer;transition:background .15s,color .15s}
+  .cb-copy:hover{background:rgba(255,255,255,.15);color:#fff}
+  .cb-copy.ok{color:#a6e3a1;border-color:#a6e3a1}
+  .cb-body{padding:20px;overflow-x:auto}
+  .cb-body pre{font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.75;color:#cdd6f4;white-space:pre}
+  .tk{color:#89b4fa} .ta{color:#a6e3a1} .tv{color:#f9e2af} .tc{color:#6272a4;font-style:italic} .tp{color:#cba6f7}
+
+  /* 데모 공통 */
+  .demo-wrap{margin-top:28px;display:flex;flex-direction:column;gap:40px}
+  .demo-label{font-size:.82rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+
+  /* ── 아코디언 공통 기반 ── */
+  .acc-item{overflow:hidden}
+  .acc-btn{width:100%;display:flex;align-items:center;justify-content:space-between;border:none;background:none;font-family:'Noto Sans KR',sans-serif;cursor:pointer;text-align:left;gap:12px}
+  .acc-arrow{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;transition:transform .3s ease}
+  .acc-item.open .acc-arrow{transform:rotate(180deg)}
+  .acc-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .acc-item.open .acc-body{max-height:500px}
+
+  /* [1] 기본형 아코디언 */
+  .acc-basic{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden}
+  .acc-basic .acc-item{border-bottom:1px solid var(--gray-200)}
+  .acc-basic .acc-item:last-child{border-bottom:none}
+  .acc-basic .acc-btn{padding:16px 20px;font-size:.93rem;font-weight:600;color:var(--gray-900);transition:background .15s}
+  .acc-basic .acc-btn:hover{background:var(--gray-50)}
+  .acc-basic .acc-item.open .acc-btn{color:var(--accent);background:var(--accent-soft)}
+  .acc-basic .acc-arrow{width:24px;height:24px;border-radius:50%;background:var(--gray-100);color:var(--gray-500);font-size:.72rem}
+  .acc-basic .acc-item.open .acc-arrow{background:var(--accent-soft);color:var(--accent)}
+  .acc-basic .acc-body-inner{padding:0 20px 18px;font-size:.9rem;color:var(--gray-600);line-height:1.75}
+
+  /* [2] 보더형 아코디언 */
+  .acc-border{display:flex;flex-direction:column;gap:10px}
+  .acc-border .acc-item{border:2px solid var(--gray-200);border-radius:var(--radius-sm);background:#fff;transition:border-color .2s,box-shadow .2s}
+  .acc-border .acc-item.open{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .acc-border .acc-btn{padding:14px 18px;font-size:.92rem;font-weight:600;color:var(--gray-900);transition:color .2s}
+  .acc-border .acc-item.open .acc-btn{color:var(--accent)}
+  .acc-border .acc-arrow{width:28px;height:28px;border-radius:var(--radius-sm);background:var(--gray-100);color:var(--gray-500);font-size:.8rem;transition:background .2s,color .2s,transform .3s}
+  .acc-border .acc-item.open .acc-arrow{background:var(--accent);color:#fff}
+  .acc-border .acc-body-inner{padding:0 18px 16px;font-size:.9rem;color:var(--gray-600);line-height:1.75;border-top:1px solid var(--gray-100)}
+
+  /* [3] 다중 오픈형 */
+  .acc-multi{display:flex;flex-direction:column;gap:0}
+  .acc-multi .acc-item{background:#fff;border-left:3px solid transparent;border-bottom:1px solid var(--gray-200);transition:border-left-color .2s,background .2s}
+  .acc-multi .acc-item:first-child{border-radius:var(--radius) var(--radius) 0 0;border-top:1px solid var(--gray-200)}
+  .acc-multi .acc-item:last-child{border-radius:0 0 var(--radius) var(--radius);border-bottom:1px solid var(--gray-200)}
+  .acc-multi-outer{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+  .acc-multi .acc-item.open{border-left-color:var(--accent);background:var(--accent-soft)}
+  .acc-multi .acc-btn{padding:16px 20px;font-size:.92rem;font-weight:600;color:var(--gray-800);transition:color .2s}
+  .acc-multi .acc-item.open .acc-btn{color:var(--accent)}
+  .acc-multi .acc-arrow{font-size:.85rem;color:var(--gray-400);transition:transform .3s,color .2s}
+  .acc-multi .acc-item.open .acc-arrow{color:var(--accent)}
+  .acc-multi .acc-body-inner{padding:0 20px 16px;font-size:.9rem;color:var(--gray-600);line-height:1.75}
+
+  /* 배지 */
+  .multi-badge{display:inline-block;font-size:.7rem;font-weight:700;color:var(--green);background:var(--green-soft);border:1px solid #bbf7d0;border-radius:10px;padding:1px 8px;margin-left:8px;vertical-align:middle}
+
+  /* FAQ 섹션용 */
+  .faq-list{margin-top:28px}
+  .faq-item{border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;background:#fff;box-shadow:var(--shadow-sm)}
+  .faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:none;border:none;font-family:'Noto Sans KR',sans-serif;font-size:.93rem;font-weight:600;color:var(--gray-900);cursor:pointer;text-align:left;gap:12px;transition:background .15s}
+  .faq-q:hover{background:var(--gray-50)}
+  .faq-q-icon{width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;transition:transform .25s}
+  .faq-item.open .faq-q-icon{transform:rotate(45deg)}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease;font-size:.9rem;color:var(--gray-600);line-height:1.75;padding:0 20px}
+  .faq-item.open .faq-a{max-height:300px;padding:0 20px 18px}
+
+  .site-footer{background:var(--gray-900);color:var(--gray-400);padding:48px 24px 36px;text-align:center}
+  .footer-logo{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:1rem;color:#fff;margin-bottom:10px}
+  .footer-logo .logo-mark{background:var(--accent)}
+  .footer-desc{font-size:.85rem;line-height:1.7;margin-bottom:20px}
+  .footer-links{display:flex;justify-content:center;gap:20px;margin-bottom:20px;flex-wrap:wrap}
+  .footer-links a{font-size:.83rem;color:var(--gray-400);transition:color .15s;text-decoration:none}
+  .footer-links a:hover{color:#fff}
+  .footer-copy{font-size:.78rem;color:var(--gray-500)}
+
+  @media(max-width:600px){
+    .hero{padding:calc(var(--nav-h)+36px) 0 48px}
+    .section{padding:52px 0}
+    .card-grid{grid-template-columns:1fr}
+  }
+  </style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark">VT</div>
+    바이브툴킷
+  </a>
+  <ul class="nav-links">
+    <li><a href="#concept">① 개념</a></li>
+    <li><a href="#demo">② 데모</a></li>
+    <li><a href="#code">③ 코드</a></li>
+    <li><a href="#advanced">④ 응용</a></li>
+    <li><a href="#prompt">⑤ 프롬프트</a></li>
+    <li><a href="#faq">⑥ FAQ</a></li>
+  </ul>
+</nav>
+
+<!-- 히어로 -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">🪗 HTML UI 패턴</div>
+    <h1>아코디언 UI<br><em>(Accordion)</em></h1>
+    <p class="hero-desc">클릭하면 펼쳐지고 다시 클릭하면 접히는 아코디언. FAQ, 메뉴, 콘텐츠 접기에 필수적인 UI 패턴을 CSS transition과 JS로 부드럽게 만들어봐요.</p>
+    <div class="hero-meta">
+      <span>🪗 CSS Transition</span>
+      <span>⚡ JS 경량</span>
+      <span>🎨 3가지 스타일</span>
+      <span>📋 복사 가능한 코드</span>
+    </div>
+  </div>
+</section>
+
+<!-- ① 개념 -->
+<section class="section" id="concept">
+  <div class="container">
+    <div class="section-badge">① Concept</div>
+    <h2 class="section-title">아코디언이란?</h2>
+    <p class="section-lead">클릭 한 번으로 콘텐츠를 펼치고 접는 UI 컴포넌트예요. 좁은 공간에 많은 정보를 담을 수 있어요.</p>
+
+    <div class="callout co-blue">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <p><strong>핵심 트릭:</strong> <code>max-height: 0</code> → <code>max-height: 500px</code> 전환이에요. <code>height: auto</code>에는 transition이 안 되지만, <code>max-height</code>에는 돼요. 이 한 가지 CSS 트릭으로 부드러운 펼침/접힘을 구현할 수 있어요.</p>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">❓</div>
+        <h4>FAQ 섹션</h4>
+        <p>자주 묻는 질문을 아코디언으로 만들면 질문 목록을 한눈에 볼 수 있고, 원하는 답변만 펼쳐 볼 수 있어요. 고객 지원 페이지의 필수 패턴이에요.</p>
+      </div>
+      <div class="info-card ic-green">
+        <div class="info-card-icon">☰</div>
+        <h4>모바일 메뉴</h4>
+        <p>모바일에서 상단 카테고리를 아코디언으로 만들면 서브메뉴를 터치로 펼칠 수 있어요. 쇼핑몰 카테고리, 블로그 태그 목록에 자주 써요.</p>
+      </div>
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">⚙️</div>
+        <h4>설정 패널</h4>
+        <p>고급 설정, 필터 옵션 등을 아코디언으로 접어두면 기본 화면이 깔끔해져요. 사용자가 필요할 때만 펼쳐서 상세 설정을 볼 수 있어요.</p>
+      </div>
+      <div class="info-card ic-red">
+        <div class="info-card-icon">📖</div>
+        <h4>긴 콘텐츠 접기</h4>
+        <p>상품 설명, 약관, 긴 텍스트를 "더 보기" 버튼으로 접어두는 패턴도 아코디언의 변형이에요. 스크롤을 줄여 UX를 향상시켜요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ② 데모 -->
+<section class="section" id="demo">
+  <div class="container">
+    <div class="section-badge">② Demo</div>
+    <h2 class="section-title">3가지 스타일 직접 체험</h2>
+    <p class="section-lead">각 항목을 클릭해서 아코디언이 펼쳐지는 것을 확인해보세요. 기본형은 하나 열면 다른 것이 자동으로 닫혀요.</p>
+
+    <div class="demo-wrap">
+
+      <!-- [1] 기본형 아코디언 (단일 오픈) -->
+      <div>
+        <p class="demo-label">① 기본형 — FAQ 아코디언 (하나만 열림)</p>
+        <div class="acc-basic" id="acc1">
+
+          <div class="acc-item open">
+            <button class="acc-btn" onclick="toggleSingle(this,'acc1')">
+              바이브 코딩이 뭔가요?
+              <span class="acc-arrow">▼</span>
+            </button>
+            <div class="acc-body">
+              <div class="acc-body-inner">
+                바이브 코딩(Vibe Coding)은 AI에게 원하는 기능을 말로 설명하고, AI가 생성한 코드를 직접 붙여넣고 실행하면서 만들어가는 개발 방식이에요. 프로그래밍 언어를 깊이 몰라도 아이디어를 빠르게 구현할 수 있어요.
+              </div>
+            </div>
+          </div>
+
+          <div class="acc-item">
+            <button class="acc-btn" onclick="toggleSingle(this,'acc1')">
+              어떤 AI 도구를 쓰면 좋을까요?
+              <span class="acc-arrow">▼</span>
+            </button>
+            <div class="acc-body">
+              <div class="acc-body-inner">
+                Claude(Anthropic), ChatGPT(OpenAI), Cursor IDE, GitHub Copilot 등이 있어요. 바이브 코딩 초보자라면 Claude나 ChatGPT로 코드를 생성하고, Cursor로 실행해보는 조합을 추천해요. 바이브툴킷은 이런 도구들로 만든 예제 모음이에요.
+              </div>
+            </div>
+          </div>
+
+          <div class="acc-item">
+            <button class="acc-btn" onclick="toggleSingle(this,'acc1')">
+              HTML/CSS를 전혀 몰라도 웹사이트를 만들 수 있나요?
+              <span class="acc-arrow">▼</span>
+            </button>
+            <div class="acc-body">
+              <div class="acc-body-inner">
+                네, 가능해요! AI에게 원하는 결과를 한국어로 설명하면 완성된 HTML + CSS + JS 코드를 받을 수 있어요. 하지만 기본 개념을 조금 알면 AI에게 더 정확한 요청을 할 수 있어요. 바이브툴킷의 각 페이지가 그 개념을 쉽게 설명해드려요.
+              </div>
+            </div>
+          </div>
+
+          <div class="acc-item">
+            <button class="acc-btn" onclick="toggleSingle(this,'acc1')">
+              만든 사이트를 무료로 배포할 수 있나요?
+              <span class="acc-arrow">▼</span>
+            </button>
+            <div class="acc-body">
+              <div class="acc-body-inner">
+                네! GitHub Pages, Netlify, Vercel은 정적 웹사이트를 무료로 배포할 수 있어요. 파일을 업로드하거나 저장소를 연결하면 자동으로 https://내주소.netlify.app 같은 URL이 생성돼요. 커스텀 도메인도 저렴하게 연결할 수 있어요.
+              </div>
+            </div>
+          </div>
+
+          <div class="acc-item">
+            <button class="acc-btn" onclick="toggleSingle(this,'acc1')">
+              아코디언과 탭 UI는 어떻게 다른가요?
+              <span class="acc-arrow">▼</span>
+            </button>
+            <div class="acc-body">
+              <div class="acc-body-inner">
+                탭은 같은 위치에서 내용이 바뀌고, 아코디언은 항목이 위아래로 펼쳐져요. 탭은 선택지가 3~5개일 때, 아코디언은 항목이 많거나 모바일에서 세로 스크롤이 자연스러울 때 유리해요. FAQ처럼 질문이 많을 때는 아코디언이 더 적합해요.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- [2] 보더형 아코디언 -->
+      <div>
+        <p class="demo-label">② 보더형 — 테두리 강조 스타일</p>
+        <div class="acc-border" id="acc2">
+
+          <div class="acc-item">
+            <button class="acc-btn" onclick="toggleSingle(this,'acc2')">
+              🎨 CSS Variables 활용법
+              <span class="acc-arrow">▼</span>
+            </button>
+            <div class="acc-body">
+              <div class="acc-body-inner">
+                <code>:root { --accent: #4f46e5; }</code>처럼 전역 변수를 선언하고, <code>color: var(--accent)</code>로 사용해요. 색상을 한 곳에서 바꾸면 전체 사이트에 반영돼요. 다크모드 구현에도 핵심적인 패턴이에요.
+              </div>
+            </div>
+          </div>
+
+          <div class="acc-item open">
+            <button class="acc-btn" onclick="toggleSingle(this,'acc2')">
+              ⚡ Fetch API로 데이터 불러오기
+              <span class="acc-arrow">▼</span>
+            </button>
+            <div class="acc-body">
+              <div class="acc-body-inner">
+                <code>const res = await fetch(url);</code>로 API 데이터를 비동기로 가져올 수 있어요. 날씨 앱, 환율 계산기 같은 실시간 데이터를 받아오는 기능에 꼭 필요해요. async/await 패턴과 함께 사용해요.
+              </div>
+            </div>
+          </div>
+
+          <div class="acc-item">
+            <button class="acc-btn" onclick="toggleSingle(this,'acc2')">
+              📱 반응형 디자인 핵심
+              <span class="acc-arrow">▼</span>
+            </button>
+            <div class="acc-body">
+              <div class="acc-body-inner">
+                <code>@media (max-width: 600px) { ... }</code>로 화면 크기별 스타일을 지정해요. Flexbox와 Grid의 <code>auto-fill</code>, <code>minmax()</code>를 활용하면 미디어쿼리 없이도 반응형이 되는 경우가 많아요.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- [3] 다중 오픈형 -->
+      <div>
+        <p class="demo-label">③ 다중 오픈형 — 여러 개 동시에 열기<span class="multi-badge">동시 열림</span></p>
+        <div class="acc-multi-outer">
+          <div class="acc-multi" id="acc3">
+
+            <div class="acc-item">
+              <button class="acc-btn" onclick="toggleMulti(this)">
+                🏠 홈페이지 섹션 구조
+                <span class="acc-arrow">▼</span>
+              </button>
+              <div class="acc-body">
+                <div class="acc-body-inner">
+                  Hero → 기능 소개 → 사용 방법 → 후기 → CTA → 푸터. 이 순서가 랜딩페이지의 기본 공식이에요. 각 섹션은 하나의 메시지만 전달하도록 집중하면 돼요.
+                </div>
+              </div>
+            </div>
+
+            <div class="acc-item open">
+              <button class="acc-btn" onclick="toggleMulti(this)">
+                🔍 SEO 기초 — 메타 태그
+                <span class="acc-arrow">▼</span>
+              </button>
+              <div class="acc-body">
+                <div class="acc-body-inner">
+                  <code>&lt;title&gt;</code>과 <code>&lt;meta name="description"&gt;</code>은 검색 결과 화면에 표시돼요. title은 60자, description은 160자 이내로 핵심 키워드를 포함해 작성하세요. <code>&lt;link rel="canonical"&gt;</code>로 중복 URL 문제도 잡아요.
+                </div>
+              </div>
+            </div>
+
+            <div class="acc-item open">
+              <button class="acc-btn" onclick="toggleMulti(this)">
+                🌙 다크모드 구현하기
+                <span class="acc-arrow">▼</span>
+              </button>
+              <div class="acc-body">
+                <div class="acc-body-inner">
+                  CSS 변수로 색상을 관리하면 <code>[data-theme="dark"]</code> 속성 하나로 전체 색상을 바꿀 수 있어요. <code>localStorage</code>에 설정을 저장해 새로고침해도 유지되게 해요. 바이브툴킷 다크모드 페이지에서 전체 코드를 볼 수 있어요.
+                </div>
+              </div>
+            </div>
+
+            <div class="acc-item">
+              <button class="acc-btn" onclick="toggleMulti(this)">
+                📋 클립보드 복사 버튼
+                <span class="acc-arrow">▼</span>
+              </button>
+              <div class="acc-body">
+                <div class="acc-body-inner">
+                  <code>await navigator.clipboard.writeText(text)</code> 세 줄이면 구현 완료예요. 복사 완료 시 버튼 색상을 초록으로 바꿔 피드백을 주고, 2초 후 원래대로 돌아오게 하면 좋은 UX가 완성돼요.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ③ 코드 -->
+<section class="section" id="code">
+  <div class="container">
+    <div class="section-badge">③ Code</div>
+    <h2 class="section-title">HTML + CSS + JS 전체 코드</h2>
+    <p class="section-lead">복사해서 바로 쓸 수 있는 완전한 아코디언 코드예요.</p>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin-bottom:4px">1 — HTML 구조</h3>
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots"><div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div></div>
+        <span class="cb-file">index.html</span>
+        <button class="cb-copy" onclick="copyBlock(this,'c1')">copy</button>
+      </div>
+      <div class="cb-body"><pre id="c1"><span class="tk">&lt;div</span> <span class="ta">class</span>=<span class="tv">"accordion"</span> <span class="ta">id</span>=<span class="tv">"myAccordion"</span><span class="tk">&gt;</span>
+
+  <span class="tk">&lt;div</span> <span class="ta">class</span>=<span class="tv">"acc-item"</span><span class="tk">&gt;</span>
+    <span class="tk">&lt;button</span> <span class="ta">class</span>=<span class="tv">"acc-btn"</span>
+            <span class="ta">onclick</span>=<span class="tv">"toggleSingle(this,'myAccordion')"</span><span class="tk">&gt;</span>
+      첫 번째 질문이에요
+      <span class="tk">&lt;span</span> <span class="ta">class</span>=<span class="tv">"acc-arrow"</span><span class="tk">&gt;</span>▼<span class="tk">&lt;/span&gt;</span>
+    <span class="tk">&lt;/button&gt;</span>
+    <span class="tk">&lt;div</span> <span class="ta">class</span>=<span class="tv">"acc-body"</span><span class="tk">&gt;</span>
+      <span class="tk">&lt;div</span> <span class="ta">class</span>=<span class="tv">"acc-body-inner"</span><span class="tk">&gt;</span>
+        첫 번째 답변 내용을 여기에 써요.
+      <span class="tk">&lt;/div&gt;</span>
+    <span class="tk">&lt;/div&gt;</span>
+  <span class="tk">&lt;/div&gt;</span>
+
+  <span class="tk">&lt;div</span> <span class="ta">class</span>=<span class="tv">"acc-item"</span><span class="tk">&gt;</span>
+    <span class="tk">&lt;button</span> <span class="ta">class</span>=<span class="tv">"acc-btn"</span>
+            <span class="ta">onclick</span>=<span class="tv">"toggleSingle(this,'myAccordion')"</span><span class="tk">&gt;</span>
+      두 번째 질문이에요
+      <span class="tk">&lt;span</span> <span class="ta">class</span>=<span class="tv">"acc-arrow"</span><span class="tk">&gt;</span>▼<span class="tk">&lt;/span&gt;</span>
+    <span class="tk">&lt;/button&gt;</span>
+    <span class="tk">&lt;div</span> <span class="ta">class</span>=<span class="tv">"acc-body"</span><span class="tk">&gt;</span>
+      <span class="tk">&lt;div</span> <span class="ta">class</span>=<span class="tv">"acc-body-inner"</span><span class="tk">&gt;</span>
+        두 번째 답변 내용을 여기에 써요.
+      <span class="tk">&lt;/div&gt;</span>
+    <span class="tk">&lt;/div&gt;</span>
+  <span class="tk">&lt;/div&gt;</span>
+
+<span class="tk">&lt;/div&gt;</span></pre></div>
+    </div>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin:40px 0 4px">2 — CSS (max-height transition 트릭)</h3>
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots"><div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div></div>
+        <span class="cb-file">style.css</span>
+        <button class="cb-copy" onclick="copyBlock(this,'c2')">copy</button>
+      </div>
+      <div class="cb-body"><pre id="c2"><span class="tc">/* 핵심: max-height 전환으로 슬라이드 효과 구현 */</span>
+<span class="ta">.acc-body</span> {
+  <span class="tp">max-height</span>: <span class="tv">0</span>;
+  <span class="tp">overflow</span>: <span class="tv">hidden</span>;
+  <span class="tp">transition</span>: <span class="tv">max-height .35s ease</span>;
+}
+<span class="ta">.acc-item.open .acc-body</span> {
+  <span class="tp">max-height</span>: <span class="tv">500px</span>; <span class="tc">/* 콘텐츠보다 크면 됨 */</span>
+}
+
+<span class="tc">/* 화살표 회전 애니메이션 */</span>
+<span class="ta">.acc-arrow</span> {
+  <span class="tp">display</span>: <span class="tv">inline-flex</span>;
+  <span class="tp">transition</span>: <span class="tv">transform .3s ease</span>;
+}
+<span class="ta">.acc-item.open .acc-arrow</span> {
+  <span class="tp">transform</span>: <span class="tv">rotate(180deg)</span>;
+}
+
+<span class="tc">/* 아코디언 버튼 기본 스타일 */</span>
+<span class="ta">.acc-btn</span> {
+  <span class="tp">width</span>: <span class="tv">100%</span>;
+  <span class="tp">display</span>: <span class="tv">flex</span>;
+  <span class="tp">align-items</span>: <span class="tv">center</span>;
+  <span class="tp">justify-content</span>: <span class="tv">space-between</span>;
+  <span class="tp">padding</span>: <span class="tv">16px 20px</span>;
+  <span class="tp">background</span>: <span class="tv">none</span>;
+  <span class="tp">border</span>: <span class="tv">none</span>;
+  <span class="tp">font-family</span>: <span class="tv">inherit</span>;
+  <span class="tp">font-size</span>: <span class="tv">.93rem</span>;
+  <span class="tp">font-weight</span>: <span class="tv">600</span>;
+  <span class="tp">color</span>: <span class="tv">#111827</span>;
+  <span class="tp">cursor</span>: <span class="tv">pointer</span>;
+  <span class="tp">text-align</span>: <span class="tv">left</span>;
+  <span class="tp">gap</span>: <span class="tv">12px</span>;
+  <span class="tp">transition</span>: <span class="tv">background .15s, color .2s</span>;
+}
+<span class="ta">.acc-btn:hover</span> { <span class="tp">background</span>: <span class="tv">#f9fafb</span>; }
+<span class="ta">.acc-item.open .acc-btn</span> { <span class="tp">color</span>: <span class="tv">#4f46e5</span>; }</pre></div>
+    </div>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin:40px 0 4px">3 — JavaScript (단일 / 다중 오픈)</h3>
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots"><div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div></div>
+        <span class="cb-file">script.js</span>
+        <button class="cb-copy" onclick="copyBlock(this,'c3')">copy</button>
+      </div>
+      <div class="cb-body"><pre id="c3"><span class="tc">// ① 단일 오픈 (하나 열면 다른 것 자동으로 닫힘)</span>
+<span class="tp">function</span> toggleSingle(btn, containerId) {
+  <span class="tp">const</span> container = document.getElementById(containerId);
+  <span class="tp">const</span> item      = btn.closest(<span class="tv">'.acc-item'</span>);
+  <span class="tp">const</span> isOpen    = item.classList.contains(<span class="tv">'open'</span>);
+
+  <span class="tc">// 모든 항목 닫기</span>
+  container.querySelectorAll(<span class="tv">'.acc-item'</span>).forEach(<span class="tp">function</span>(el) {
+    el.classList.remove(<span class="tv">'open'</span>);
+  });
+
+  <span class="tc">// 클릭한 항목이 닫혀있었으면 열기</span>
+  <span class="tp">if</span> (!isOpen) {
+    item.classList.add(<span class="tv">'open'</span>);
+  }
+}
+
+<span class="tc">// ② 다중 오픈 (각자 독립적으로 열고 닫힘)</span>
+<span class="tp">function</span> toggleMulti(btn) {
+  btn.closest(<span class="tv">'.acc-item'</span>).classList.toggle(<span class="tv">'open'</span>);
+}
+
+<span class="tc">// ③ 전체 닫기 버튼 (선택사항)</span>
+<span class="tp">function</span> closeAll(containerId) {
+  document.getElementById(containerId)
+    .querySelectorAll(<span class="tv">'.acc-item'</span>)
+    .forEach(<span class="tp">function</span>(el) { el.classList.remove(<span class="tv">'open'</span>); });
+}</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ④ 응용 -->
+<section class="section" id="advanced">
+  <div class="container">
+    <div class="section-badge">④ Advanced</div>
+    <h2 class="section-title">응용 & 심화 패턴</h2>
+    <p class="section-lead">기본 아코디언을 더 정교하게 만드는 팁이에요.</p>
+
+    <div class="callout co-amber">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-body">
+        <p><strong>max-height 값 설정 주의:</strong> <code>max-height: 500px</code>로 설정했는데 콘텐츠가 500px를 넘으면 잘려요. 콘텐츠 최대 높이보다 여유 있게 설정하거나, 동적으로 <code>scrollHeight</code>를 읽어서 설정하는 방법을 쓰면 돼요.</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:1.05rem;font-weight:700;color:var(--gray-900);margin:32px 0 4px">scrollHeight로 정확한 높이 계산</h3>
+    <p style="font-size:.9rem;color:var(--gray-500);margin:4px 0 0">콘텐츠 높이가 가변적일 때 <code>scrollHeight</code>를 동적으로 읽어 설정하면 어떤 내용도 안전하게 펼쳐져요.</p>
+    <div class="code-block">
+      <div class="cb-header">
+        <div class="cb-dots"><div class="cb-dot cb-dot-r"></div><div class="cb-dot cb-dot-y"></div><div class="cb-dot cb-dot-g"></div></div>
+        <span class="cb-file">advanced.js</span>
+        <button class="cb-copy" onclick="copyBlock(this,'c4')">copy</button>
+      </div>
+      <div class="cb-body"><pre id="c4"><span class="tp">function</span> toggleAccurate(btn) {
+  <span class="tp">const</span> item = btn.closest(<span class="tv">'.acc-item'</span>);
+  <span class="tp">const</span> body = item.querySelector(<span class="tv">'.acc-body'</span>);
+
+  <span class="tp">if</span> (item.classList.contains(<span class="tv">'open'</span>)) {
+    <span class="tc">// 닫기: 현재 높이 → 0</span>
+    body.style.maxHeight = body.scrollHeight + <span class="tv">'px'</span>;
+    <span class="tc">// 다음 프레임에서 0으로 설정해야 transition이 동작</span>
+    requestAnimationFrame(() => {
+      body.style.maxHeight = <span class="tv">'0'</span>;
+    });
+    item.classList.remove(<span class="tv">'open'</span>);
+  } <span class="tp">else</span> {
+    <span class="tc">// 열기: 0 → scrollHeight</span>
+    item.classList.add(<span class="tv">'open'</span>);
+    body.style.maxHeight = body.scrollHeight + <span class="tv">'px'</span>;
+
+    <span class="tc">// transition 끝나면 auto로 (내용 늘어나도 대응)</span>
+    body.addEventListener(<span class="tv">'transitionend'</span>, () => {
+      body.style.maxHeight = <span class="tv">'none'</span>;
+    }, { once: <span class="tp">true</span> });
+  }
+}</pre></div>
+    </div>
+
+    <div class="card-grid" style="margin-top:32px">
+      <div class="info-card ic-accent">
+        <div class="info-card-icon">🔄</div>
+        <h4>아이콘 회전</h4>
+        <p><code>transform: rotate(180deg)</code>과 <code>transition</code>으로 ▼가 부드럽게 ▲로 회전해요. 단순한 텍스트 ▼ 대신 SVG 아이콘을 쓰면 더 세련돼요.</p>
+      </div>
+      <div class="info-card ic-green">
+        <div class="info-card-icon">🪆</div>
+        <h4>중첩 아코디언</h4>
+        <p>아코디언 안에 아코디언을 넣을 수 있어요. 단, max-height가 중첩되면 계산이 복잡해져요. 중첩이 깊어지면 <code>scrollHeight</code> 방식으로 전환하는 것을 추천해요.</p>
+      </div>
+      <div class="info-card ic-amber">
+        <div class="info-card-icon">♿</div>
+        <h4>접근성 추가</h4>
+        <p>버튼에 <code>aria-expanded="false/true"</code>, 패널에 <code>aria-hidden="true/false"</code>를 추가해요. 스크린 리더가 "닫혀있음/열려있음"을 읽어줘서 장애인 사용자도 쓸 수 있어요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤ 프롬프트 -->
+<section class="section" id="prompt">
+  <div class="container">
+    <div class="section-badge">⑤ Prompt Tip</div>
+    <h2 class="section-title">AI 프롬프트 팁</h2>
+    <p class="section-lead">아코디언 UI를 AI에게 요청할 때 이 프롬프트를 참고해보세요.</p>
+    <div class="vibe-tip">
+      <div class="vibe-tip-label">✦ 바이브코더 프롬프트</div>
+      <p>아래 프롬프트를 복사해서 AI에 붙여넣어 보세요.</p>
+      <div class="prompt-box">
+        <pre>내 웹사이트 하단에 FAQ 아코디언을 만들어줘.
+
+질문/답변 목록:
+1. 배송은 얼마나 걸리나요? / 평균 2~3 영업일이 소요돼요.
+2. 교환/환불은 어떻게 하나요? / 수령 후 7일 이내 문의주세요.
+3. 재고가 없으면 어떻게 되나요? / 입고 알림을 신청할 수 있어요.
+4. 해외 배송도 되나요? / 현재 국내 배송만 운영 중이에요.
+
+요구사항:
+- 클릭하면 max-height 트랜지션으로 부드럽게 펼쳐짐
+- 하나 열면 다른 것은 자동으로 닫힘 (단일 오픈)
+- 화살표(▼)가 열릴 때 180도 회전
+- 열린 항목 헤더 색상: 인디고 (#4f46e5)
+- 모바일에서도 자연스럽게 동작
+- 순수 HTML + CSS + Vanilla JS (라이브러리 없이)</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑥ FAQ -->
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-badge">⑥ FAQ</div>
+    <h2 class="section-title">자주 묻는 질문</h2>
+    <p class="section-lead">아코디언 구현 시 자주 맞닥뜨리는 질문들이에요.</p>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <code>height: auto</code>에는 왜 transition이 안 되나요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          CSS transition은 수치 사이를 보간(interpolate)해서 애니메이션을 만들어요. <code>auto</code>는 고정 수치가 아닌 브라우저가 계산하는 값이라 보간이 불가능해요. 그래서 <code>max-height: 0 → 500px</code>처럼 구체적인 수치 사이에서는 transition이 잘 동작해요. CSS Grid의 <code>grid-template-rows: 0fr → 1fr</code> 트릭도 비슷한 문제를 해결하는 현대적 방법이에요.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          아코디언 항목을 JavaScript 없이 CSS만으로 만들 수 있나요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          네! HTML의 <code>&lt;details&gt;</code>와 <code>&lt;summary&gt;</code> 태그를 사용하면 JavaScript 없이 기본 아코디언을 만들 수 있어요. <code>&lt;details open&gt;</code>으로 기본 열림 설정도 돼요. 단, 브라우저 기본 스타일이 제한적이고 애니메이션이 없어요. CSS <code>animation</code>을 <code>details[open]</code>에 적용하면 어느 정도 개선할 수 있어요.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          React에서 아코디언을 구현하려면요?
+          <div class="faq-q-icon">+</div>
+        </button>
+        <div class="faq-a">
+          <code>useState</code>로 열린 항목의 인덱스를 관리해요. 단일 오픈은 <code>const [openIdx, setOpenIdx] = useState(null)</code>, 다중 오픈은 <code>const [openSet, setOpenSet] = useState(new Set())</code>를 사용해요. Radix UI의 <code>Accordion</code> 컴포넌트를 쓰면 접근성까지 포함된 완성된 컴포넌트를 바로 사용할 수 있어요.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-logo"><div class="logo-mark">VT</div>바이브툴킷</div>
+  <p class="footer-desc">바이브 코딩으로 웹사이트를 만드는 초보 개발자를 위한 도구 모음</p>
+  <div class="footer-links">
+    <a href="index.html">홈</a><a href="about.html">소개</a>
+    <a href="contact.html">문의</a><a href="sitemap.html">사이트맵</a>
+  </div>
+  <div class="footer-copy">© 2026 바이브툴킷. 콘텐츠는 자유롭게 참고하세요.</div>
+</footer>
+
+<script>
+/* 단일 오픈 아코디언 */
+function toggleSingle(btn, containerId) {
+  var container = document.getElementById(containerId);
+  var item = btn.closest('.acc-item');
+  var isOpen = item.classList.contains('open');
+  container.querySelectorAll('.acc-item').forEach(function(el) {
+    el.classList.remove('open');
+  });
+  if (!isOpen) item.classList.add('open');
+}
+
+/* 다중 오픈 아코디언 */
+function toggleMulti(btn) {
+  btn.closest('.acc-item').classList.toggle('open');
+}
+
+/* FAQ 토글 */
+function toggleFaq(btn) { btn.closest('.faq-item').classList.toggle('open'); }
+
+/* 코드 블록 복사 */
+function copyBlock(btn, id) {
+  var pre = document.getElementById(id);
+  var text = pre.innerText;
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = 'copied!'; btn.classList.add('ok');
+      setTimeout(function() { btn.textContent = 'copy'; btn.classList.remove('ok'); }, 2000);
+    });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:-9999px';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    btn.textContent = 'copied!'; btn.classList.add('ok');
+    setTimeout(function() { btn.textContent = 'copy'; btn.classList.remove('ok'); }, 2000);
+  }
+}
+
+/* 네비 활성화 */
+(function() {
+  var sections = document.querySelectorAll('.section[id]');
+  var links = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', function() {
+    var pos = window.scrollY + 80;
+    sections.forEach(function(s) {
+      if (s.offsetTop <= pos && s.offsetTop + s.offsetHeight > pos) {
+        links.forEach(function(l) { l.classList.remove('active'); });
+        var link = document.querySelector('.nav-links a[href="#' + s.id + '"]');
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { passive: true });
+})();
+
+/* iframe 감지 */
+(function() {
+  if (self === top) return;
+  var nav = document.querySelector('.site-nav'); if (nav) nav.style.display = 'none';
+  var hero = document.querySelector('.hero'); if (hero) hero.style.paddingTop = '40px';
+  document.querySelectorAll('a[href$=".html"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      if (window.parent && window.parent.loadTool) { e.preventDefault(); window.parent.loadTool(this.getAttribute('href')); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
