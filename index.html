@@ -22,6 +22,15 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6RZV7FZZBM"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-6RZV7FZZBM');
+  </script>
+
   <style>
   /* ══════════════════════════════════════
      CSS 변수 & 리셋
@@ -734,6 +743,15 @@ function loadTool(url) {
 
   /* iframe에 URL 로드 */
   frame.src = url;
+
+  /* GA4 가상 페이지뷰 — iframe 전환 시마다 기록 */
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'page_view', {
+      page_title: url.replace('.html', ''),
+      page_location: 'https://aun-jy.github.io/vibe-toolkit/' + url,
+      page_path: '/vibe-toolkit/' + url
+    });
+  }
 
   /* 사이드바 활성 표시 갱신 */
   updateSidebarActive(url);
